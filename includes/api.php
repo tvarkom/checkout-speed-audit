@@ -42,6 +42,77 @@ function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
 }
 
 /**
+ * The store's plan and usage from GET /v1/client, cached for 5 minutes.
+ *
+ * @param string $api_key Key to ask about (default: the stored one).
+ * @param bool   $fresh   Skip the cache.
+ * @return array|string Status array, or an error code ("invalid_key", "network", …).
+ */
+function tvarkom_csa_status( $api_key = '', $fresh = false ) {
+	$stored = '' === $api_key;
+	if ( $stored ) {
+		$api_key = tvarkom_csa_settings()['api_key'];
+		if ( '' === $api_key ) {
+			return 'not_registered';
+		}
+		$cached = get_transient( TVARKOM_CSA_STATUS );
+		if ( ! $fresh && is_array( $cached ) ) {
+			return $cached;
+		}
+	}
+	$response = wp_remote_get(
+		TVARKOM_CSA_API_URL . '/v1/client',
+		array(
+			'timeout' => 15,
+			'headers' => array( 'Authorization' => 'Bearer ' . $api_key ),
+		)
+	);
+	if ( is_wp_error( $response ) ) {
+		return 'network';
+	}
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+	if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || ! is_array( $body ) ) {
+		return isset( $body['error'] ) && is_string( $body['error'] ) ? sanitize_key( $body['error'] ) : 'server';
+	}
+	if ( $stored ) {
+		set_transient( TVARKOM_CSA_STATUS, $body, 5 * MINUTE_IN_SECONDS );
+	}
+	return $body;
+}
+
+/**
+ * Checks a pasted license key with the gateway and, if it belongs to this store, stores it.
+ *
+ * @param string $key License key.
+ * @return string "license_saved", or an error code.
+ */
+function tvarkom_csa_save_license( $key ) {
+	if ( ! preg_match( '/^tvk_[A-Za-z0-9_-]{20,}$/', $key ) ) {
+		return 'license_invalid';
+	}
+	$status = tvarkom_csa_status( $key );
+	if ( 'invalid_key' === $status ) {
+		return 'license_invalid';
+	}
+	if ( ! is_array( $status ) ) {
+		return $status;
+	}
+	$host = wp_parse_url( home_url(), PHP_URL_HOST );
+	$own  = wp_parse_url( (string) $status['origin'], PHP_URL_HOST );
+	if ( ! is_string( $host ) || ! is_string( $own ) || preg_replace( '/^www\./', '', strtolower( $host ) ) !== preg_replace( '/^www\./', '', strtolower( $own ) ) ) {
+		return 'license_other_store';
+	}
+	tvarkom_csa_update_settings(
+		array(
+			'api_key' => $key,
+			'plan'    => sanitize_key( (string) $status['plan'] ),
+		)
+	);
+	set_transient( TVARKOM_CSA_STATUS, $status, 5 * MINUTE_IN_SECONDS );
+	return 'license_saved';
+}
+
+/**
  * Error code from a gateway response, or $fallback.
  *
  * @param array  $response Response from tvarkom_csa_post().
@@ -92,6 +163,7 @@ function tvarkom_csa_register( $email ) {
 			'plan'    => isset( $verify['body']['plan'] ) ? sanitize_key( $verify['body']['plan'] ) : 'free',
 		)
 	);
+	delete_transient( TVARKOM_CSA_STATUS );
 	return '';
 }
 
@@ -115,13 +187,18 @@ function tvarkom_csa_run_audit() {
 	);
 	if ( $settings['consent'] ) {
 		$body['metrics'] = tvarkom_csa_collect_metrics();
+		// Pro: one detailed audit per 30 days. Only collect the detailed data when it will be used.
+		$status = tvarkom_csa_status( '', true );
+		if ( is_array( $status ) && ! empty( $status['detailed_available'] ) ) {
+			$body['detailed'] = tvarkom_csa_collect_detailed();
+		}
 	}
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
 	if ( is_wp_error( $response ) ) {
 		$code = 'network';
 	} elseif ( 202 === $response['status'] ) {
-		$code = 'queued';
+		$code = empty( $response['body']['detailed'] ) ? 'queued' : 'queued_detailed';
 	} else {
 		$code = tvarkom_csa_error_code( $response );
 	}
@@ -132,4 +209,5 @@ function tvarkom_csa_run_audit() {
 		$changes['api_key'] = '';
 	}
 	tvarkom_csa_update_settings( $changes );
+	delete_transient( TVARKOM_CSA_STATUS ); // usage changed
 }

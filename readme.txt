@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,8 @@ Adds a **WooCommerce → Speed Audit** page. Click **Run free audit** and Tvarko
 
 The free plan includes 4 audits per 30 days. Reports go to the site's admin email by default; you can change the address.
 
+**Pro** (paid, one year) adds a detailed audit every 30 days: the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Buy it from the plugin page; the license key is emailed to you, and you paste it under **License key**. When the license ends, the store goes back to the free plan.
+
 The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store.
 
 == External services ==
@@ -36,6 +38,12 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Number of active plugins, object cache type
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
+
+**Pro detailed audits** (once every 30 days, only with the box ticked) also send: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments).
+
+**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage when you open its page (cached for 5 minutes).
+
+**Buying Pro**: **Get Pro license** opens Stripe's checkout (`buy.stripe.com`) with a reference to your store. Payment is handled by Stripe; Tvarkom receives your email, the amount and the store reference, and emails you the license key.
 
 No customer data, order contents or revenue figures are ever sent. The report is emailed to you, with a copy to hello@tvarkom.com.
 
@@ -66,6 +74,10 @@ The free plan allows 4 audits per 30 days, and one audit per store and email add
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.3.0 =
+* Pro license: paste the key from your email; detailed audit every 30 days with autoloaded options, leftover tables, PHP settings, failed and late background tasks.
+* Plan, license expiry and usage on the plugin page.
 
 = 0.2.0 =
 * Free API key per store, with a domain check.

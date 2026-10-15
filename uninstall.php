@@ -12,6 +12,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 delete_option( 'tvarkom_csa' );
 delete_transient( 'tvarkom_csa_verify_token' );
+delete_transient( 'tvarkom_csa_status' );
 if ( function_exists( 'as_unschedule_all_actions' ) ) {
 	as_unschedule_all_actions( 'tvarkom_csa_run_audit' );
 }
