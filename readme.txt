@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,9 +21,9 @@ Adds a **WooCommerce → Speed Audit** page. Click **Run free audit** and Tvarko
 
 The free plan includes 4 audits per 30 days. Reports go to the site's admin email by default; you can change the address.
 
-**Pro** (a yearly subscription) gives one detailed audit every 30 days, which adds the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Buy it from the plugin page; the license key is emailed to you, and you paste it under **License key**. Each yearly renewal extends the license with the same key; if you cancel, the store goes back to the free plan when the paid year ends.
+**Pro** (a yearly subscription) gives one detailed audit every 30 days, which adds a checkout profile (the server time each plugin, the theme and WordPress take on your checkout page, the slowest database queries and hooks, calls to outside services and object cache hits), the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Buy it from the plugin page; the license key is emailed to you, and you paste it under **License key**. Each yearly renewal extends the license with the same key; if you cancel, the store goes back to the free plan when the paid year ends.
 
-The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store.
+The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Pro checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered.
 
 == External services ==
 
@@ -39,7 +39,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
 
-**Pro detailed audits** (once every 30 days, only with the box ticked) also send: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments).
+**Pro detailed audits** (once every 30 days, only with the box ticked) also send: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. Analytics or marketing plugins that record checkout visits on the server may count the profile's page load as one visit.
 
 **Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage when you open its page (cached for 5 minutes).
 
@@ -74,6 +74,9 @@ The free plan allows 4 audits per 30 days; Pro allows one detailed audit per 30 
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.4.0 =
+* Pro checkout profile: server time on the checkout page by plugin, theme and WordPress, slowest hooks and database queries, outside service calls and object cache hits.
 
 = 0.3.0 =
 * Pro license: paste the key from your email; detailed audit every 30 days with autoloaded options, leftover tables, PHP settings, failed and late background tasks.

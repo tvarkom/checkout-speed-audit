@@ -15,17 +15,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Collects the detailed diagnostics.
  *
+ * @param bool $with_profile Also profile one checkout page load (includes/profile.php). The preview skips it.
  * @return array<string, mixed>
  */
-function tvarkom_csa_collect_detailed() {
-	return array(
-		'schema'                     => 1,
+function tvarkom_csa_collect_detailed( $with_profile = true ) {
+	$detailed = array(
+		'schema'                     => 2,
 		'top_autoloaded_keys'        => tvarkom_csa_top_autoloaded_keys(),
 		'orphaned_tables'            => tvarkom_csa_orphaned_tables(),
 		'php_configuration'          => tvarkom_csa_php_configuration(),
 		'failed_task_breakdown'      => tvarkom_csa_failed_tasks(),
 		'cron_queue_stalled_actions' => tvarkom_csa_stalled_actions(),
 	);
+	if ( $with_profile ) {
+		$detailed['checkout_profile'] = tvarkom_csa_profile_checkout();
+	}
+	return $detailed;
 }
 
 /**

@@ -117,7 +117,7 @@ function tvarkom_csa_render_plan( $status ) {
 			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
 			esc_url( $status['upgrade_url'] ),
 			esc_html( $label ),
-			esc_html__( 'Pro: one detailed audit every 30 days, adding the largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks. Your key is emailed after payment.', 'checkout-speed-audit' )
+			esc_html__( 'Pro: one detailed audit every 30 days, adding a checkout profile (which plugins, database queries and outside services take the server\'s time on your checkout page), the largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks. Your key is emailed after payment.', 'checkout-speed-audit' )
 		);
 	}
 }
@@ -191,6 +191,7 @@ function tvarkom_csa_render_page() {
 						<p class="description">
 							<?php esc_html_e( 'Sends counts and settings only: PHP, WordPress and WooCommerce versions, database and options table sizes, autoloaded options size, number of active plugins, object cache type, background task and cron counts, and your monthly order volume as a range (e.g. 50–200). Never customer data, order details or revenue.', 'checkout-speed-audit' ); ?>
 							<?php esc_html_e( 'On a Pro detailed audit it also sends the names and sizes of the 20 largest autoloaded options (not their contents), the names and sizes of database tables no active plugin seems to use, PHP memory, time-limit and OPcache settings, failed background tasks by name with their last error (emails, links, IP addresses and long numbers removed) and the names of late scheduled tasks.', 'checkout-speed-audit' ); ?>
+							<?php esc_html_e( 'For the checkout profile, the plugin loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. It sends plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts. Analytics or marketing plugins that track checkout visits on the server may count this load as one visit.', 'checkout-speed-audit' ); ?>
 							<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=tvarkom-csa&csa_preview=1' ), 'tvarkom_csa_preview' ) ); ?>"><?php esc_html_e( 'Preview data', 'checkout-speed-audit' ); ?></a>
 						</p>
 					</td>
@@ -208,7 +209,8 @@ function tvarkom_csa_render_page() {
 			<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_metrics(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
 			<?php if ( is_array( $status ) && 'pro' === $status['plan'] ) : ?>
 				<h2><?php esc_html_e( 'Added on your next detailed Pro audit', 'checkout-speed-audit' ); ?></h2>
-				<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_detailed(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
+				<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_detailed( false ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
+				<p class="description"><?php esc_html_e( 'The checkout profile is measured when the audit runs, so it isn\'t shown here.', 'checkout-speed-audit' ); ?></p>
 			<?php endif; ?>
 		<?php endif; ?>
 	</div>
