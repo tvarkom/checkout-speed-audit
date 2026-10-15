@@ -49,7 +49,7 @@ function tvarkom_csa_messages() {
 		'key_expired'            => array( 'error', __( 'Your API key has expired. Email hello@tvarkom.com to renew it.', 'checkout-speed-audit' ) ),
 		'client_disabled'        => array( 'error', __( 'Audits are paused for this store. Email hello@tvarkom.com.', 'checkout-speed-audit' ) ),
 		'website_not_allowed'    => array( 'error', __( 'This store\'s address changed since it was registered. Click Run free audit to register it again.', 'checkout-speed-audit' ) ),
-		'limit_reached'          => array( 'error', __( 'You\'ve used the free plan\'s 4 audits for the last 30 days. Try again later.', 'checkout-speed-audit' ) ),
+		'limit_reached'          => array( 'error', __( 'You\'ve used the audits your plan allows for the last 30 days: 4 on the free plan, 1 detailed audit on Pro. The plan line below shows when the next one is available.', 'checkout-speed-audit' ) ),
 		'rate_limited'           => array( 'error', __( 'Too many audits or registrations for this store or email today.', 'checkout-speed-audit' ) . ' ' . $try_later ),
 		'not_woocommerce'        => array( 'error', __( 'Our scanner couldn\'t detect WooCommerce on your public homepage.', 'checkout-speed-audit' ) ),
 		'busy'                   => array( 'error', __( 'The scanner is busy right now. Try again in a few minutes.', 'checkout-speed-audit' ) ),
@@ -96,9 +96,9 @@ function tvarkom_csa_render_plan( $status ) {
 		/* translators: %s: date. */
 		$parts[] = sprintf( __( 'Plan: Pro, valid until %s.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['license_expires_at'] ) );
 		$parts[] = ! empty( $status['detailed_available'] )
-			? __( 'Your next audit will be the detailed one (one every 30 days).', 'checkout-speed-audit' )
+			? __( 'Your detailed Pro audit for this 30-day period is available.', 'checkout-speed-audit' )
 			/* translators: %s: date. */
-			: sprintf( __( 'Next detailed audit from %s; audits until then are standard.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['next_detailed_at'] ) );
+			: sprintf( __( 'Your next detailed Pro audit is available from %s.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['next_detailed_at'] ) );
 	} elseif ( ! empty( $status['license_expired'] ) ) {
 		/* translators: %s: date. */
 		$parts[] = sprintf( __( 'Your Pro license ended on %s. The store is on the free plan.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['license_expires_at'] ) );
@@ -117,7 +117,7 @@ function tvarkom_csa_render_plan( $status ) {
 			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
 			esc_url( $status['upgrade_url'] ),
 			esc_html( $label ),
-			esc_html__( 'Pro adds a detailed audit every 30 days: largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks. Your key is emailed after payment.', 'checkout-speed-audit' )
+			esc_html__( 'Pro: one detailed audit every 30 days, adding the largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks. Your key is emailed after payment.', 'checkout-speed-audit' )
 		);
 	}
 }

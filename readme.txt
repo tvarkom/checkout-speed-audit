@@ -21,7 +21,7 @@ Adds a **WooCommerce → Speed Audit** page. Click **Run free audit** and Tvarko
 
 The free plan includes 4 audits per 30 days. Reports go to the site's admin email by default; you can change the address.
 
-**Pro** (paid, one year) adds a detailed audit every 30 days: the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Buy it from the plugin page; the license key is emailed to you, and you paste it under **License key**. When the license ends, the store goes back to the free plan.
+**Pro** (paid, one year) gives one detailed audit every 30 days, which adds the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Buy it from the plugin page; the license key is emailed to you, and you paste it under **License key**. When the license ends, the store goes back to the free plan.
 
 The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store.
 
@@ -67,7 +67,7 @@ Tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a 
 
 = How often can I run it? =
 
-The free plan allows 4 audits per 30 days, and one audit per store and email address per day.
+The free plan allows 4 audits per 30 days; Pro allows one detailed audit per 30 days. Either way, one audit per store and email address per day.
 
 = What happens to my data if I uninstall? =
 
