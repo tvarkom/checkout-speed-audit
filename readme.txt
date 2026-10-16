@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.5.0
+Stable tag: 0.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,7 +41,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 
 **Pro audits** (only with the box ticked) also send: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. Analytics or marketing plugins that record checkout visits on the server may count the profile's page load as one visit.
 
-**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage when you open its page (cached for 5 minutes).
+**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage each time you open its page.
 
 **Buying Pro**: **Buy Pro** opens Stripe's checkout (`buy.stripe.com`) for a one-time payment, with a reference to your store. Payment is handled by Stripe; Tvarkom receives your email, the amount and the store reference, and emails you a confirmation. If your store wasn't registered with the plugin yet, that email contains a license key to paste under **License key**.
 
@@ -74,6 +74,9 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.5.1 =
+* The plugin page always shows the current plan, so Pro appears right after a purchase.
 
 = 0.5.0 =
 * Pro is now a one-time payment for 4 detailed audits within 12 months. The plugin shows the Pro audits left, and a Pro audit needs the store data box ticked.

@@ -42,22 +42,17 @@ function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
 }
 
 /**
- * The store's plan and usage from GET /v1/client, cached for 5 minutes.
+ * The store's plan and usage from GET /v1/client. Never cached: right after a
+ * purchase the page must show Pro, not the Buy Pro button.
  *
  * @param string $api_key Key to ask about (default: the stored one).
- * @param bool   $fresh   Skip the cache.
  * @return array|string Status array, or an error code ("invalid_key", "network", …).
  */
-function tvarkom_csa_status( $api_key = '', $fresh = false ) {
-	$stored = '' === $api_key;
-	if ( $stored ) {
+function tvarkom_csa_status( $api_key = '' ) {
+	if ( '' === $api_key ) {
 		$api_key = tvarkom_csa_settings()['api_key'];
 		if ( '' === $api_key ) {
 			return 'not_registered';
-		}
-		$cached = get_transient( TVARKOM_CSA_STATUS );
-		if ( ! $fresh && is_array( $cached ) ) {
-			return $cached;
 		}
 	}
 	$response = wp_remote_get(
@@ -73,9 +68,6 @@ function tvarkom_csa_status( $api_key = '', $fresh = false ) {
 	$body = json_decode( wp_remote_retrieve_body( $response ), true );
 	if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || ! is_array( $body ) ) {
 		return isset( $body['error'] ) && is_string( $body['error'] ) ? sanitize_key( $body['error'] ) : 'server';
-	}
-	if ( $stored ) {
-		set_transient( TVARKOM_CSA_STATUS, $body, 5 * MINUTE_IN_SECONDS );
 	}
 	return $body;
 }
@@ -108,7 +100,6 @@ function tvarkom_csa_save_license( $key ) {
 			'plan'    => sanitize_key( (string) $status['plan'] ),
 		)
 	);
-	set_transient( TVARKOM_CSA_STATUS, $status, 5 * MINUTE_IN_SECONDS );
 	return 'license_saved';
 }
 
@@ -163,7 +154,6 @@ function tvarkom_csa_register( $email ) {
 			'plan'    => isset( $verify['body']['plan'] ) ? sanitize_key( $verify['body']['plan'] ) : 'free',
 		)
 	);
-	delete_transient( TVARKOM_CSA_STATUS );
 	return '';
 }
 
@@ -186,7 +176,7 @@ function tvarkom_csa_run_audit() {
 		),
 	);
 	// With Pro audits left, every audit is a Pro audit, and it needs the store data.
-	$status = tvarkom_csa_status( '', true );
+	$status = tvarkom_csa_status();
 	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
 	if ( $is_pro && ! $settings['consent'] ) {
 		tvarkom_csa_update_settings( array( 'last' => array( 'code' => 'consent_required', 'time' => time() ) ) );
@@ -214,5 +204,4 @@ function tvarkom_csa_run_audit() {
 		$changes['api_key'] = '';
 	}
 	tvarkom_csa_update_settings( $changes );
-	delete_transient( TVARKOM_CSA_STATUS ); // usage changed
 }

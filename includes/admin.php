@@ -274,7 +274,7 @@ function tvarkom_csa_handle_form() {
 	}
 
 	// A Pro audit needs the store data; without it, don't use one of the Pro audits.
-	if ( ! $consent && tvarkom_csa_is_pro( tvarkom_csa_status( '', true ) ) ) {
+	if ( ! $consent && tvarkom_csa_is_pro( tvarkom_csa_status() ) ) {
 		tvarkom_csa_redirect( 'consent_required' );
 	}
 
