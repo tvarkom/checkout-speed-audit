@@ -35,7 +35,8 @@ function tvarkom_csa_messages() {
 		'saved'                  => array( 'success', __( 'Settings saved.', 'checkout-speed-audit' ) ),
 		'pending'                => array( 'info', __( 'Your audit is being prepared in the background. Reload this page in a minute to see if it was sent.', 'checkout-speed-audit' ) ),
 		'queued'                 => array( 'success', __( 'Audit requested. The report will arrive by email in a few minutes.', 'checkout-speed-audit' ) ),
-		'queued_detailed'        => array( 'success', __( 'Detailed Pro audit requested. The report will arrive by email in a few minutes.', 'checkout-speed-audit' ) ),
+		'queued_detailed'        => array( 'success', __( 'Pro audit requested. The detailed report will arrive by email in a few minutes.', 'checkout-speed-audit' ) ),
+		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Tick "Include store data in my audit" below and run the audit again. No Pro audit was used.', 'checkout-speed-audit' ) ),
 		'license_saved'          => array( 'success', __( 'License key saved.', 'checkout-speed-audit' ) ),
 		'license_invalid'        => array( 'error', __( 'That license key isn\'t valid. Paste it exactly as it appears in your email, starting with tvk_.', 'checkout-speed-audit' ) ),
 		'license_other_store'    => array( 'error', __( 'That license key belongs to a different store address.', 'checkout-speed-audit' ) ),
@@ -49,7 +50,7 @@ function tvarkom_csa_messages() {
 		'key_expired'            => array( 'error', __( 'Your API key has expired. Email hello@tvarkom.com to renew it.', 'checkout-speed-audit' ) ),
 		'client_disabled'        => array( 'error', __( 'Audits are paused for this store. Email hello@tvarkom.com.', 'checkout-speed-audit' ) ),
 		'website_not_allowed'    => array( 'error', __( 'This store\'s address changed since it was registered. Click Run free audit to register it again.', 'checkout-speed-audit' ) ),
-		'limit_reached'          => array( 'error', __( 'You\'ve used the audits your plan allows for the last 30 days: 4 on the free plan, 1 detailed audit on Pro. The plan line below shows when the next one is available.', 'checkout-speed-audit' ) ),
+		'limit_reached'          => array( 'error', __( 'You\'ve used the 4 audits the free plan allows in the last 30 days. Each one becomes available again 30 days after it ran.', 'checkout-speed-audit' ) ),
 		'rate_limited'           => array( 'error', __( 'Too many audits or registrations for this store or email today.', 'checkout-speed-audit' ) . ' ' . $try_later ),
 		'not_woocommerce'        => array( 'error', __( 'Our scanner couldn\'t detect WooCommerce on your public homepage.', 'checkout-speed-audit' ) ),
 		'busy'                   => array( 'error', __( 'The scanner is busy right now. Try again in a few minutes.', 'checkout-speed-audit' ) ),
@@ -80,7 +81,17 @@ function tvarkom_csa_date( $time ) {
 }
 
 /**
- * Plan line under the API key: plan, usage, Pro expiry and the upgrade link.
+ * Whether the store has Pro audits left, from tvarkom_csa_status().
+ *
+ * @param array|string $status Status.
+ * @return bool
+ */
+function tvarkom_csa_is_pro( $status ) {
+	return is_array( $status ) && 'pro' === $status['plan'];
+}
+
+/**
+ * Plan line under the API key: plan, Pro audits left, free usage and the link to buy Pro.
  *
  * @param array|string $status From tvarkom_csa_status().
  */
@@ -89,35 +100,38 @@ function tvarkom_csa_render_plan( $status ) {
 		echo '<p class="description">' . esc_html__( 'Plan details are unavailable right now.', 'checkout-speed-audit' ) . '</p>';
 		return;
 	}
-	$used  = (int) $status['audits_last_30_days'];
-	$limit = isset( $status['monthly_limit'] ) ? (int) $status['monthly_limit'] : 0;
 	$parts = array();
-	if ( 'pro' === $status['plan'] ) {
-		/* translators: %s: date. */
-		$parts[] = sprintf( __( 'Plan: Pro, valid until %s.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['license_expires_at'] ) );
-		$parts[] = ! empty( $status['detailed_available'] )
-			? __( 'Your detailed Pro audit for this 30-day period is available.', 'checkout-speed-audit' )
-			/* translators: %s: date. */
-			: sprintf( __( 'Your next detailed Pro audit is available from %s.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['next_detailed_at'] ) );
-	} elseif ( ! empty( $status['license_expired'] ) ) {
-		/* translators: %s: date. */
-		$parts[] = sprintf( __( 'Your Pro license ended on %s. The store is on the free plan.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['license_expires_at'] ) );
+	if ( tvarkom_csa_is_pro( $status ) ) {
+		$parts[] = sprintf(
+			/* translators: 1: Pro audits left, 2: Pro audits bought, 3: date. */
+			__( 'Plan: Pro, %1$d of %2$d detailed audits left, to use by %3$s. Every audit you run now is a detailed one.', 'checkout-speed-audit' ),
+			(int) $status['pro_scans_left'],
+			(int) $status['pro_scans_total'],
+			tvarkom_csa_date( $status['license_expires_at'] )
+		);
 	} else {
-		$parts[] = __( 'Plan: free.', 'checkout-speed-audit' );
-	}
-	if ( $limit > 0 ) {
-		/* translators: 1: audits used, 2: audits allowed. */
-		$parts[] = sprintf( __( '%1$d of %2$d audits used in the last 30 days.', 'checkout-speed-audit' ), $used, $limit );
+		if ( isset( $status['license_ended'] ) && 'used' === $status['license_ended'] ) {
+			$parts[] = __( 'You\'ve used all your Pro audits. The store is on the free plan.', 'checkout-speed-audit' );
+		} elseif ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
+			/* translators: %s: date. */
+			$parts[] = sprintf( __( 'Your Pro audits expired on %s. The store is on the free plan.', 'checkout-speed-audit' ), tvarkom_csa_date( $status['license_expires_at'] ) );
+		} else {
+			$parts[] = __( 'Plan: free.', 'checkout-speed-audit' );
+		}
+		$limit = isset( $status['monthly_limit'] ) ? (int) $status['monthly_limit'] : 0;
+		if ( $limit > 0 ) {
+			/* translators: 1: audits used, 2: audits allowed. */
+			$parts[] = sprintf( __( '%1$d of %2$d free audits used in the last 30 days.', 'checkout-speed-audit' ), (int) $status['audits_last_30_days'], $limit );
+		}
 	}
 	echo '<p class="description">' . esc_html( implode( ' ', $parts ) ) . '</p>';
 
 	if ( ! empty( $status['upgrade_url'] ) ) {
-		$label = 'pro' === $status['plan'] ? __( 'Renew Pro license', 'checkout-speed-audit' ) : __( 'Get Pro license', 'checkout-speed-audit' );
 		printf(
 			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
 			esc_url( $status['upgrade_url'] ),
-			esc_html( $label ),
-			esc_html__( 'Pro: one detailed audit every 30 days, adding a checkout profile (which plugins, database queries and outside services take the server\'s time on your checkout page), the largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks. Your key is emailed after payment.', 'checkout-speed-audit' )
+			esc_html__( 'Buy Pro', 'checkout-speed-audit' ),
+			esc_html__( 'Pro: a one-time payment for 4 detailed audits to use within 12 months. Each adds a checkout profile (which plugins, database queries and outside services take the server\'s time on your checkout page), a fix plan, the largest autoloaded options, leftover database tables, PHP settings, and failed and late background tasks.', 'checkout-speed-audit' )
 		);
 	}
 }
@@ -139,7 +153,8 @@ function tvarkom_csa_render_page() {
 		$notice = $settings['last']['code'];
 	}
 	$preview = isset( $_GET['csa_preview'], $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'tvarkom_csa_preview' );
-	$status  = $preview && '' !== $settings['api_key'] ? tvarkom_csa_status() : null;
+	$status  = '' !== $settings['api_key'] ? tvarkom_csa_status() : null;
+	$is_pro  = tvarkom_csa_is_pro( $status );
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Checkout Speed Audit', 'checkout-speed-audit' ); ?></h1>
@@ -164,7 +179,7 @@ function tvarkom_csa_render_page() {
 					<td>
 						<?php if ( '' !== $settings['api_key'] ) : ?>
 							<code><?php echo esc_html( tvarkom_csa_mask_key( $settings['api_key'] ) ); ?></code>
-							<?php tvarkom_csa_render_plan( tvarkom_csa_status() ); ?>
+							<?php tvarkom_csa_render_plan( $status ); ?>
 						<?php else : ?>
 							<?php esc_html_e( 'Not registered yet. Your first audit registers this store and issues a free key for this domain.', 'checkout-speed-audit' ); ?>
 						<?php endif; ?>
@@ -174,7 +189,7 @@ function tvarkom_csa_render_page() {
 					<th scope="row"><label for="csa-license"><?php esc_html_e( 'License key', 'checkout-speed-audit' ); ?></label></th>
 					<td>
 						<input type="password" id="csa-license" name="csa_license" class="regular-text" autocomplete="off" placeholder="tvk_…" value="">
-						<p class="description"><?php esc_html_e( 'Bought Pro? Paste the key from your email here. It replaces the current key.', 'checkout-speed-audit' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Only if you bought Pro before installing this plugin: paste the key from your email here. It replaces the current key. If the store was already registered, Pro appears above by itself.', 'checkout-speed-audit' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -190,7 +205,7 @@ function tvarkom_csa_render_page() {
 						<label><input type="checkbox" name="csa_consent" value="1" <?php checked( $settings['consent'] ); ?>> <?php esc_html_e( 'Include store data in my audit', 'checkout-speed-audit' ); ?></label>
 						<p class="description">
 							<?php esc_html_e( 'Sends counts and settings only: PHP, WordPress and WooCommerce versions, database and options table sizes, autoloaded options size, number of active plugins, object cache type, background task and cron counts, and your monthly order volume as a range (e.g. 50–200). Never customer data, order details or revenue.', 'checkout-speed-audit' ); ?>
-							<?php esc_html_e( 'On a Pro detailed audit it also sends the names and sizes of the 20 largest autoloaded options (not their contents), the names and sizes of database tables no active plugin seems to use, PHP memory, time-limit and OPcache settings, failed background tasks by name with their last error (emails, links, IP addresses and long numbers removed) and the names of late scheduled tasks.', 'checkout-speed-audit' ); ?>
+							<?php esc_html_e( 'On a Pro audit (required for Pro) it also sends the names and sizes of the 20 largest autoloaded options (not their contents), the names and sizes of database tables no active plugin seems to use, PHP memory, time-limit and OPcache settings, failed background tasks by name with their last error (emails, links, IP addresses and long numbers removed) and the names of late scheduled tasks.', 'checkout-speed-audit' ); ?>
 							<?php esc_html_e( 'For the checkout profile, the plugin loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. It sends plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts. Analytics or marketing plugins that track checkout visits on the server may count this load as one visit.', 'checkout-speed-audit' ); ?>
 							<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=tvarkom-csa&csa_preview=1' ), 'tvarkom_csa_preview' ) ); ?>"><?php esc_html_e( 'Preview data', 'checkout-speed-audit' ); ?></a>
 						</p>
@@ -199,7 +214,7 @@ function tvarkom_csa_render_page() {
 			</table>
 			<p class="description"><?php esc_html_e( 'When you run an audit, your store address, its cart and checkout URLs, the report email and (if checked) the store data above are sent to Tvarkom (tvarkom.com). Nothing is sent until you click the button.', 'checkout-speed-audit' ); ?></p>
 			<p class="submit">
-				<button type="submit" name="csa_do" value="audit" class="button button-primary"><?php esc_html_e( 'Run free audit', 'checkout-speed-audit' ); ?></button>
+				<button type="submit" name="csa_do" value="audit" class="button button-primary"><?php echo esc_html( $is_pro ? __( 'Run Pro audit', 'checkout-speed-audit' ) : __( 'Run free audit', 'checkout-speed-audit' ) ); ?></button>
 				<button type="submit" name="csa_do" value="save" class="button"><?php esc_html_e( 'Save settings', 'checkout-speed-audit' ); ?></button>
 			</p>
 		</form>
@@ -207,8 +222,8 @@ function tvarkom_csa_render_page() {
 		<?php if ( $preview ) : ?>
 			<h2><?php esc_html_e( 'Store data that would be sent', 'checkout-speed-audit' ); ?></h2>
 			<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_metrics(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
-			<?php if ( is_array( $status ) && 'pro' === $status['plan'] ) : ?>
-				<h2><?php esc_html_e( 'Added on your next detailed Pro audit', 'checkout-speed-audit' ); ?></h2>
+			<?php if ( $is_pro ) : ?>
+				<h2><?php esc_html_e( 'Added on your next Pro audit', 'checkout-speed-audit' ); ?></h2>
 				<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_detailed( false ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
 				<p class="description"><?php esc_html_e( 'The checkout profile is measured when the audit runs, so it isn\'t shown here.', 'checkout-speed-audit' ); ?></p>
 			<?php endif; ?>
@@ -218,7 +233,7 @@ function tvarkom_csa_render_page() {
 }
 
 /**
- * Saves the settings and, for "Run free audit", registers the store if needed and
+ * Saves the settings and, for the audit button, registers the store if needed and
  * schedules the audit in the background.
  */
 function tvarkom_csa_handle_form() {
@@ -256,6 +271,11 @@ function tvarkom_csa_handle_form() {
 		if ( '' !== $error ) {
 			tvarkom_csa_redirect( $error );
 		}
+	}
+
+	// A Pro audit needs the store data; without it, don't use one of the Pro audits.
+	if ( ! $consent && tvarkom_csa_is_pro( tvarkom_csa_status( '', true ) ) ) {
+		tvarkom_csa_redirect( 'consent_required' );
 	}
 
 	as_enqueue_async_action( TVARKOM_CSA_ACTION, array(), 'checkout-speed-audit', true );

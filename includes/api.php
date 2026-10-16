@@ -185,11 +185,16 @@ function tvarkom_csa_run_audit() {
 			'checkout' => wc_get_checkout_url(),
 		),
 	);
+	// With Pro audits left, every audit is a Pro audit, and it needs the store data.
+	$status = tvarkom_csa_status( '', true );
+	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
+	if ( $is_pro && ! $settings['consent'] ) {
+		tvarkom_csa_update_settings( array( 'last' => array( 'code' => 'consent_required', 'time' => time() ) ) );
+		return;
+	}
 	if ( $settings['consent'] ) {
 		$body['metrics'] = tvarkom_csa_collect_metrics();
-		// Pro: one detailed audit per 30 days. Only collect the detailed data when it will be used.
-		$status = tvarkom_csa_status( '', true );
-		if ( is_array( $status ) && ! empty( $status['detailed_available'] ) ) {
+		if ( $is_pro ) {
 			$body['detailed'] = tvarkom_csa_collect_detailed();
 		}
 	}
