@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Checkout Speed Audit for WooCommerce
  * Description:       Free store health audit by Tvarkom: server and checkout speed, caching, database and background tasks, emailed to you as a report.
- * Version:           0.5.4
+ * Version:           0.5.5
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TVARKOM_CSA_VERSION', '0.5.4' );
+define( 'TVARKOM_CSA_VERSION', '0.5.5' );
 define( 'TVARKOM_CSA_OPTION', 'tvarkom_csa' );
 define( 'TVARKOM_CSA_TOKEN', 'tvarkom_csa_verify_token' );
 define( 'TVARKOM_CSA_ACTION', 'tvarkom_csa_run_audit' );

@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.5.4
+Stable tag: 0.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,8 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 
 No customer data, order contents or revenue figures are ever sent. The report is emailed to you, with a copy to hello@tvarkom.com.
 
+Terms of use: https://tvarkom.com/terms/
+
 Privacy policy: https://tvarkom.com/privacy
 
 == Installation ==
@@ -74,6 +76,9 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.5.5 =
+* Readme links Tvarkom's Terms of Use.
 
 = 0.5.4 =
 * When Pro ends before its audits are used, the plugin page says it ended on that date.
