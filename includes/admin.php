@@ -114,7 +114,7 @@ function tvarkom_csa_render_plan( $status ) {
 			$parts[] = __( 'You\'ve used all your Pro audits. The store is on the free plan.', 'checkout-speed-audit-for-woocommerce' );
 		} elseif ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
 			/* translators: %s: date. */
-			$parts[] = sprintf( __( 'Your Pro audits expired on %s. The store is on the free plan.', 'checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
+			$parts[] = sprintf( __( 'Your Pro audits ended on %s. The store is on the free plan.', 'checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
 		} else {
 			$parts[] = __( 'Plan: free.', 'checkout-speed-audit-for-woocommerce' );
 		}
