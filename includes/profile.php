@@ -162,6 +162,7 @@ function tvarkom_csa_profile_maybe_start() {
 	Tvarkom_CSA_Profiler::$product_id = isset( $pending['product_id'] ) ? (int) $pending['product_id'] : 0;
 
 	if ( ! defined( 'SAVEQUERIES' ) ) {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress core's query log switch; set only on the profiled request.
 		define( 'SAVEQUERIES', true ); // wpdb checks it per query, so it applies from here on
 	}
 	nocache_headers();
@@ -802,7 +803,7 @@ function tvarkom_csa_profile_checkout() {
 				'Cache-Control'            => 'no-cache',
 			),
 			// Same as WordPress's own loopback checks: the request goes to this server.
-			'sslverify'   => apply_filters( 'https_local_ssl_verify', false ),
+			'sslverify'   => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core's filter.
 		)
 	);
 	$wall_ms = round( ( microtime( true ) - $start ) * 1000, 1 );

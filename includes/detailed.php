@@ -258,17 +258,18 @@ function tvarkom_csa_failed_tasks() {
 		return array();
 	}
 	$since = gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS );
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table names come from $wpdb->prefix.
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery -- read once per detailed audit; Action Scheduler has no API for these aggregates.
 	$groups = $wpdb->get_results(
 		$wpdb->prepare(
-			"SELECT hook, COUNT(*) AS failures, MAX(action_id) AS last_id FROM {$tables['actions']} WHERE status = 'failed' AND last_attempt_gmt >= %s GROUP BY hook ORDER BY failures DESC LIMIT 20",
+			"SELECT hook, COUNT(*) AS failures, MAX(action_id) AS last_id FROM %i WHERE status = 'failed' AND last_attempt_gmt >= %s GROUP BY hook ORDER BY failures DESC LIMIT 20",
+			$tables['actions'],
 			$since
 		)
 	);
 	$out = array();
 	foreach ( (array) $groups as $group ) {
 		$message = $wpdb->get_var(
-			$wpdb->prepare( "SELECT message FROM {$tables['logs']} WHERE action_id = %d ORDER BY log_id DESC LIMIT 1", (int) $group->last_id )
+			$wpdb->prepare( 'SELECT message FROM %i WHERE action_id = %d ORDER BY log_id DESC LIMIT 1', $tables['logs'], (int) $group->last_id )
 		);
 		$out[]   = array(
 			'hook_signature'     => (string) $group->hook,
@@ -293,10 +294,11 @@ function tvarkom_csa_stalled_actions() {
 
 	$tables = tvarkom_csa_scheduler_tables();
 	if ( null !== $tables ) {
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- read once per detailed audit.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT hook, scheduled_date_gmt FROM {$tables['actions']} WHERE status = 'pending' AND scheduled_date_gmt < %s ORDER BY scheduled_date_gmt ASC LIMIT 15",
+				"SELECT hook, scheduled_date_gmt FROM %i WHERE status = 'pending' AND scheduled_date_gmt < %s ORDER BY scheduled_date_gmt ASC LIMIT 15",
+				$tables['actions'],
 				gmdate( 'Y-m-d H:i:s', $cutoff )
 			)
 		);

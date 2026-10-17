@@ -222,11 +222,9 @@ function tvarkom_csa_render_page() {
 		<?php if ( $preview ) : ?>
 			<h2><?php esc_html_e( 'Store data that would be sent', 'checkout-speed-audit' ); ?></h2>
 			<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_metrics(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
-			<?php if ( $is_pro ) : ?>
-				<h2><?php esc_html_e( 'Added on your next Pro audit', 'checkout-speed-audit' ); ?></h2>
-				<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_detailed( false ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
-				<p class="description"><?php esc_html_e( 'The checkout profile is measured when the audit runs, so it isn\'t shown here.', 'checkout-speed-audit' ); ?></p>
-			<?php endif; ?>
+			<h2><?php esc_html_e( 'Added on a Pro audit', 'checkout-speed-audit' ); ?></h2>
+			<pre style="background:#fff;border:1px solid #c3c4c7;padding:12px;max-width:720px;overflow:auto;"><?php echo esc_html( wp_json_encode( tvarkom_csa_collect_detailed( false ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></pre>
+			<p class="description"><?php esc_html_e( 'Sent only on a Pro audit. The checkout profile is measured when the audit runs, so it isn\'t shown here.', 'checkout-speed-audit' ); ?></p>
 		<?php endif; ?>
 	</div>
 	<?php

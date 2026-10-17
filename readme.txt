@@ -2,9 +2,9 @@
 Contributors: tvarkom
 Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.5.1
+Stable tag: 0.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,10 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.5.2 =
+* Preview data shows what a Pro audit adds to every store, not only Pro stores.
+* Tested with WordPress 7.1.
 
 = 0.5.1 =
 * The plugin page always shows the current plan, so Pro appears right after a purchase.
