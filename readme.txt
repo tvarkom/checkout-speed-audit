@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.5.2
+Stable tag: 0.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,7 +51,7 @@ Privacy policy: https://tvarkom.com/privacy
 
 == Installation ==
 
-1. Install from **Plugins → Add New**, or upload the `checkout-speed-audit` folder to `/wp-content/plugins/`.
+1. Install from **Plugins → Add New**, or upload the `checkout-speed-audit-for-woocommerce` folder to `/wp-content/plugins/`.
 2. Activate the plugin. WooCommerce must be active.
 3. Go to **WooCommerce → Speed Audit** and click **Run free audit**.
 
@@ -74,6 +74,9 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.5.3 =
+* Text domain matches the WordPress.org slug, checkout-speed-audit-for-woocommerce.
 
 = 0.5.2 =
 * Preview data shows what a Pro audit adds to every store, not only Pro stores.
