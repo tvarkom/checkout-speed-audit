@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<ruleset name="Tvarkom Checkout Speed Audit">
+	<description>WordPress Coding Standards and PHP 7.4 compatibility for the plugin.</description>
+
+	<file>.</file>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+
+	<!-- Requires PHP: 7.4 and Requires at least: 6.5 in the plugin header. -->
+	<config name="testVersion" value="7.4-"/>
+	<config name="minimum_wp_version" value="6.5"/>
+
+	<rule ref="WordPress"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="tvarkom-checkout-speed-audit-for-woocommerce"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="tvarkom_csa"/>
+				<element value="TVARKOM_CSA"/>
+				<element value="Tvarkom_CSA"/>
+			</property>
+		</properties>
+	</rule>
+	<!-- manage_woocommerce is registered by WooCommerce. -->
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="manage_woocommerce"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- profile.php keeps the profiler class next to the functions that install and run it;
+	     splitting the file would change the includes for no behavior gain. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/includes/profile\.php$</exclude-pattern>
+	</rule>
+	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
+		<exclude-pattern>/includes/profile\.php$</exclude-pattern>
+	</rule>
+</ruleset>

@@ -26,3 +26,12 @@ php-7.4:
 php-8.4:
   extends: .php-lint
   image: php:8.4-cli
+
+# WordPress Coding Standards and PHP 7.4 compatibility (phpcs.xml.dist); fails on any error or warning.
+phpcs:
+  stage: test
+  image: composer:2.8
+  script:
+    - composer install --no-interaction --no-progress
+    - vendor/bin/phpcs -i
+    - vendor/bin/phpcs

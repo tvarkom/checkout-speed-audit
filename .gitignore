@@ -4,3 +4,4 @@
 
 # Emails, reviews and other documents are not part of the plugin.
 *.pdf
+/vendor/
