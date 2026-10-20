@@ -1,3 +1,6 @@
 .DS_Store
 .idea/
 *.zip
+
+# Emails, reviews and other documents are not part of the plugin.
+*.pdf
