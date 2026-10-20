@@ -1,0 +1,28 @@
+# Checks run on every branch and merge request. Nothing deploys from here: releases
+# are zips built from a tagged commit (and, once approved, the WordPress.org SVN).
+
+stages:
+  - test
+
+# One pipeline per change: merge request pipelines when an MR is open, branch pipelines otherwise.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+# Syntax on the oldest PHP the plugin supports (Requires PHP: 7.4) and a current one.
+.php-lint:
+  stage: test
+  script:
+    - php -v
+    - find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+
+php-7.4:
+  extends: .php-lint
+  image: php:7.4-cli
+
+php-8.4:
+  extends: .php-lint
+  image: php:8.4-cli
