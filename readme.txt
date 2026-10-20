@@ -1,18 +1,22 @@
-=== Checkout Speed Audit for WooCommerce ===
+=== Tvarkom Checkout Speed Audit for WooCommerce ===
 Contributors: tvarkom
 Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.5.5
+Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Free store health audit by Tvarkom: server and checkout speed, caching, database and background tasks, scored from 0 to 100 and emailed to you.
+Store diagnostics and a checkout profiler in your WordPress admin, plus a free health report from Tvarkom scored from 0 to 100.
 
 == Description ==
 
-Adds a **WooCommerce → Speed Audit** page. Click **Run free audit** and Tvarkom scans your store and emails you a report with a health score from 0 to 100:
+Adds a **WooCommerce → Speed Audit** page with two parts.
+
+**Store diagnostics** (in your admin, nothing is sent anywhere): the 20 largest autoloaded options with their likely plugin, database tables no active plugin seems to use, your PHP memory, time-limit and OPcache settings, failed background tasks with their last error, and scheduled tasks running late. **Profile my checkout** loads your checkout page once from your own server and shows where the time goes: by plugin and theme, the slowest hooks, the most expensive database queries, calls to outside services and object cache hits.
+
+**Store health report** (from Tvarkom's service): click **Run free audit** and Tvarkom scans your store and emails you a report with a health score from 0 to 100:
 
 * Server response time of your homepage, cart and checkout
 * Caching of your pages and static files
@@ -21,13 +25,13 @@ Adds a **WooCommerce → Speed Audit** page. Click **Run free audit** and Tvarko
 
 The free plan includes 4 audits per 30 days. Reports go to the site's admin email by default; you can change the address.
 
-**Pro** is a one-time payment for 4 detailed audits, to use within 12 months. While you have Pro audits left, every audit you run is a detailed one; an audit that fails on our side doesn't count. Each adds a checkout profile (the server time each plugin, the theme and WordPress take on your checkout page, the slowest database queries and hooks, calls to outside services and object cache hits), a fix plan with steps and estimated hours, the largest autoloaded options, database tables left behind by removed plugins, PHP settings with recommended changes, failed background tasks with their last error, and late scheduled tasks. Pro audits need **Include store data in my audit** ticked. Buy it from the plugin page with **Buy Pro**; Pro then appears on the plugin page by itself. When the 4 audits are used or the 12 months pass, the store goes back to the free plan, and you can buy Pro again.
+**Pro** is Tvarkom's paid report service: a one-time payment for 4 detailed reports, to use within 12 months. For each one, the plugin sends your store diagnostics and a fresh checkout profile to Tvarkom, which analyzes them on its servers and emails a report with a fix plan: what to fix first, step by step, with estimated hours, and recommended PHP settings. Everything the plugin itself does stays free; Pro is the analysis and the report. While you have Pro reports left, every audit you run is a Pro one; an audit that fails on our side doesn't count. Pro audits need **Include store data in my audit** ticked. Buy it from the plugin page with **Buy Pro**; Pro then appears on the plugin page by itself. When the 4 audits are used or the 12 months pass, the store goes back to the free plan, and you can buy Pro again.
 
-The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Pro checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered.
+The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered.
 
 == External services ==
 
-This plugin uses the Tvarkom audit service (https://tvarkom.com) to register your store and run audits. Nothing is sent until an administrator clicks **Run free audit**.
+This plugin uses the Tvarkom audit service (https://tvarkom.com) to register your store and run audits. Store diagnostics and **Profile my checkout** work without it and send nothing. Nothing is sent to Tvarkom until an administrator clicks **Run free audit**.
 
 **Registration** (first audit only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. Tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
 
@@ -39,7 +43,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
 
-**Pro audits** (only with the box ticked) also send: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. Analytics or marketing plugins that record checkout visits on the server may count the profile's page load as one visit.
+**Pro audits** (only with the box ticked) also send the store diagnostics: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin seems to use; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. Analytics or marketing plugins that record checkout visits on the server may count the profile's page load as one visit.
 
 **Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage each time you open its page.
 
@@ -53,7 +57,7 @@ Privacy policy: https://tvarkom.com/privacy
 
 == Installation ==
 
-1. Install from **Plugins → Add New**, or upload the `checkout-speed-audit-for-woocommerce` folder to `/wp-content/plugins/`.
+1. Install from **Plugins → Add New**, or upload the `tvarkom-checkout-speed-audit-for-woocommerce` folder to `/wp-content/plugins/`.
 2. Activate the plugin. WooCommerce must be active.
 3. Go to **WooCommerce → Speed Audit** and click **Run free audit**.
 
@@ -76,6 +80,11 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.6.0 =
+* New name: Tvarkom Checkout Speed Audit for WooCommerce.
+* Store diagnostics and Profile my checkout on the plugin page, free for every store and sent nowhere.
+* Pro is described as what it is: Tvarkom's analysis and report service.
 
 = 0.5.5 =
 * Readme links Tvarkom's Terms of Use.

@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       Checkout Speed Audit for WooCommerce
- * Description:       Free store health audit by Tvarkom: server and checkout speed, caching, database and background tasks, emailed to you as a report.
- * Version:           0.5.5
+ * Plugin Name:       Tvarkom Checkout Speed Audit for WooCommerce
+ * Description:       Store diagnostics and a checkout profiler in your WordPress admin, plus a free store health report from Tvarkom: server and checkout speed, caching, database and background tasks.
+ * Version:           0.6.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -10,7 +10,7 @@
  * Author URI:        https://tvarkom.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       checkout-speed-audit-for-woocommerce
+ * Text Domain:       tvarkom-checkout-speed-audit-for-woocommerce
  *
  * @package CheckoutSpeedAudit
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TVARKOM_CSA_VERSION', '0.5.5' );
+define( 'TVARKOM_CSA_VERSION', '0.6.0' );
 define( 'TVARKOM_CSA_OPTION', 'tvarkom_csa' );
 define( 'TVARKOM_CSA_TOKEN', 'tvarkom_csa_verify_token' );
 define( 'TVARKOM_CSA_ACTION', 'tvarkom_csa_run_audit' );
@@ -33,6 +33,7 @@ require_once __DIR__ . '/includes/api.php';
 require_once __DIR__ . '/includes/metrics.php';
 require_once __DIR__ . '/includes/detailed.php';
 require_once __DIR__ . '/includes/profile.php';
+require_once __DIR__ . '/includes/diagnostics.php';
 require_once __DIR__ . '/includes/admin.php';
 
 // Only acts on the audit job's own checkout request (includes/profile.php).
