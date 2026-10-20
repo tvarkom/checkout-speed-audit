@@ -168,7 +168,7 @@ function tvarkom_csa_render_page() {
 		<p><?php esc_html_e( 'Get a free store health report from Tvarkom, scored from 0 to 100: server and checkout speed, caching, page weight and, if you allow it below, your database, PHP setup and background tasks.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 		<p><?php esc_html_e( 'The scan runs on Tvarkom\'s servers and loads your public pages like a visitor would. Nothing on your store is changed. Free plan: 4 audits per 30 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<form id="tvarkom-csa-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="tvarkom_csa_form">
 			<?php wp_nonce_field( 'tvarkom_csa_form' ); ?>
 			<table class="form-table" role="presentation">
@@ -235,7 +235,7 @@ function tvarkom_csa_render_page() {
 
 /**
  * Saves the settings and, for the audit button, registers the store if needed and
- * schedules the audit in the background.
+ * requests the audit.
  */
 function tvarkom_csa_handle_form() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -274,14 +274,14 @@ function tvarkom_csa_handle_form() {
 		}
 	}
 
-	// A Pro audit needs the store data; without it, don't use one of the Pro audits.
-	if ( ! $consent && tvarkom_csa_is_pro( tvarkom_csa_status() ) ) {
-		tvarkom_csa_redirect( 'consent_required' );
-	}
-
-	as_enqueue_async_action( TVARKOM_CSA_ACTION, array(), 'checkout-speed-audit', true );
-	tvarkom_csa_update_settings( array( 'last' => array( 'code' => 'pending', 'time' => time() ) ) );
-	tvarkom_csa_redirect( 'pending' );
+	// Run the audit now rather than in the background: WordPress's background queue
+	// (Action Scheduler, WP-Cron) is often what's broken or backed up on the stores we
+	// audit, and the admin gets the real result at once. tvarkom_csa_run_audit() also
+	// refuses a Pro audit without the store data, without using one.
+	wc_set_time_limit( 120 );
+	tvarkom_csa_run_audit();
+	$last = tvarkom_csa_settings()['last'];
+	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );
 }
 add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 
@@ -295,3 +295,33 @@ function tvarkom_csa_redirect( $code, array $args = array() ) {
 	wp_safe_redirect( add_query_arg( array_merge( array( 'csa_result' => $code ), $args ), admin_url( 'admin.php?page=tvarkom-csa' ) ) );
 	exit;
 }
+
+/**
+ * On the plugin page: while an audit runs (it can take up to a minute), the button
+ * says so and a second click is ignored.
+ *
+ * @param string $hook_suffix Current admin page.
+ */
+function tvarkom_csa_admin_scripts( $hook_suffix ) {
+	if ( 'woocommerce_page_tvarkom-csa' !== $hook_suffix ) {
+		return;
+	}
+	wp_register_script( 'tvarkom-csa-admin', false, array(), TVARKOM_CSA_VERSION, true );
+	wp_enqueue_script( 'tvarkom-csa-admin' );
+	wp_add_inline_script(
+		'tvarkom-csa-admin',
+		'(function () {
+	var form = document.getElementById("tvarkom-csa-form");
+	if (!form) { return; }
+	var running = false;
+	form.addEventListener("submit", function (event) {
+		if (!event.submitter || event.submitter.value !== "audit") { return; }
+		if (running) { event.preventDefault(); return; }
+		running = true;
+		event.submitter.textContent = ' . wp_json_encode( __( 'Running the audit… this can take up to a minute', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ) . ';
+		event.submitter.setAttribute("aria-busy", "true");
+	});
+})();'
+	);
+}
+add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
