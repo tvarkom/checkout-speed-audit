@@ -158,17 +158,18 @@ function tvarkom_csa_profile_maybe_start() {
 	if ( ! is_array( $pending ) || empty( $pending['token'] ) || ! hash_equals( (string) $pending['token'], $sent ) ) {
 		return;
 	}
-	delete_transient( TVARKOM_CSA_PROFILE_TOKEN ); // single use
+	delete_transient( TVARKOM_CSA_PROFILE_TOKEN ); // Single use.
 	Tvarkom_CSA_Profiler::$product_id = isset( $pending['product_id'] ) ? (int) $pending['product_id'] : 0;
 
 	if ( ! defined( 'SAVEQUERIES' ) ) {
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress core's query log switch; set only on the profiled request.
-		define( 'SAVEQUERIES', true ); // wpdb checks it per query, so it applies from here on
+		define( 'SAVEQUERIES', true ); // wpdb checks it per query, so it applies from here on.
 	}
 	nocache_headers();
 
 	$self = wp_normalize_path( dirname( __DIR__ ) ) . '/';
 	$real = realpath( dirname( __DIR__ ) );
+
 	Tvarkom_CSA_Profiler::$dirs = array(
 		'self'   => array_unique( array( $self, false !== $real ? wp_normalize_path( $real ) . '/' : $self ) ),
 		'plugin' => tvarkom_csa_profile_dir_variants( WP_PLUGIN_DIR ),
@@ -246,19 +247,19 @@ function tvarkom_csa_profile_calibrate() {
 }
 
 /**
- * A callable that runs $fn and records its own time for $component.
+ * A callable that runs $callback and records its own time for $component.
  *
- * @param callable $fn        Original callback.
+ * @param callable $callback  Original callback.
  * @param string   $component Component key.
  * @param string   $hook      Hook name.
  * @return Closure
  */
-function tvarkom_csa_profile_wrapper( $fn, $component, $hook ) {
-	return static function ( ...$args ) use ( $fn, $component, $hook ) {
+function tvarkom_csa_profile_wrapper( $callback, $component, $hook ) {
+	return static function ( ...$args ) use ( $callback, $component, $hook ) {
 		Tvarkom_CSA_Profiler::$stack[] = 0;
 		$start                         = hrtime( true );
 		try {
-			return call_user_func_array( $fn, $args );
+			return call_user_func_array( $callback, $args );
 		} finally {
 			$elapsed  = hrtime( true ) - $start;
 			$children = (int) array_pop( Tvarkom_CSA_Profiler::$stack );
@@ -319,25 +320,25 @@ function tvarkom_csa_profile_hook_name( $tag ) {
  * Component key of a callback from the file that defines it, or false to leave
  * it unwrapped (unknown callable or arguments by reference).
  *
- * @param mixed $fn Callback.
+ * @param mixed $callback Callback.
  * @return string|false
  */
-function tvarkom_csa_profile_callback_component( $fn ) {
+function tvarkom_csa_profile_callback_component( $callback ) {
 	try {
-		if ( is_string( $fn ) && false !== strpos( $fn, '::' ) ) {
-			$fn = explode( '::', $fn, 2 );
+		if ( is_string( $callback ) && false !== strpos( $callback, '::' ) ) {
+			$callback = explode( '::', $callback, 2 );
 		}
-		if ( is_array( $fn ) && 2 === count( $fn ) ) {
-			$ref = new ReflectionMethod( $fn[0], $fn[1] );
-		} elseif ( $fn instanceof Closure || is_string( $fn ) ) {
-			$ref = new ReflectionFunction( $fn );
-		} elseif ( is_object( $fn ) && method_exists( $fn, '__invoke' ) ) {
-			$ref = new ReflectionMethod( $fn, '__invoke' );
+		if ( is_array( $callback ) && 2 === count( $callback ) ) {
+			$ref = new ReflectionMethod( $callback[0], $callback[1] );
+		} elseif ( $callback instanceof Closure || is_string( $callback ) ) {
+			$ref = new ReflectionFunction( $callback );
+		} elseif ( is_object( $callback ) && method_exists( $callback, '__invoke' ) ) {
+			$ref = new ReflectionMethod( $callback, '__invoke' );
 		} else {
 			return false;
 		}
 	} catch ( ReflectionException $e ) {
-		return false; // e.g. a method handled by __call()
+		return false; // E.g. a method handled by __call().
 	}
 	foreach ( $ref->getParameters() as $param ) {
 		if ( $param->isPassedByReference() ) {
@@ -345,7 +346,7 @@ function tvarkom_csa_profile_callback_component( $fn ) {
 		}
 	}
 	$file = $ref->getFileName();
-	return false === $file ? 'core' : tvarkom_csa_profile_file_component( $file ); // internal PHP functions count as core
+	return false === $file ? 'core' : tvarkom_csa_profile_file_component( $file ); // Internal PHP functions count as core.
 }
 
 /**
@@ -361,7 +362,7 @@ function tvarkom_csa_profile_file_component( $file ) {
 	$path      = wp_normalize_path( $file );
 	$component = 'other';
 	if ( in_array( trailingslashit( dirname( $path ) ), tvarkom_csa_profile_dir_variants( ABSPATH ), true ) && preg_match( '/^(wp-[\w-]+|index)\.php$/', basename( $path ) ) ) {
-		$component = 'core'; // index.php, wp-blog-header.php, wp-load.php, …
+		$component = 'core'; // index.php, wp-blog-header.php, wp-load.php and the like.
 	}
 	foreach ( 'core' === $component ? array() : array( 'self', 'mu', 'plugin', 'theme', 'core', 'dropin' ) as $type ) {
 		foreach ( Tvarkom_CSA_Profiler::$dirs[ $type ] as $dir ) {
@@ -399,7 +400,7 @@ function tvarkom_csa_profile_caller() {
 	$frames = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 40 );
 	for ( $i = count( $frames ) - 1; $i > 0; $i-- ) {
 		if ( isset( $frames[ $i ]['class'] ) && is_a( $frames[ $i ]['class'], 'wpdb', true ) ) {
-			$frames = array_slice( $frames, $i ); // its 'file' is the code that called $wpdb
+			$frames = array_slice( $frames, $i ); // Its 'file' is the code that called $wpdb.
 			break;
 		}
 	}
@@ -443,13 +444,13 @@ function tvarkom_csa_profile_http_start( $pre, $args, $url ) {
 /**
  * Records a finished outgoing HTTP call: host, time and status only (action http_api_debug).
  *
- * @param array|WP_Error $response Response.
- * @param string         $context  "response".
- * @param string         $class    Transport class.
- * @param array          $args     Request arguments.
- * @param string         $url      URL.
+ * @param array|WP_Error $response  Response.
+ * @param string         $context   "response".
+ * @param string         $transport Transport class.
+ * @param array          $args      Request arguments.
+ * @param string         $url       URL.
  */
-function tvarkom_csa_profile_http_end( $response, $context, $class, $args, $url ) {
+function tvarkom_csa_profile_http_end( $response, $context, $transport, $args, $url ) {
 	for ( $i = count( Tvarkom_CSA_Profiler::$http_open ) - 1; $i >= 0; $i-- ) {
 		if ( Tvarkom_CSA_Profiler::$http_open[ $i ][1] !== (string) $url ) {
 			continue;
@@ -462,7 +463,7 @@ function tvarkom_csa_profile_http_end( $response, $context, $class, $args, $url 
 		if ( count( Tvarkom_CSA_Profiler::$http ) < 25 ) {
 			Tvarkom_CSA_Profiler::$http[] = array(
 				'host'      => $host,
-				'own_site'  => in_array( $host, $own, true ), // e.g. WordPress starting WP-Cron
+				'own_site'  => in_array( $host, $own, true ), // E.g. WordPress starting WP-Cron.
 				'component' => $component,
 				'ms'        => round( ( hrtime( true ) - $start ) / 1e6, 1 ),
 				'status'    => is_wp_error( $response ) ? null : (int) wp_remote_retrieve_response_code( $response ),
@@ -488,7 +489,7 @@ function tvarkom_csa_profile_fill_cart() {
 	$product = Tvarkom_CSA_Profiler::$product_id ? wc_get_product( Tvarkom_CSA_Profiler::$product_id ) : null;
 	if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
 		Tvarkom_CSA_Profiler::$product_id = 0;
-		add_filter( 'woocommerce_checkout_redirect_empty_cart', '__return_false' ); // profile the empty checkout instead
+		add_filter( 'woocommerce_checkout_redirect_empty_cart', '__return_false' ); // Profile the empty checkout instead.
 		return;
 	}
 	$key = WC()->cart->generate_cart_id( $product->get_id() );
@@ -531,7 +532,7 @@ function tvarkom_csa_profile_query_shape( $sql ) {
  * @return string
  */
 function tvarkom_csa_profile_component_name( $key ) {
-	static $plugins = null;
+	static $plugins    = null;
 	list( $type, $id ) = array_pad( explode( ':', $key, 2 ), 2, '' );
 	switch ( $type ) {
 		case 'core':
@@ -564,9 +565,9 @@ function tvarkom_csa_profile_component_name( $key ) {
  */
 function tvarkom_csa_profile_finish() {
 	global $wpdb, $wp_object_cache;
-	$total_ms = round( tvarkom_csa_profile_elapsed() * 1000, 1 );
-	$marks    = Tvarkom_CSA_Profiler::$marks;
-	$at       = function ( $phase ) use ( $marks ) {
+	$total_ms  = round( tvarkom_csa_profile_elapsed() * 1000, 1 );
+	$marks     = Tvarkom_CSA_Profiler::$marks;
+	$at        = function ( $phase ) use ( $marks ) {
 		return isset( $marks[ $phase ] ) ? round( $marks[ $phase ] * 1000, 1 ) : null;
 	};
 	$loaded    = $at( 'plugins_loaded' );
@@ -818,7 +819,7 @@ function tvarkom_csa_profile_checkout() {
 		} elseif ( $status >= 300 && $status < 400 ) {
 			$reason = 'redirected';
 		} else {
-			$reason = 'not_profiled'; // blocked, or answered by a cache before WordPress ran
+			$reason = 'not_profiled'; // Blocked, or answered by a cache before WordPress ran.
 		}
 		return array(
 			'status'      => 'unavailable',

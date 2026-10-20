@@ -157,7 +157,7 @@ function tvarkom_csa_top_autoloaded_keys() {
 function tvarkom_csa_orphaned_tables() {
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table metadata, once per detailed audit.
-	$rows = $wpdb->get_results(
+	$rows    = $wpdb->get_results(
 		$wpdb->prepare(
 			'SELECT TABLE_NAME AS name, DATA_LENGTH + INDEX_LENGTH AS bytes, TABLE_ROWS AS row_count FROM information_schema.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME LIKE %s ORDER BY bytes DESC',
 			DB_NAME,
@@ -266,7 +266,7 @@ function tvarkom_csa_failed_tasks() {
 			$since
 		)
 	);
-	$out = array();
+	$out    = array();
 	foreach ( (array) $groups as $group ) {
 		$message = $wpdb->get_var(
 			$wpdb->prepare( 'SELECT message FROM %i WHERE action_id = %d ORDER BY log_id DESC LIMIT 1', $tables['logs'], (int) $group->last_id )

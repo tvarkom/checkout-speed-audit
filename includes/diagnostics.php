@@ -19,13 +19,13 @@ define( 'TVARKOM_CSA_LOCAL_PROFILE', 'tvarkom_csa_local_profile' );
 /**
  * One small table.
  *
- * @param string[]   $head  Column headings.
- * @param string[][] $rows  Cells (plain text).
- * @param string     $empty Text when there are no rows.
+ * @param string[]   $head       Column headings.
+ * @param string[][] $rows       Cells (plain text).
+ * @param string     $empty_text Text when there are no rows.
  */
-function tvarkom_csa_table( array $head, array $rows, $empty ) {
+function tvarkom_csa_table( array $head, array $rows, $empty_text ) {
 	if ( empty( $rows ) ) {
-		echo '<p>' . esc_html( $empty ) . '</p>';
+		echo '<p>' . esc_html( $empty_text ) . '</p>';
 		return;
 	}
 	echo '<table class="widefat striped" style="max-width:960px"><thead><tr>';

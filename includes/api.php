@@ -164,7 +164,14 @@ function tvarkom_csa_register( $email ) {
 function tvarkom_csa_run_audit() {
 	$settings = tvarkom_csa_settings();
 	if ( '' === $settings['api_key'] ) {
-		tvarkom_csa_update_settings( array( 'last' => array( 'code' => 'invalid_key', 'time' => time() ) ) );
+		tvarkom_csa_update_settings(
+			array(
+				'last' => array(
+					'code' => 'invalid_key',
+					'time' => time(),
+				),
+			)
+		);
 		return;
 	}
 
@@ -180,7 +187,14 @@ function tvarkom_csa_run_audit() {
 	$status = tvarkom_csa_status();
 	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
 	if ( $is_pro && ! $settings['consent'] ) {
-		tvarkom_csa_update_settings( array( 'last' => array( 'code' => 'consent_required', 'time' => time() ) ) );
+		tvarkom_csa_update_settings(
+			array(
+				'last' => array(
+					'code' => 'consent_required',
+					'time' => time(),
+				),
+			)
+		);
 		return;
 	}
 	if ( $settings['consent'] ) {
@@ -199,7 +213,12 @@ function tvarkom_csa_run_audit() {
 		$code = tvarkom_csa_error_code( $response );
 	}
 
-	$changes = array( 'last' => array( 'code' => $code, 'time' => time() ) );
+	$changes = array(
+		'last' => array(
+			'code' => $code,
+			'time' => time(),
+		),
+	);
 	if ( 'invalid_key' === $code || 'website_not_allowed' === $code ) {
 		// Key revoked, replaced, or for the domain this site had before a move: the next audit registers again.
 		$changes['api_key'] = '';
