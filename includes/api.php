@@ -46,9 +46,10 @@ function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
  * purchase the page must show Pro, not the Buy Pro button.
  *
  * @param string $api_key Key to ask about (default: the stored one).
+ * @param int    $timeout Seconds to wait for the gateway (short when only showing the page).
  * @return array|string Status array, or an error code ("invalid_key", "network", …).
  */
-function tvarkom_csa_status( $api_key = '' ) {
+function tvarkom_csa_status( $api_key = '', $timeout = 15 ) {
 	if ( '' === $api_key ) {
 		$api_key = tvarkom_csa_settings()['api_key'];
 		if ( '' === $api_key ) {
@@ -58,7 +59,7 @@ function tvarkom_csa_status( $api_key = '' ) {
 	$response = wp_remote_get(
 		TVARKOM_CSA_API_URL . '/v1/client',
 		array(
-			'timeout' => 15,
+			'timeout' => $timeout,
 			'headers' => array( 'Authorization' => 'Bearer ' . $api_key ),
 		)
 	);

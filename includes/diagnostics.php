@@ -57,9 +57,19 @@ function tvarkom_csa_ms( $ms ) {
 }
 
 /**
- * Renders the Store diagnostics section.
+ * Renders the Store diagnostics section: a button, or the diagnostics once asked for
+ * (they query the database, which can take a moment on large hosts).
  */
 function tvarkom_csa_render_diagnostics() {
+	$show = isset( $_GET['csa_diagnostics'], $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'tvarkom_csa_diagnostics' );
+	if ( ! $show ) {
+		?>
+		<h2><?php esc_html_e( 'Store diagnostics', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'Your largest autoloaded options, leftover tables, PHP settings, failed and late background tasks, and a profile of your checkout, read from your store. Nothing in this section is sent to Tvarkom.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+		<p><a class="button" href="<?php echo esc_url( tvarkom_csa_diagnostics_url() ); ?>"><?php esc_html_e( 'Show store diagnostics', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></a></p>
+		<?php
+		return;
+	}
 	$d   = tvarkom_csa_collect_detailed( false );
 	$php = $d['php_configuration'];
 	?>
@@ -139,6 +149,15 @@ function tvarkom_csa_render_diagnostics() {
 		__( 'No late scheduled tasks.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
 	);
 	tvarkom_csa_render_local_profile();
+}
+
+/**
+ * URL of the plugin page with the diagnostics shown.
+ *
+ * @return string
+ */
+function tvarkom_csa_diagnostics_url() {
+	return wp_nonce_url( admin_url( 'admin.php?page=tvarkom-csa&csa_diagnostics=1' ), 'tvarkom_csa_diagnostics' );
 }
 
 /**
@@ -261,6 +280,12 @@ function tvarkom_csa_handle_profile() {
 		),
 		false
 	);
-	tvarkom_csa_redirect( 'ok' === $profile['status'] ? 'profiled' : 'profile_failed' );
+	tvarkom_csa_redirect(
+		'ok' === $profile['status'] ? 'profiled' : 'profile_failed',
+		array(
+			'csa_diagnostics' => 1,
+			'_wpnonce'        => wp_create_nonce( 'tvarkom_csa_diagnostics' ),
+		)
+	);
 }
 add_action( 'admin_post_tvarkom_csa_profile', 'tvarkom_csa_handle_profile' );

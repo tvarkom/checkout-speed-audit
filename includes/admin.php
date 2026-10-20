@@ -155,7 +155,7 @@ function tvarkom_csa_render_page() {
 		$notice = $settings['last']['code'];
 	}
 	$preview = isset( $_GET['csa_preview'], $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'tvarkom_csa_preview' );
-	$status  = '' !== $settings['api_key'] ? tvarkom_csa_status() : null;
+	$status  = '' !== $settings['api_key'] ? tvarkom_csa_status( '', 5 ) : null;
 	$is_pro  = tvarkom_csa_is_pro( $status );
 	?>
 	<div class="wrap">
@@ -289,8 +289,9 @@ add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
  * Back to the plugin page with a result code.
  *
  * @param string $code Key of tvarkom_csa_messages().
+ * @param array  $args Extra query arguments.
  */
-function tvarkom_csa_redirect( $code ) {
-	wp_safe_redirect( add_query_arg( 'csa_result', $code, admin_url( 'admin.php?page=tvarkom-csa' ) ) );
+function tvarkom_csa_redirect( $code, array $args = array() ) {
+	wp_safe_redirect( add_query_arg( array_merge( array( 'csa_result' => $code ), $args ), admin_url( 'admin.php?page=tvarkom-csa' ) ) );
 	exit;
 }
