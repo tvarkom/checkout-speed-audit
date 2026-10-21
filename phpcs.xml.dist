@@ -38,4 +38,22 @@
 			</property>
 		</properties>
 	</rule>
+	<!-- The PHPUnit tests (tests/) aren't shipped. PHPUnit finds them as test-*.php (phpunit.xml.dist),
+	     test method names say what they check, the lock tests read the option row directly on purpose,
+	     and the WordPress test suite sets its own constants, globals and request variables. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionComment.Missing">
+		<exclude-pattern>/tests/test-*\.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Security.NonceVerification">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
 </ruleset>

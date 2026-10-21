@@ -24,6 +24,7 @@ needs WooCommerce.
 | `includes/diagnostics.php` | The Store diagnostics section and the local checkout profile |
 | `includes/admin.php` | The WooCommerce → Speed Audit page, its form handler and script |
 | `uninstall.php` | Removes the plugin's options and transients |
+| `tests/` | PHPUnit tests (not shipped): `class-tvarkom-csa-test-case.php` has the fake gateway they all use |
 
 ## Hooks
 
@@ -51,11 +52,40 @@ composer install                                   # development tools only, int
 vendor/bin/phpcs                                   # WordPress Coding Standards + PHP 7.4 compatibility
 vendor/bin/phpstan analyse --memory-limit=1G       # level 5, WordPress and WooCommerce stubs
 php -l <file>                                      # on PHP 7.4 and 8.4
+vendor/bin/phpunit                                 # on PHP 7.4 and 8.4, with MySQL
 ```
 
-`vendor/bin/phpcbf` fixes most formatting reports. Before a release, also run
-[Plugin Check](https://wordpress.org/plugins/plugin-check/) on the zip's contents, for example in
-WordPress Playground with WooCommerce and Plugin Check installed:
+`vendor/bin/phpcbf` fixes most formatting reports. Composer resolves the tools for PHP 7.4
+(`config.platform`), so one `composer.lock` installs on 7.4 and 8.4.
+
+### Tests
+
+`tests/` uses the WordPress test suite (`WP_UnitTestCase`, from `wp-phpunit/wp-phpunit`) with
+WooCommerce and the plugin loaded. Each test runs in a database transaction that is rolled
+back. No test reaches the network: requests to `TVARKOM_CSA_API_URL` (`https://gateway.test`
+in the tests) are answered by the fake gateway in `Tvarkom_CSA_Test_Case::respond()`, and any
+other request fails as if the store were offline.
+
+To run them you need a WordPress copy with WooCommerce in `wp-content/plugins/woocommerce`,
+and an empty MySQL database the suite may wipe:
+
+```sh
+WP_CORE_DIR=/path/to/wordpress \
+WP_TESTS_DB_NAME=wordpress_test WP_TESTS_DB_USER=root WP_TESTS_DB_PASSWORD=... WP_TESTS_DB_HOST=127.0.0.1 \
+vendor/bin/phpunit
+```
+
+`tests/wp-tests-config.php` lists the variables; the CI job `.phpunit` shows the whole setup
+(WordPress and WooCommerce versions included).
+
+Not covered by the tests: the profiled checkout request itself (it changes the whole process:
+`SAVEQUERIES`, wrapped hooks) and the Store diagnostics tables' contents. Check those in
+WordPress Playground before a release, with Plugin Check.
+
+### Before a release
+
+Also run [Plugin Check](https://wordpress.org/plugins/plugin-check/) on the zip's contents, for
+example in WordPress Playground with WooCommerce and Plugin Check installed:
 `wp plugin check tvarkom-checkout-speed-audit-for-woocommerce`.
 
 To test against a local gateway, set `TVARKOM_CSA_API_URL` in `wp-config.php`.
