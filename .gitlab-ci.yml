@@ -12,40 +12,21 @@ workflow:
       when: never
     - if: $CI_COMMIT_BRANCH
 
-# Syntax on the oldest PHP the plugin supports (Requires PHP: 7.4) and a current one.
-.php-lint:
-  stage: test
-  script:
-    - php -v
-    - find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-
-php-7.4:
-  extends: .php-lint
-  image: php:7.4-cli
-
-php-8.4:
-  extends: .php-lint
-  image: php:8.4-cli
-
-# WordPress Coding Standards and PHP 7.4 compatibility (phpcs.xml.dist); fails on any error or warning.
-phpcs:
+# WordPress Coding Standards and PHP 7.4 compatibility (phpcs.xml.dist; fails on any error or
+# warning), then static analysis at level 5 (phpstan.neon.dist, with WordPress and WooCommerce
+# stubs). One job, so Composer installs once.
+static-analysis:
   stage: test
   image: composer:2.8
   script:
     - composer install --no-interaction --no-progress
     - vendor/bin/phpcs -i
     - vendor/bin/phpcs
-
-# Static analysis at level 5 (phpstan.neon.dist), with WordPress and WooCommerce stubs.
-phpstan:
-  stage: test
-  image: composer:2.8
-  script:
-    - composer install --no-interaction --no-progress
     - vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
-# PHPUnit (tests/, phpunit.xml.dist): the WordPress test suite with WooCommerce, on a MySQL
-# database the suite empties, on the oldest PHP the plugin supports and a current one.
+# Syntax check, then PHPUnit (tests/, phpunit.xml.dist): the WordPress test suite with
+# WooCommerce, on a MySQL database the suite empties, on the oldest PHP the plugin supports
+# (Requires PHP: 7.4) and a current one.
 .phpunit:
   stage: test
   services:
@@ -72,6 +53,7 @@ phpstan:
       php -r 'for ($i = 0; $i < 30; $i++) { if (@mysqli_connect(getenv("WP_TESTS_DB_HOST"), "root", getenv("WP_TESTS_DB_PASSWORD"))) { exit(0); } sleep(2); } fwrite(STDERR, "MySQL did not start\n"); exit(1);'
   script:
     - php -v
+    - find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
     - vendor/bin/phpunit
 
 phpunit-7.4:
