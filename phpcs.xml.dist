@@ -38,13 +38,4 @@
 			</property>
 		</properties>
 	</rule>
-
-	<!-- profile.php keeps the profiler class next to the functions that install and run it;
-	     splitting the file would change the includes for no behavior gain. -->
-	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
-		<exclude-pattern>/includes/profile\.php$</exclude-pattern>
-	</rule>
-	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
-		<exclude-pattern>/includes/profile\.php$</exclude-pattern>
-	</rule>
 </ruleset>

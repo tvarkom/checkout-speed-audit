@@ -29,68 +29,35 @@ if ( ! defined( 'TVARKOM_CSA_API_URL' ) ) {
 	define( 'TVARKOM_CSA_API_URL', 'https://api.tvarkom.com' );
 }
 
+require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/api.php';
+require_once __DIR__ . '/includes/rest.php';
 require_once __DIR__ . '/includes/metrics.php';
 require_once __DIR__ . '/includes/detailed.php';
+require_once __DIR__ . '/includes/audit.php';
+require_once __DIR__ . '/includes/class-tvarkom-csa-profiler.php';
 require_once __DIR__ . '/includes/profile.php';
+require_once __DIR__ . '/includes/profile-report.php';
+require_once __DIR__ . '/includes/profile-request.php';
 require_once __DIR__ . '/includes/diagnostics.php';
 require_once __DIR__ . '/includes/admin.php';
 
-// Only acts on the audit job's own checkout request (includes/profile.php).
+// Every hook the plugin registers when it loads. The profiler registers its own hooks, and
+// only on the audit job's own checkout request (includes/profile.php).
 tvarkom_csa_profile_maybe_start();
 
-/**
- * Stored settings: API key, plan, report email, consent and the last result.
- *
- * @return array{api_key: string, plan: string, email: string, consent: bool, last: array}
- */
-function tvarkom_csa_settings() {
-	$saved = get_option( TVARKOM_CSA_OPTION, array() );
-	return wp_parse_args(
-		is_array( $saved ) ? $saved : array(),
-		array(
-			'api_key' => '',
-			'plan'    => '',
-			'email'   => get_option( 'admin_email' ),
-			'consent' => false,
-			'last'    => array(),
-		)
-	);
-}
+// The admin page (includes/admin.php).
+add_action( 'admin_menu', 'tvarkom_csa_admin_menu', 99 );
+add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
+add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
 
-/**
- * Merges $changes into the stored settings. Not autoloaded: it's only read on the plugin's own page and job.
- *
- * @param array $changes Settings to change.
- */
-function tvarkom_csa_update_settings( array $changes ) {
-	update_option( TVARKOM_CSA_OPTION, array_merge( tvarkom_csa_settings(), $changes ), false );
-}
+// Store diagnostics: the local checkout profile button (includes/diagnostics.php).
+add_action( 'admin_post_tvarkom_csa_profile', 'tvarkom_csa_handle_profile' );
 
-/**
- * Domain check for registration: the gateway fetches this URL and expects the token it
- * handed to this site a moment earlier. Public on purpose; it only ever returns a
- * short-lived, single-use token that is useless to anyone else.
- */
-function tvarkom_csa_register_routes() {
-	register_rest_route(
-		'tvarkom/v1',
-		'/verify',
-		array(
-			'methods'             => 'GET',
-			'permission_callback' => '__return_true',
-			'callback'            => function () {
-				$token = get_transient( TVARKOM_CSA_TOKEN );
-				if ( ! is_string( $token ) || '' === $token ) {
-					return new WP_Error( 'tvarkom_csa_no_registration', 'No registration in progress.', array( 'status' => 404 ) );
-				}
-				return array( 'token' => $token );
-			},
-		)
-	);
-}
+// Domain check for registration (includes/rest.php).
 add_action( 'rest_api_init', 'tvarkom_csa_register_routes' );
 
 // Audits run when the admin clicks the button (admin.php). Versions up to 0.6.1 queued them
-// with Action Scheduler; this keeps a job such a version queued before an upgrade working.
+// with Action Scheduler; this keeps a job such a version queued before an upgrade working
+// (includes/audit.php).
 add_action( TVARKOM_CSA_ACTION, 'tvarkom_csa_run_audit' );

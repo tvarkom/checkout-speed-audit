@@ -288,4 +288,3 @@ function tvarkom_csa_handle_profile() {
 		)
 	);
 }
-add_action( 'admin_post_tvarkom_csa_profile', 'tvarkom_csa_handle_profile' );

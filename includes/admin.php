@@ -22,7 +22,6 @@ function tvarkom_csa_admin_menu() {
 		'tvarkom_csa_render_page'
 	);
 }
-add_action( 'admin_menu', 'tvarkom_csa_admin_menu', 99 );
 
 /**
  * Notice for each result code from the gateway or this plugin.
@@ -283,7 +282,6 @@ function tvarkom_csa_handle_form() {
 	$last = tvarkom_csa_settings()['last'];
 	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );
 }
-add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 
 /**
  * Back to the plugin page with a result code.
@@ -324,4 +322,3 @@ function tvarkom_csa_admin_scripts( $hook_suffix ) {
 })();'
 	);
 }
-add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
