@@ -35,6 +35,7 @@ function tvarkom_csa_messages() {
 		'pending'                => array( 'info', __( 'Your audit is being prepared in the background. Reload this page in a minute to see if it was sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'queued'                 => array( 'success', __( 'Audit requested. The report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'queued_detailed'        => array( 'success', __( 'Pro audit requested. The detailed report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'audit_running'          => array( 'info', __( 'An audit for this store is already running, so this click didn\'t send another one. Reload this page in a minute to see its result.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'profiled'               => array( 'success', __( 'Checkout profiled. The result is under Store diagnostics below.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'profile_failed'         => array( 'warning', __( 'The checkout profile couldn\'t run. The reason is under Store diagnostics below.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Tick "Include store data in my audit" below and run the audit again. No Pro audit was used.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -266,9 +267,14 @@ function tvarkom_csa_handle_form() {
 		tvarkom_csa_redirect( 'saved' );
 	}
 
+	// One audit at a time, registration included (tvarkom_csa_audit_lock()).
+	if ( ! tvarkom_csa_audit_lock() ) {
+		tvarkom_csa_redirect( 'audit_running' );
+	}
 	if ( '' === tvarkom_csa_settings()['api_key'] ) {
 		$error = tvarkom_csa_register( $email );
 		if ( '' !== $error ) {
+			tvarkom_csa_audit_unlock();
 			tvarkom_csa_redirect( $error );
 		}
 	}
@@ -279,6 +285,7 @@ function tvarkom_csa_handle_form() {
 	// refuses a Pro audit without the store data, without using one.
 	wc_set_time_limit( 120 );
 	tvarkom_csa_run_audit();
+	tvarkom_csa_audit_unlock();
 	$last = tvarkom_csa_settings()['last'];
 	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );
 }
