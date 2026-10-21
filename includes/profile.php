@@ -419,7 +419,7 @@ function tvarkom_csa_profile_caller() {
 /**
  * Tags each logged query with the component that ran it (filter log_query_custom_data).
  *
- * @param array $data Custom query data.
+ * @param mixed $data Custom query data (an array, unless another filter broke it).
  * @return array
  */
 function tvarkom_csa_profile_tag_query( $data ) {

@@ -1,0 +1,17 @@
+# WordPress and WooCommerce functions come from the stubs (szepeviktor/phpstan-wordpress
+# is loaded by phpstan/extension-installer).
+parameters:
+    level: 5
+    phpVersion: 70400
+    paths:
+        - checkout-speed-audit.php
+        - uninstall.php
+        - includes
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    scanFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+    # Docblocks in WordPress, WooCommerce and other plugins aren't guarantees (filters pass
+    # whatever other code returns; WC()->cart is null outside the front end), so the
+    # plugin's defensive checks stay and aren't reported as always true.
+    treatPhpDocTypesAsCertain: false

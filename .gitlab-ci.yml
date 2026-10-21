@@ -35,3 +35,11 @@ phpcs:
     - composer install --no-interaction --no-progress
     - vendor/bin/phpcs -i
     - vendor/bin/phpcs
+
+# Static analysis at level 5 (phpstan.neon.dist), with WordPress and WooCommerce stubs.
+phpstan:
+  stage: test
+  image: composer:2.8
+  script:
+    - composer install --no-interaction --no-progress
+    - vendor/bin/phpstan analyse --no-progress --memory-limit=1G
