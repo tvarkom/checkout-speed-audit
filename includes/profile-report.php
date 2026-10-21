@@ -64,6 +64,8 @@ function tvarkom_csa_profile_component_name( $key ) {
 
 /**
  * Builds the profile at the end of the request and leaves it for the audit job.
+ *
+ * @return void
  */
 function tvarkom_csa_profile_finish() {
 	global $wpdb, $wp_object_cache;

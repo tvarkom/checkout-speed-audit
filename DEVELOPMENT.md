@@ -50,7 +50,7 @@ The CI (`.gitlab-ci.yml`) runs on every branch and merge request:
 ```sh
 composer install                                   # development tools only, into vendor/
 vendor/bin/phpcs                                   # WordPress Coding Standards + PHP 7.4 compatibility
-vendor/bin/phpstan analyse --memory-limit=1G       # level 5, WordPress and WooCommerce stubs
+vendor/bin/phpstan analyse --memory-limit=1G       # level 6, WordPress and WooCommerce stubs
 php -l <file>                                      # on PHP 7.4 and 8.4
 vendor/bin/phpunit                                 # on PHP 7.4 and 8.4, with MySQL
 ```

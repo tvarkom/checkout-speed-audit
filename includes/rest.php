@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Domain check for registration: the gateway fetches this URL and expects the token it
  * handed to this site a moment earlier. Public on purpose; it only ever returns a
  * short-lived, single-use token that is useless to anyone else.
+ *
+ * @return void
  */
 function tvarkom_csa_register_routes() {
 	register_rest_route(

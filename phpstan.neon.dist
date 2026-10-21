@@ -1,7 +1,7 @@
 # WordPress and WooCommerce functions come from the stubs (szepeviktor/phpstan-wordpress
 # is loaded by phpstan/extension-installer).
 parameters:
-    level: 5
+    level: 6
     phpVersion: 70400
     paths:
         - checkout-speed-audit.php

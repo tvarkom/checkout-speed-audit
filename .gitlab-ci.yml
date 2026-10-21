@@ -13,7 +13,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 # WordPress Coding Standards and PHP 7.4 compatibility (phpcs.xml.dist; fails on any error or
-# warning), then static analysis at level 5 (phpstan.neon.dist, with WordPress and WooCommerce
+# warning), then static analysis at level 6 (phpstan.neon.dist, with WordPress and WooCommerce
 # stubs). One job, so Composer installs once.
 static-analysis:
   stage: test

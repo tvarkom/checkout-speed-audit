@@ -14,6 +14,8 @@ define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
 
 /**
  * The background job: collects the store metrics (only with consent) and requests the audit.
+ *
+ * @return void
  */
 function tvarkom_csa_run_audit() {
 	$settings = tvarkom_csa_settings();
@@ -111,6 +113,8 @@ function tvarkom_csa_audit_lock() {
 
 /**
  * Releases the lock taken by tvarkom_csa_audit_lock().
+ *
+ * @return void
  */
 function tvarkom_csa_audit_unlock() {
 	delete_option( TVARKOM_CSA_AUDIT_LOCK );
@@ -119,6 +123,8 @@ function tvarkom_csa_audit_unlock() {
 /**
  * An audit queued by version 0.6.0 (Action Scheduler), run under the same lock as a click. If an
  * audit is running already, the queued one is dropped: it would only repeat that audit.
+ *
+ * @return void
  */
 function tvarkom_csa_run_queued_audit() {
 	if ( ! tvarkom_csa_audit_lock() ) {

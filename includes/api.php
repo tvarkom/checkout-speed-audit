@@ -13,10 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * POSTs JSON to the gateway.
  *
- * @param string $path    Path, e.g. "/v1/audits".
- * @param array  $body    Request body.
- * @param string $api_key Bearer key, or "" for none.
- * @return array{status: int, body: array}|WP_Error
+ * @param string               $path    Path, e.g. "/v1/audits".
+ * @param array<string, mixed> $body    Request body.
+ * @param string               $api_key Bearer key, or "" for none.
+ * @return array{status: int, body: array<string, mixed>}|WP_Error
  */
 function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
 	$headers = array( 'Content-Type' => 'application/json' );
@@ -48,7 +48,7 @@ function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
  *
  * @param string $api_key Key to ask about (default: the stored one).
  * @param int    $timeout Seconds to wait for the gateway (short when only showing the page).
- * @return array|string Status array, or an error code ("invalid_key", "network", …).
+ * @return array<string, mixed>|string Status array, or an error code ("invalid_key", "network", …).
  */
 function tvarkom_csa_status( $api_key = '', $timeout = 15 ) {
 	if ( '' === $api_key ) {
@@ -108,8 +108,8 @@ function tvarkom_csa_save_license( $key ) {
 /**
  * Error code from a gateway response, or $fallback.
  *
- * @param array  $response Response from tvarkom_csa_post().
- * @param string $fallback Code when the body has none.
+ * @param array{status: int, body: array<string, mixed>} $response Response from tvarkom_csa_post().
+ * @param string                                         $fallback Code when the body has none.
  * @return string
  */
 function tvarkom_csa_error_code( array $response, $fallback = 'server' ) {

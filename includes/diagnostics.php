@@ -22,6 +22,7 @@ define( 'TVARKOM_CSA_LOCAL_PROFILE', 'tvarkom_csa_local_profile' );
  * @param string[]   $head       Column headings.
  * @param string[][] $rows       Cells (plain text).
  * @param string     $empty_text Text when there are no rows.
+ * @return void
  */
 function tvarkom_csa_table( array $head, array $rows, $empty_text ) {
 	if ( empty( $rows ) ) {
@@ -59,6 +60,8 @@ function tvarkom_csa_ms( $ms ) {
 /**
  * Renders the Store diagnostics section: a button, or the diagnostics once asked for
  * (they query the database, which can take a moment on large hosts).
+ *
+ * @return void
  */
 function tvarkom_csa_render_diagnostics() {
 	$show = isset( $_GET['csa_diagnostics'], $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'tvarkom_csa_diagnostics' );
@@ -162,6 +165,8 @@ function tvarkom_csa_diagnostics_url() {
 
 /**
  * The checkout profile part: the button and the last result.
+ *
+ * @return void
  */
 function tvarkom_csa_render_local_profile() {
 	$saved = get_option( TVARKOM_CSA_LOCAL_PROFILE );
@@ -265,6 +270,8 @@ function tvarkom_csa_render_local_profile() {
 
 /**
  * "Profile my checkout": runs the checkout profile and keeps the result for the page.
+ *
+ * @return void
  */
 function tvarkom_csa_handle_profile() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) {

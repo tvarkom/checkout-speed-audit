@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Adds the page under the WooCommerce menu.
+ *
+ * @return void
  */
 function tvarkom_csa_admin_menu() {
 	add_submenu_page(
@@ -85,7 +87,7 @@ function tvarkom_csa_date( $time ) {
 /**
  * Whether the store has Pro audits left, from tvarkom_csa_status().
  *
- * @param array|string $status Status.
+ * @param array<string, mixed>|string $status Status.
  * @return bool
  */
 function tvarkom_csa_is_pro( $status ) {
@@ -95,7 +97,8 @@ function tvarkom_csa_is_pro( $status ) {
 /**
  * Plan line under the API key: plan, Pro audits left, free usage and the link to buy Pro.
  *
- * @param array|string $status From tvarkom_csa_status().
+ * @param array<string, mixed>|string $status From tvarkom_csa_status().
+ * @return void
  */
 function tvarkom_csa_render_plan( $status ) {
 	if ( ! is_array( $status ) ) {
@@ -140,6 +143,8 @@ function tvarkom_csa_render_plan( $status ) {
 
 /**
  * Renders the page.
+ *
+ * @return void
  */
 function tvarkom_csa_render_page() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -241,6 +246,8 @@ function tvarkom_csa_render_page() {
 /**
  * Saves the settings and, for the audit button, registers the store if needed and
  * requests the audit.
+ *
+ * @return void
  */
 function tvarkom_csa_handle_form() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -298,8 +305,9 @@ function tvarkom_csa_handle_form() {
 /**
  * Back to the plugin page with a result code.
  *
- * @param string $code Key of tvarkom_csa_messages().
- * @param array  $args Extra query arguments.
+ * @param string                    $code Key of tvarkom_csa_messages().
+ * @param array<string, int|string> $args Extra query arguments.
+ * @return never
  */
 function tvarkom_csa_redirect( $code, array $args = array() ) {
 	wp_safe_redirect( add_query_arg( array_merge( array( 'csa_result' => $code ), $args ), admin_url( 'admin.php?page=tvarkom-csa' ) ) );
@@ -311,6 +319,7 @@ function tvarkom_csa_redirect( $code, array $args = array() ) {
  * says so and a second click is ignored.
  *
  * @param string $hook_suffix Current admin page.
+ * @return void
  */
 function tvarkom_csa_admin_scripts( $hook_suffix ) {
 	if ( 'woocommerce_page_tvarkom-csa' !== $hook_suffix ) {

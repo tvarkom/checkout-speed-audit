@@ -33,6 +33,8 @@ define( 'TVARKOM_CSA_PROFILE_HEADER', 'X-Tvarkom-Profile' );
 /**
  * Starts the profiler if this request carries the token the audit job set a moment ago.
  * Called when the plugin file loads; costs one isset() on every other request.
+ *
+ * @return void
  */
 function tvarkom_csa_profile_maybe_start() {
 	if ( empty( $_SERVER['HTTP_X_TVARKOM_PROFILE'] ) || ! isset( $_SERVER['REQUEST_METHOD'] ) || 'GET' !== $_SERVER['REQUEST_METHOD'] ) {
@@ -118,6 +120,8 @@ function tvarkom_csa_profile_elapsed() {
 
 /**
  * Measures what one wrapped call costs, to report the profiler's own overhead.
+ *
+ * @return void
  */
 function tvarkom_csa_profile_calibrate() {
 	$wrapper = tvarkom_csa_profile_wrapper( '__return_null', 'self', 'calibrate' );
@@ -161,6 +165,8 @@ function tvarkom_csa_profile_wrapper( $callback, $component, $hook ) {
  * Wraps every hook callback not wrapped yet. The callback keeps its key in the
  * hook, so remove_action() and has_filter() by other plugins still find it.
  * Callbacks taking arguments by reference are left alone (a wrapper would break them).
+ *
+ * @return void
  */
 function tvarkom_csa_profile_wrap() {
 	global $wp_filter;
@@ -305,7 +311,7 @@ function tvarkom_csa_profile_caller() {
  * Tags each logged query with the component that ran it (filter log_query_custom_data).
  *
  * @param mixed $data Custom query data (an array, unless another filter broke it).
- * @return array
+ * @return array<string, mixed>
  */
 function tvarkom_csa_profile_tag_query( $data ) {
 	$data                = is_array( $data ) ? $data : array();
@@ -316,9 +322,9 @@ function tvarkom_csa_profile_tag_query( $data ) {
 /**
  * Notes the start of an outgoing HTTP call (filter pre_http_request, passes $pre through).
  *
- * @param mixed  $pre  Short-circuit value.
- * @param array  $args Request arguments.
- * @param string $url  URL.
+ * @param mixed                $pre  Short-circuit value.
+ * @param array<string, mixed> $args Request arguments.
+ * @param string               $url  URL.
  * @return mixed
  */
 function tvarkom_csa_profile_http_start( $pre, $args, $url ) {
@@ -329,11 +335,12 @@ function tvarkom_csa_profile_http_start( $pre, $args, $url ) {
 /**
  * Records a finished outgoing HTTP call: host, time and status only (action http_api_debug).
  *
- * @param array|WP_Error $response  Response.
- * @param string         $context   "response".
- * @param string         $transport Transport class.
- * @param array          $args      Request arguments.
- * @param string         $url       URL.
+ * @param array<string, mixed>|WP_Error $response  Response.
+ * @param string                        $context   "response".
+ * @param string                        $transport Transport class.
+ * @param array<string, mixed>          $args      Request arguments.
+ * @param string                        $url       URL.
+ * @return void
  */
 function tvarkom_csa_profile_http_end( $response, $context, $transport, $args, $url ) {
 	for ( $i = count( Tvarkom_CSA_Profiler::$http_open ) - 1; $i >= 0; $i-- ) {
@@ -362,6 +369,8 @@ function tvarkom_csa_profile_http_end( $response, $context, $transport, $args, $
  * Puts the chosen product in a cart that exists only for this request, so the
  * real checkout renders. No add-to-cart actions run, no cookie is set and the
  * session isn't saved.
+ *
+ * @return void
  */
 function tvarkom_csa_profile_fill_cart() {
 	if ( ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->cart->is_empty() ) {

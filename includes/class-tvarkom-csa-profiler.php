@@ -110,6 +110,7 @@ final class Tvarkom_CSA_Profiler {
 	 * @param string $component Component key.
 	 * @param string $hook      Hook name.
 	 * @param int    $ns        Self time.
+	 * @return void
 	 */
 	public static function record( $component, $hook, $ns ) {
 		if ( isset( self::$components[ $component ] ) ) {

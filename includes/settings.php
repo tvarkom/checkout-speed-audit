@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Stored settings: API key, plan, report email, consent and the last result.
  *
- * @return array{api_key: string, plan: string, email: string, consent: bool, last: array}
+ * @return array{api_key: string, plan: string, email: string, consent: bool, last: array<string, mixed>}
  */
 function tvarkom_csa_settings() {
 	$saved = get_option( TVARKOM_CSA_OPTION, array() );
@@ -31,7 +31,8 @@ function tvarkom_csa_settings() {
 /**
  * Merges $changes into the stored settings. Not autoloaded: it's only read on the plugin's own page and job.
  *
- * @param array $changes Settings to change.
+ * @param array<string, mixed> $changes Settings to change.
+ * @return void
  */
 function tvarkom_csa_update_settings( array $changes ) {
 	update_option( TVARKOM_CSA_OPTION, array_merge( tvarkom_csa_settings(), $changes ), false );
