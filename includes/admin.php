@@ -154,6 +154,11 @@ function tvarkom_csa_render_page() {
 	if ( '' === $notice && ! empty( $settings['last']['code'] ) ) {
 		$notice = $settings['last']['code'];
 	}
+	// A code this version has no text for (the gateway's "internal", "upstream_error", …)
+	// still tells the admin the audit didn't go through.
+	if ( '' !== $notice && ! isset( $messages[ $notice ] ) ) {
+		$notice = 'server';
+	}
 	$preview = isset( $_GET['csa_preview'], $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'tvarkom_csa_preview' );
 	$status  = '' !== $settings['api_key'] ? tvarkom_csa_status( '', 5 ) : null;
 	$is_pro  = tvarkom_csa_is_pro( $status );
