@@ -1,6 +1,8 @@
 # Development
 
 `readme.txt` is the WordPress.org readme for store owners. This file is for working on the code.
+**New here? Read [docs/request-flow.md](docs/request-flow.md)**: it follows one "Run free audit"
+click through the code, step by step, and says where to change things.
 
 The plugin is procedural WordPress code: a main file, `includes/`, and every function, constant
 and option prefixed `tvarkom_csa` / `TVARKOM_CSA`. It supports PHP 7.4+ and WordPress 6.5+, and
