@@ -45,7 +45,7 @@ one header check.
 
 ## Checks
 
-The CI (`.gitlab-ci.yml`) runs on every branch and merge request:
+The CI (`.github/workflows/ci.yml`, GitHub Actions) runs on pushes to `main` and on pull requests:
 
 ```sh
 composer install                                   # development tools only, into vendor/
