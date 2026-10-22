@@ -213,8 +213,9 @@ function tvarkom_csa_installed_components() {
  * known plugin (by its usual prefix) that isn't installed. "unknown": nothing identified. A
  * name never proves a table is unused, so the report never calls one confirmed.
  *
- * @param string                                       $short      Table name without the site prefix.
- * @param array{plugins: array<string, array{0: string, 1: bool}>, themes: array<string, array{0: string, 1: bool}>, names: array<string, bool>} $components From tvarkom_csa_installed_components().
+ * @param string $short      Table name without the site prefix.
+ * @param array  $components From tvarkom_csa_installed_components().
+ * @phpstan-param array{plugins: array<string, array{0: string, 1: bool}>, themes: array<string, array{0: string, 1: bool}>, names: array<string, bool>} $components
  * @return array{0: string, 1: string|null} Classification and owner.
  */
 function tvarkom_csa_table_owner( $short, array $components ) {
@@ -227,7 +228,7 @@ function tvarkom_csa_table_owner( $short, array $components ) {
 		if ( false !== strpos( $owner, 'WooCommerce' ) || false !== strpos( $owner, 'WordPress' ) ) {
 			return array( 'active', $owner );
 		}
-		// "Wordfence" is installed as "Wordfence Security", "WPForms" as "WPForms Lite".
+		// The installed name can be longer than the known owner, as with Wordfence Security.
 		$installed = null;
 		foreach ( $components['names'] as $name => $on ) {
 			if ( false !== stripos( $name, $owner ) ) {
@@ -285,7 +286,7 @@ function tvarkom_csa_known_table_prefixes() {
 function tvarkom_csa_orphaned_tables() {
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table metadata, once per detailed audit.
-	$rows    = $wpdb->get_results(
+	$rows       = $wpdb->get_results(
 		$wpdb->prepare(
 			'SELECT TABLE_NAME AS name, DATA_LENGTH + INDEX_LENGTH AS bytes, TABLE_ROWS AS row_count FROM information_schema.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME LIKE %s ORDER BY bytes DESC',
 			DB_NAME,
@@ -301,6 +302,7 @@ function tvarkom_csa_orphaned_tables() {
 		if ( isset( $core[ $table ] ) || ( is_multisite() && preg_match( '/^\d+_/', $short ) ) ) {
 			continue;
 		}
+
 		list( $classification, $owner ) = tvarkom_csa_table_owner( $short, $components );
 		if ( 'active' === $classification ) {
 			continue;

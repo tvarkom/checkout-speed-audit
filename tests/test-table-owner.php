@@ -19,9 +19,9 @@ class Tvarkom_CSA_Table_Owner_Test extends Tvarkom_CSA_Test_Case {
 	 */
 	private function components() {
 		$out = array(
-			'plugins' => array(),
-			'themes'  => array(),
-			'names'   => array(),
+			'plugins'                                     => array(),
+			'themes'                                      => array(),
+			'names'                                       => array(),
 		);
 		foreach ( array(
 			array( 'wp-defender', 'Defender Pro', true ),
@@ -49,16 +49,16 @@ class Tvarkom_CSA_Table_Owner_Test extends Tvarkom_CSA_Test_Case {
 	 */
 	public function data_tables() {
 		return array(
-			'active plugin, prefix without its "wp-"'  => array( 'defender_antibot', 'active', 'Defender Pro' ),
-			'active theme'                             => array( 'woodmart_wishlists', 'active', 'Woodmart' ),
-			'Elementor table named e_'                 => array( 'e_events', 'active', 'Elementor' ),
+			'active plugin, prefix without its "wp-"'     => array( 'defender_antibot', 'active', 'Defender Pro' ),
+			'active theme'                                => array( 'woodmart_wishlists', 'active', 'Woodmart' ),
+			'Elementor table named e_'                    => array( 'e_events', 'active', 'Elementor' ),
 			'known prefix, installed under a longer name' => array( 'wfconfig', 'active', 'Wordfence' ),
-			'WooCommerce'                              => array( 'wc_orders', 'active', 'WooCommerce' ),
-			'switched-off plugin'                      => array( 'old_forms_entries', 'inactive', 'Old Forms' ),
-			'switched-off theme'                       => array( 'oldtheme_settings', 'inactive', 'Old Theme' ),
-			'known plugin not installed'               => array( 'aioseo_posts', 'not_installed', 'All in One SEO' ),
-			'nothing identified'                       => array( 'old_stats', 'unknown', null ),
-			'short prefix never says not installed'    => array( 'gf_entry', 'unknown', null ),
+			'WooCommerce'                                 => array( 'wc_orders', 'active', 'WooCommerce' ),
+			'switched-off plugin'                         => array( 'old_forms_entries', 'inactive', 'Old Forms' ),
+			'switched-off theme'                          => array( 'oldtheme_settings', 'inactive', 'Old Theme' ),
+			'known plugin not installed'                  => array( 'aioseo_posts', 'not_installed', 'All in One SEO' ),
+			'nothing identified'                          => array( 'old_stats', 'unknown', null ),
+			'short prefix never says not installed'       => array( 'gf_entry', 'unknown', null ),
 		);
 	}
 
