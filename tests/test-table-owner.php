@@ -19,9 +19,9 @@ class Tvarkom_CSA_Table_Owner_Test extends Tvarkom_CSA_Test_Case {
 	 */
 	private function components() {
 		$out = array(
-			'plugins'                                     => array(),
-			'themes'                                      => array(),
-			'names'                                       => array(),
+			'plugins' => array(),
+			'themes'  => array(),
+			'names'   => array(),
 		);
 		foreach ( array(
 			array( 'wp-defender', 'Defender Pro', true ),
