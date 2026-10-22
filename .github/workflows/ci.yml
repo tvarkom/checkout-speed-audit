@@ -39,26 +39,32 @@ jobs:
       fail-fast: false
       matrix:
         php: ['7.4', '8.4']
-    container: php:${{ matrix.php }}-cli
+    # PHP from setup-php on the runner, not the php:X-cli image: php:7.4-cli is Debian 11,
+    # whose package archive no longer serves the tools the job needs (unzip).
     services:
       mysql:
         image: mysql:8.4
         env:
           MYSQL_DATABASE: wordpress_test
           MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
     env:
-      WP_TESTS_DB_HOST: mysql
+      WP_TESTS_DB_HOST: 127.0.0.1
       WP_TESTS_DB_PASSWORD: root
       WP_CORE_DIR: /tmp/wordpress
       WP_VERSION: 7.1.3 # Tested up to in readme.txt
       WC_VERSION: 11.2.1
     steps:
       - uses: actions/checkout@v4
-      - name: Install tools, WordPress and WooCommerce
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli
+          tools: composer:v2
+          coverage: none
+      - name: Install development tools, WordPress and WooCommerce
         run: |
-          apt-get update -qq && apt-get install -y -qq unzip > /dev/null
-          docker-php-ext-install mysqli > /dev/null
-          curl -sS https://getcomposer.org/installer | php -- --quiet --install-dir=/usr/local/bin --filename=composer
           composer install --no-interaction --no-progress
           mkdir -p "$WP_CORE_DIR"
           curl -sSfL "https://wordpress.org/wordpress-$WP_VERSION.tar.gz" | tar -xz --strip-components=1 -C "$WP_CORE_DIR"
