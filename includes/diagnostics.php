@@ -17,6 +17,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TVARKOM_CSA_LOCAL_PROFILE', 'tvarkom_csa_local_profile' );
 
 /**
+ * What the Status column says about a table no active plugin or theme matched.
+ *
+ * @param string      $classification not_installed, inactive or unknown (tvarkom_csa_table_owner()).
+ * @param string|null $owner          The plugin or theme the name points to.
+ * @return string
+ */
+function tvarkom_csa_table_status_label( $classification, $owner ) {
+	if ( 'not_installed' === $classification && null !== $owner ) {
+		/* translators: %s: plugin name. */
+		return sprintf( __( 'Likely left by %s, which isn\'t installed', 'tvarkom-checkout-speed-audit-for-woocommerce' ), $owner );
+	}
+	if ( 'inactive' === $classification && null !== $owner ) {
+		/* translators: %s: plugin or theme name. */
+		return sprintf( __( 'Installed but switched off: %s', 'tvarkom-checkout-speed-audit-for-woocommerce' ), $owner );
+	}
+	return __( 'Owner not identified', 'tvarkom-checkout-speed-audit-for-woocommerce' );
+}
+
+/**
  * One small table.
  *
  * @param string[]   $head       Column headings.
@@ -94,14 +113,14 @@ function tvarkom_csa_render_diagnostics() {
 	);
 	?>
 
-	<h3><?php esc_html_e( 'Tables no active plugin seems to use', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h3>
-	<p class="description"><?php esc_html_e( 'Often left behind by removed plugins. Check before deleting: some belong to plugins that are only switched off.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+	<h3><?php esc_html_e( 'Tables not matched to an active plugin or theme', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h3>
+	<p class="description"><?php esc_html_e( 'A table name alone can\'t prove a table is unused. Only remove one after confirming its plugin is gone, with a backup.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 	<?php
 	tvarkom_csa_table(
-		array( __( 'Table', 'tvarkom-checkout-speed-audit-for-woocommerce' ), __( 'Size', 'tvarkom-checkout-speed-audit-for-woocommerce' ), __( 'Rows (estimate)', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		array( __( 'Table', 'tvarkom-checkout-speed-audit-for-woocommerce' ), __( 'Size', 'tvarkom-checkout-speed-audit-for-woocommerce' ), __( 'Rows (estimate)', 'tvarkom-checkout-speed-audit-for-woocommerce' ), __( 'Status', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		array_map(
 			function ( $t ) {
-				return array( $t['table_name'], number_format_i18n( $t['size_mb'], 1 ) . ' MB', number_format_i18n( $t['estimated_row_count'] ) );
+				return array( $t['table_name'], number_format_i18n( $t['size_mb'], 1 ) . ' MB', number_format_i18n( $t['estimated_row_count'] ), tvarkom_csa_table_status_label( $t['classification'], $t['owner'] ) );
 			},
 			$d['orphaned_tables']
 		),

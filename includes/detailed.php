@@ -149,10 +149,138 @@ function tvarkom_csa_top_autoloaded_keys() {
 }
 
 /**
- * Tables with this site's prefix that belong neither to WordPress, WooCommerce
- * nor an active plugin (by name), largest first.
+ * Name prefixes a plugin's or theme's tables may use, from its folder name: "wp-defender" →
+ * wp_defender and defender. Short or generic results are dropped so they can't match by chance.
  *
- * @return array<int, array{table_name: string, size_mb: float, estimated_row_count: int}>
+ * @param string $folder Plugin or theme folder (slug).
+ * @return array<int, string>
+ */
+function tvarkom_csa_slug_variants( $folder ) {
+	$slug     = str_replace( '-', '_', strtolower( $folder ) );
+	$variants = strlen( $slug ) >= 3 ? array( $slug ) : array();
+	$bare     = (string) preg_replace( '/_(pro|premium|lite|free)$/', '', (string) preg_replace( '/^(wp|woo|wc)_/', '', $slug ) );
+	if ( strlen( $bare ) >= 4 && $bare !== $slug ) {
+		$variants[] = $bare;
+	}
+	return $variants;
+}
+
+/**
+ * Installed plugins and themes as [name prefix => [name, active]], to tell a table's owner.
+ *
+ * @return array{plugins: array<string, array{0: string, 1: bool}>, themes: array<string, array{0: string, 1: bool}>, names: array<string, bool>}
+ */
+function tvarkom_csa_installed_components() {
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$active = (array) get_option( 'active_plugins', array() );
+	if ( is_multisite() ) {
+		$active = array_merge( $active, array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+	}
+	$out = array(
+		'plugins' => array(),
+		'themes'  => array(),
+		'names'   => array(),
+	);
+	foreach ( get_plugins() as $file => $data ) {
+		$folder = dirname( $file ) === '.' ? basename( $file, '.php' ) : dirname( $file );
+		$name   = isset( $data['Name'] ) ? (string) $data['Name'] : $folder;
+		$on     = in_array( $file, $active, true );
+		foreach ( tvarkom_csa_slug_variants( $folder ) as $prefix ) {
+			// An active plugin wins over an inactive one with the same prefix.
+			if ( ! isset( $out['plugins'][ $prefix ] ) || $on ) {
+				$out['plugins'][ $prefix ] = array( $name, $on );
+			}
+		}
+		$out['names'][ $name ] = $on || ! empty( $out['names'][ $name ] );
+	}
+	$current = array( get_stylesheet(), get_template() );
+	foreach ( wp_get_themes() as $stylesheet => $theme ) {
+		$on = in_array( $stylesheet, $current, true );
+		foreach ( tvarkom_csa_slug_variants( (string) $stylesheet ) as $prefix ) {
+			if ( ! isset( $out['themes'][ $prefix ] ) || $on ) {
+				$out['themes'][ $prefix ] = array( (string) $theme->get( 'Name' ), $on );
+			}
+		}
+	}
+	return $out;
+}
+
+/**
+ * Who a table belongs to. "active": WordPress, WooCommerce or an active plugin or theme (not
+ * reported). "inactive": an installed plugin or theme that is switched off. "not_installed": a
+ * known plugin (by its usual prefix) that isn't installed. "unknown": nothing identified. A
+ * name never proves a table is unused, so the report never calls one confirmed.
+ *
+ * @param string                                       $short      Table name without the site prefix.
+ * @param array{plugins: array<string, array{0: string, 1: bool}>, themes: array<string, array{0: string, 1: bool}>, names: array<string, bool>} $components From tvarkom_csa_installed_components().
+ * @return array{0: string, 1: string|null} Classification and owner.
+ */
+function tvarkom_csa_table_owner( $short, array $components ) {
+	$short = strtolower( $short );
+	$known = null;
+	foreach ( tvarkom_csa_known_table_prefixes() as $prefix => $owner ) {
+		if ( 0 !== strpos( $short, $prefix ) ) {
+			continue;
+		}
+		if ( false !== strpos( $owner, 'WooCommerce' ) || false !== strpos( $owner, 'WordPress' ) ) {
+			return array( 'active', $owner );
+		}
+		// "Wordfence" is installed as "Wordfence Security", "WPForms" as "WPForms Lite".
+		$installed = null;
+		foreach ( $components['names'] as $name => $on ) {
+			if ( false !== stripos( $name, $owner ) ) {
+				$installed = $installed || $on;
+			}
+		}
+		if ( null !== $installed ) {
+			return array( $installed ? 'active' : 'inactive', $owner );
+		}
+		// Only a distinctive prefix may say "not installed": that's the one class the report
+		// suggests removing (after checks), and a short prefix like "wf" can match by chance.
+		$known = strlen( $prefix ) >= 4 ? $owner : null;
+		break;
+	}
+	$match = null;
+	foreach ( array( 'plugins', 'themes' ) as $kind ) {
+		foreach ( $components[ $kind ] as $prefix => $owner ) {
+			if ( 0 === strpos( $short, $prefix . '_' ) || $short === $prefix ) {
+				if ( $owner[1] ) {
+					return array( 'active', $owner[0] );
+				}
+				$match = $match ? $match : $owner[0];
+			}
+		}
+	}
+	if ( null !== $match ) {
+		return array( 'inactive', $match );
+	}
+	return null === $known ? array( 'unknown', null ) : array( 'not_installed', $known );
+}
+
+/**
+ * Table prefixes of WooCommerce and popular plugins whose tables don't start with their folder
+ * name (tvarkom_csa_known_prefixes() without the option-only entries), with the plugin's name
+ * as WordPress shows it.
+ *
+ * @return array<string, string> Prefix => owner.
+ */
+function tvarkom_csa_known_table_prefixes() {
+	$prefixes = tvarkom_csa_known_prefixes();
+	unset( $prefixes['theme_mods_'], $prefixes['widget_'] );
+	$prefixes['e_events']      = 'Elementor';
+	$prefixes['e_submissions'] = 'Elementor Pro';
+	$prefixes['e_notes']       = 'Elementor Pro';
+	return $prefixes;
+}
+
+/**
+ * Tables with this site's prefix that belong neither to WordPress, WooCommerce nor an active
+ * plugin or theme, largest first, each with its classification and likely owner (see
+ * tvarkom_csa_table_owner()).
+ *
+ * @return array<int, array{table_name: string, size_mb: float, estimated_row_count: int, classification: string, owner: string|null}>
  */
 function tvarkom_csa_orphaned_tables() {
 	global $wpdb;
@@ -164,23 +292,25 @@ function tvarkom_csa_orphaned_tables() {
 			$wpdb->esc_like( $wpdb->prefix ) . '%'
 		)
 	);
-	$core    = array_flip( $wpdb->tables( 'all', true ) );
-	$plugins = tvarkom_csa_active_plugin_names();
-	$out     = array();
+	$core       = array_flip( $wpdb->tables( 'all', true ) );
+	$components = tvarkom_csa_installed_components();
+	$out        = array();
 	foreach ( (array) $rows as $row ) {
 		$table = (string) $row->name;
 		$short = substr( $table, strlen( $wpdb->prefix ) );
 		if ( isset( $core[ $table ] ) || ( is_multisite() && preg_match( '/^\d+_/', $short ) ) ) {
 			continue;
 		}
-		$owner = tvarkom_csa_owner( $short, $plugins );
-		if ( null !== $owner && ( false !== strpos( $owner, 'WooCommerce' ) || in_array( $owner, $plugins, true ) ) ) {
+		list( $classification, $owner ) = tvarkom_csa_table_owner( $short, $components );
+		if ( 'active' === $classification ) {
 			continue;
 		}
 		$out[] = array(
 			'table_name'          => $table,
 			'size_mb'             => round( (int) $row->bytes / 1048576, 1 ),
 			'estimated_row_count' => (int) $row->row_count,
+			'classification'      => $classification,
+			'owner'               => $owner,
 		);
 		if ( count( $out ) >= 50 ) {
 			break;
