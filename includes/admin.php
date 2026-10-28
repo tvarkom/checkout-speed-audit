@@ -55,7 +55,7 @@ function tvarkom_csa_messages() {
 		'verification_failed'    => array( 'error', __( 'We couldn\'t confirm this domain. Tvarkom must be able to reach /wp-json/tvarkom/v1/verify on your store; check that the REST API isn\'t blocked by a security plugin or firewall.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'registration_not_found' => array( 'error', __( 'The registration expired. Click Run free audit again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'origin_taken'           => array( 'error', __( 'This domain is already set up with Tvarkom another way. Email hello@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'invalid_key'            => array( 'error', __( 'Your key was replaced or revoked. If you bought Pro, paste the license key from your email below; otherwise click Run free audit to register this store again (a Pro plan is kept).', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'invalid_key'            => array( 'error', __( 'Your key was replaced or revoked. If Tvarkom sent you a license key, paste it below; otherwise click Run free audit to register this store again (a Pro plan is kept).', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'key_expired'            => array( 'error', __( 'Your API key has expired. Email hello@tvarkom.com to renew it.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'client_disabled'        => array( 'error', __( 'Audits are paused for this store. Email hello@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'website_not_allowed'    => array( 'error', __( 'This store\'s address changed since it was registered. Click Run free audit to register it again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -222,7 +222,7 @@ function tvarkom_csa_render_page() {
 					<th scope="row"><label for="csa-license"><?php esc_html_e( 'License key', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></label></th>
 					<td>
 						<input type="password" id="csa-license" name="csa_license" class="regular-text" autocomplete="off" placeholder="tvk_…" value="">
-						<p class="description"><?php esc_html_e( 'Only if you bought Pro before installing this plugin: paste the key from your email here. It replaces the current key. If the store was already registered, Pro appears above by itself.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Only if Tvarkom sent you a license key by email: paste it here. It replaces the current key. Most stores never need this.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 					</td>
 				</tr>
 				<tr>
