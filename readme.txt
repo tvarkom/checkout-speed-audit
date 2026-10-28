@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,8 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 
 **Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan, license expiry and usage each time you open its page.
 
+**Weekly Pro report**: while your store is on Pro, Tvarkom's server asks your store about once a week, with a request signed with your store's key, to run a Pro audit. The plugin then sends the same data as a Pro audit you run yourself (above, only with the box ticked), from your server to `https://api.tvarkom.com/v1/audits`, and answers Tvarkom with only the audit's result. It uses the REST route `/wp-json/tvarkom/v1/monitor`, which refuses any request not signed with your store's key.
+
 **Buying Pro**: **Buy Pro** opens Stripe's checkout (`buy.stripe.com`) for a one-time payment, with a reference to your store. Payment is handled by Stripe; Tvarkom receives your email, the amount and the store reference, and emails you a confirmation. If your store wasn't registered with the plugin yet, that email contains a license key to paste under **License key**.
 
 No customer data, order contents or revenue figures are ever sent. The report is emailed to you, with a copy to hello@tvarkom.com.
@@ -80,6 +82,11 @@ The free plan allows 4 audits per 30 days, at most one per store and email addre
 Uninstalling removes the plugin's settings from your database. Run the plugin again later and your store registers again with a new key.
 
 == Changelog ==
+
+= 0.8.0 =
+* Weekly Pro report: while the store is on Pro, Tvarkom asks the plugin once a week, with a request signed with the store's key, for a Pro audit with fresh store data.
+* Pro is shown as a subscription: the plan line shows the current period's end, and no Buy Pro button is shown while Pro is active.
+* When a Pro report from the last 7 days exists, the plugin page says it was emailed again and when it was generated, instead of saying a new audit was requested.
 
 = 0.7.0 =
 * Store diagnostics and Pro audits now tell which plugin or theme a database table likely belongs to (switched off, not installed, or not identified), and no longer list tables of active plugins or the active theme as leftovers.

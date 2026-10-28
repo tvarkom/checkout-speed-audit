@@ -35,17 +35,33 @@ sends it to the Tvarkom API gateway, and shows the gateway's answer. The report 
 | 3 | A pasted license key is checked against the gateway and must belong to this store | `tvarkom_csa_save_license` (`api.php`) | `license_invalid`, `license_other_store` |
 | 4 | One audit at a time: an atomic option row is the lock (stale after 5 minutes) | `tvarkom_csa_audit_lock` (`audit.php`) | `audit_running` |
 | 5 | No API key yet: register. The gateway gets a token, fetches it from this site's REST route to prove the domain, and returns a free key | `tvarkom_csa_register` (`api.php`), `tvarkom_csa_register_routes` (`rest.php`) | `network`, the gateway's code (e.g. `origin_taken`) |
-| 6 | The plan now: with Pro audits left, every audit is a Pro audit and needs the store data | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status` | `consent_required` (nothing sent, no Pro audit used) |
+| 6 | The plan now: on Pro, every audit is a Pro audit and needs the store data | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status` | `consent_required` (nothing sent) |
 | 7 | With consent: aggregate store metrics (versions, sizes, counts, an order range) | `tvarkom_csa_collect_metrics` (`metrics.php`) | — |
 | 8 | Pro only: autoloaded options, leftover tables, PHP settings, failed and late tasks | `tvarkom_csa_collect_detailed` (`detailed.php`) | — |
 | 9 | Pro only: the checkout profile. A single-use token is stored; the plugin loads its own checkout once with the token in a header; on that request only, the profiler times every hook, query and outgoing call, then stores the result | `tvarkom_csa_profile_checkout` (`profile-request.php`) → `tvarkom_csa_profile_maybe_start` (`profile.php`, runs at load) → `tvarkom_csa_profile_finish` (`profile-report.php`) | the profile says why it's unavailable (`request_failed`, `redirected`, `not_profiled`); the audit still runs |
 | 10 | `POST /v1/audits` with the API key: website, cart and checkout URLs, email, and the data above | `tvarkom_csa_post` (`api.php`) | `network`, or the gateway's code via `tvarkom_csa_error_code` |
-| 11 | The answer is stored as the last result; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
+| 11 | The answer is stored as the last result: `queued`/`queued_detailed`, `cached_pro`/`cached` (a report from the last 7 days was emailed again; its generation date and the next date are kept for the message) or `in_progress`; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
 | 12 | The lock is released and the admin is redirected back with the result code, shown as a message | `tvarkom_csa_audit_unlock`, `tvarkom_csa_redirect`, `tvarkom_csa_messages` (`admin.php`) | — |
 
 What leaves the store, field by field, is in `readme.txt` ("External services") and the
 privacy policy; the profiler's header in `profile.php` lists what the profile sends and never sends.
 
+
+## The weekly Pro report
+
+While the store is on Pro, the gateway asks the plugin about once a week for a Pro audit
+(`includes/monitor.php`):
+
+1. The gateway POSTs `{"v":1,"store":…,"attempt":…,"ts":…}` to `/wp-json/tvarkom/v1/monitor`
+   (as `/?rest_route=…`, which works without pretty permalinks), signed in `X-Tvarkom-Signature`
+   with HMAC-SHA256 over the exact body, keyed by the SHA-256 of the store's API key.
+2. `tvarkom_csa_handle_monitor` refuses an unregistered store, a bad signature, another store,
+   a request more than 5 minutes off, an audit already running (the same lock as a click), and
+   an attempt id not greater than the last one answered (option `tvarkom_csa_monitor_seen`).
+3. `tvarkom_csa_run_audit( $attempt )` sends the same data as a Pro audit the admin runs (only
+   with consent) to `POST /v1/audits` with `monitor_attempt`, and returns the gateway's result
+   code. It doesn't touch the admin page's last result.
+4. The endpoint answers the gateway with that code only, e.g. `{"code":"queued_detailed"}`.
 ## The other flows, in one paragraph each
 
 - **Store diagnostics and "Profile my checkout"** run locally and send nothing:

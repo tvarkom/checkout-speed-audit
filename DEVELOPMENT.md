@@ -16,6 +16,7 @@ needs WooCommerce.
 | `includes/settings.php` | The stored settings (option `tvarkom_csa`): API key, plan, email, consent, last result |
 | `includes/api.php` | The Tvarkom API gateway client: requests, plan status, license keys, registration, error codes |
 | `includes/rest.php` | `GET /wp-json/tvarkom/v1/verify`, which the gateway fetches to check the domain at registration |
+| `includes/monitor.php` | `POST /wp-json/tvarkom/v1/monitor`: the gateway's signed weekly request for a Pro audit (its header explains the signature and the replay checks) |
 | `includes/audit.php` | One audit: what is collected (only with consent) and sent, and the stored outcome; the lock that allows one audit at a time |
 | `includes/metrics.php` | Store metrics sent with every audit that has consent |
 | `includes/detailed.php` | Pro diagnostics: autoloaded options, orphaned tables, PHP setup, failed background tasks |
@@ -38,7 +39,7 @@ All in `checkout-speed-audit.php`:
 | `admin_post_tvarkom_csa_form` | `tvarkom_csa_handle_form` (save settings, license, run an audit) |
 | `admin_enqueue_scripts` | `tvarkom_csa_admin_scripts` |
 | `admin_post_tvarkom_csa_profile` | `tvarkom_csa_handle_profile` (the "Profile my checkout" button) |
-| `rest_api_init` | `tvarkom_csa_register_routes` |
+| `rest_api_init` | `tvarkom_csa_register_routes` (`/verify`, and `/monitor` through `tvarkom_csa_register_monitor_route`) |
 | `tvarkom_csa_run_audit` | `tvarkom_csa_run_queued_audit`; only for audits queued by versions up to 0.6.0 |
 
 `tvarkom_csa_profile_maybe_start()` runs at load. On the profiled checkout request only, it
