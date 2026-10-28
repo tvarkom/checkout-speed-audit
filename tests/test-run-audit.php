@@ -147,4 +147,48 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( $code, $settings['last']['code'] );
 		$this->assertSame( $key_kept ? 'tvk_test' : '', $settings['api_key'] );
 	}
+
+	public function test_a_reused_pro_report_says_when_it_was_generated() {
+		$this->store( true, true );
+		$this->respond(
+			'POST',
+			'/v1/audits',
+			202,
+			array(
+				'status'           => 'cached',
+				'detailed'         => true,
+				'report_id'        => 9,
+				'collected_at'     => 1793000000,
+				'next_eligible_at' => 1793600000,
+			)
+		);
+
+		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit() );
+
+		$last = tvarkom_csa_settings()['last'];
+		$this->assertSame( 'cached_pro', $last['code'] );
+		$this->assertSame( 1793000000, $last['collected_at'] );
+		$this->assertSame( 1793600000, $last['next_eligible_at'] );
+		$messages = tvarkom_csa_messages();
+		$text     = tvarkom_csa_notice_text( 'cached_pro', $messages['cached_pro'][1], $last );
+		$this->assertStringContainsString( 'no new check was run', $text );
+		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), 1793000000 ), $text );
+		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), 1793600000 ), $text );
+	}
+
+	public function test_a_report_in_progress_is_not_a_new_audit() {
+		$this->store( true, true );
+		$this->respond(
+			'POST',
+			'/v1/audits',
+			202,
+			array(
+				'status'   => 'in_progress',
+				'detailed' => false,
+			)
+		);
+
+		$this->assertSame( 'in_progress', tvarkom_csa_run_audit() );
+		$this->assertSame( 'in_progress', tvarkom_csa_settings()['last']['code'] );
+	}
 }

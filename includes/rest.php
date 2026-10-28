@@ -1,6 +1,7 @@
 <?php
 /**
- * REST route: GET /wp-json/tvarkom/v1/verify, the domain check for registration.
+ * REST routes: GET /wp-json/tvarkom/v1/verify, the domain check for registration, and
+ * POST /wp-json/tvarkom/v1/monitor, the weekly Pro report (monitor.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -32,4 +33,5 @@ function tvarkom_csa_register_routes() {
 			},
 		)
 	);
+	tvarkom_csa_register_monitor_route();
 }

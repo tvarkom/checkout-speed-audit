@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Tvarkom Checkout Speed Audit for WooCommerce
  * Description:       Store diagnostics and a checkout profiler in your WordPress admin, plus a free store health report from Tvarkom: server and checkout speed, caching, database and background tasks.
- * Version:           0.7.0
+ * Version:           0.8.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TVARKOM_CSA_VERSION', '0.7.0' );
+define( 'TVARKOM_CSA_VERSION', '0.8.0' );
 define( 'TVARKOM_CSA_OPTION', 'tvarkom_csa' );
 define( 'TVARKOM_CSA_TOKEN', 'tvarkom_csa_verify_token' );
 define( 'TVARKOM_CSA_ACTION', 'tvarkom_csa_run_audit' );
@@ -32,6 +32,7 @@ if ( ! defined( 'TVARKOM_CSA_API_URL' ) ) {
 require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/api.php';
 require_once __DIR__ . '/includes/rest.php';
+require_once __DIR__ . '/includes/monitor.php';
 require_once __DIR__ . '/includes/metrics.php';
 require_once __DIR__ . '/includes/detailed.php';
 require_once __DIR__ . '/includes/audit.php';
@@ -54,7 +55,7 @@ add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
 // Store diagnostics: the local checkout profile button (includes/diagnostics.php).
 add_action( 'admin_post_tvarkom_csa_profile', 'tvarkom_csa_handle_profile' );
 
-// Domain check for registration (includes/rest.php).
+// Domain check for registration, and the weekly Pro report (includes/rest.php, includes/monitor.php).
 add_action( 'rest_api_init', 'tvarkom_csa_register_routes' );
 
 // Audits run when the admin clicks the button (admin.php). Version 0.6.0 and earlier queued

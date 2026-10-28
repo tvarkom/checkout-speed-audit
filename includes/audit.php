@@ -1,7 +1,8 @@
 <?php
 /**
  * One audit: what is collected (only with consent) and sent to the gateway, and the outcome
- * stored for the admin page. Runs when the admin clicks the button (admin.php).
+ * stored for the admin page. Runs when the admin clicks the button (admin.php), and for the
+ * weekly Pro report when the gateway asks (monitor.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -13,12 +14,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
 
 /**
- * The background job: collects the store metrics (only with consent) and requests the audit.
+ * Collects the store metrics (only with consent) and requests the audit.
  *
- * @return void
+ * A weekly Pro report ($monitor_attempt, from monitor.php) sends the same data as a Pro audit
+ * the admin runs, naming the gateway's attempt; the gateway decides it's a Pro diagnostic. Its
+ * result goes back to the gateway only: the admin page's last result is left alone.
+ *
+ * @param int $monitor_attempt The gateway's weekly attempt, or 0 for the admin's audit.
+ * @return string The result code (the admin page's codes).
  */
-function tvarkom_csa_run_audit() {
+function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
 	$settings = tvarkom_csa_settings();
+	if ( $monitor_attempt > 0 ) {
+		$body = array(
+			'website'         => home_url( '/' ),
+			'email'           => $settings['email'],
+			'pages'           => array(
+				'cart'     => wc_get_cart_url(),
+				'checkout' => wc_get_checkout_url(),
+			),
+			'monitor_attempt' => $monitor_attempt,
+		);
+		if ( $settings['consent'] ) {
+			$body['metrics']  = tvarkom_csa_collect_metrics();
+			$body['detailed'] = tvarkom_csa_collect_detailed();
+		}
+		$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
+		if ( is_wp_error( $response ) ) {
+			return 'network';
+		}
+		return 202 === $response['status'] ? 'queued_detailed' : tvarkom_csa_error_code( $response );
+	}
 	if ( '' === $settings['api_key'] ) {
 		tvarkom_csa_update_settings(
 			array(
@@ -28,7 +54,7 @@ function tvarkom_csa_run_audit() {
 				),
 			)
 		);
-		return;
+		return 'invalid_key';
 	}
 
 	$body = array(
@@ -39,7 +65,7 @@ function tvarkom_csa_run_audit() {
 			'checkout' => wc_get_checkout_url(),
 		),
 	);
-	// With Pro audits left, every audit is a Pro audit, and it needs the store data.
+	// On Pro, every audit is a Pro audit, and a new one needs the store data.
 	$status = tvarkom_csa_status();
 	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
 	if ( $is_pro && ! $settings['consent'] ) {
@@ -51,7 +77,7 @@ function tvarkom_csa_run_audit() {
 				),
 			)
 		);
-		return;
+		return 'consent_required';
 	}
 	if ( $settings['consent'] ) {
 		$body['metrics'] = tvarkom_csa_collect_metrics();
@@ -61,18 +87,35 @@ function tvarkom_csa_run_audit() {
 	}
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
+	$last     = array();
 	if ( is_wp_error( $response ) ) {
 		$code = 'network';
 	} elseif ( 202 === $response['status'] ) {
-		$code = empty( $response['body']['detailed'] ) ? 'queued' : 'queued_detailed';
+		$detailed = ! empty( $response['body']['detailed'] );
+		$status   = isset( $response['body']['status'] ) ? (string) $response['body']['status'] : 'queued';
+		if ( 'cached' === $status ) {
+			// A report from the last 7 days was emailed again: when it was made, and when a new one can be.
+			$code = $detailed ? 'cached_pro' : 'cached';
+			$last = array(
+				'collected_at'     => isset( $response['body']['collected_at'] ) ? (int) $response['body']['collected_at'] : 0,
+				'next_eligible_at' => isset( $response['body']['next_eligible_at'] ) ? (int) $response['body']['next_eligible_at'] : 0,
+			);
+		} elseif ( 'in_progress' === $status ) {
+			$code = 'in_progress';
+		} else {
+			$code = $detailed ? 'queued_detailed' : 'queued';
+		}
 	} else {
 		$code = tvarkom_csa_error_code( $response );
 	}
 
 	$changes = array(
-		'last' => array(
-			'code' => $code,
-			'time' => time(),
+		'last' => array_merge(
+			array(
+				'code' => $code,
+				'time' => time(),
+			),
+			$last
 		),
 	);
 	if ( 'invalid_key' === $code || 'website_not_allowed' === $code ) {
@@ -80,13 +123,14 @@ function tvarkom_csa_run_audit() {
 		$changes['api_key'] = '';
 	}
 	tvarkom_csa_update_settings( $changes );
+	return $code;
 }
 
 /**
- * Takes the lock that lets one audit run at a time on this store. Each audit uses one of the
- * store's scans, a paid one on Pro, and a click can outlast the browser's wait behind a proxy
- * (the admin sees an error although the audit was sent), so a second click must not send a
- * second audit while the first is still running.
+ * Takes the lock that lets one audit run at a time on this store: the admin's clicks and the
+ * weekly Pro report alike. A click can outlast the browser's wait behind a proxy (the admin
+ * sees an error although the audit was sent), so a second click must not send a second audit
+ * while the first is still running.
  *
  * The lock is an option row inserted atomically, as in WordPress core's
  * WP_Upgrader::create_lock(). A lock older than five minutes was left by a request that died

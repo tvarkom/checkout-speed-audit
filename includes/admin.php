@@ -36,11 +36,16 @@ function tvarkom_csa_messages() {
 		'saved'                  => array( 'success', __( 'Settings saved.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'pending'                => array( 'info', __( 'Your audit is being prepared in the background. Reload this page in a minute to see if it was sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'queued'                 => array( 'success', __( 'Audit requested. The report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'queued_detailed'        => array( 'success', __( 'Pro audit requested. The detailed report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'queued_detailed'        => array( 'success', __( 'Pro audit requested. A new Pro report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		/* translators: 1: date the report was generated, 2: date a new report can be generated. */
+		'cached_pro'             => array( 'info', __( 'Your store already has a Pro report from the last 7 days, so no new check was run. We emailed you that report again; it was generated on %1$s. A new Pro report can be generated after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		/* translators: 1: date the report was generated, 2: date a new report can be generated. */
+		'cached'                 => array( 'info', __( 'This store was audited in the last 7 days, so no new check was run. We emailed you that report again; it was generated on %1$s. A new audit can run after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'in_progress'            => array( 'info', __( 'A report for this store is being generated right now, so this click didn\'t start another one. It will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'audit_running'          => array( 'info', __( 'An audit for this store is already running, so this click didn\'t send another one. Reload this page in a minute to see its result.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'profiled'               => array( 'success', __( 'Checkout profiled. The result is under Store diagnostics below.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'profile_failed'         => array( 'warning', __( 'The checkout profile couldn\'t run. The reason is under Store diagnostics below.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Tick "Include store data in my audit" below and run the audit again. No Pro audit was used.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Tick "Include store data in my audit" below and run the audit again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'license_saved'          => array( 'success', __( 'License key saved.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'license_invalid'        => array( 'error', __( 'That license key isn\'t valid. Paste it exactly as it appears in your email, starting with tvk_.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'license_other_store'    => array( 'error', __( 'That license key belongs to a different store address.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -61,6 +66,25 @@ function tvarkom_csa_messages() {
 		'network'                => array( 'error', __( 'Couldn\'t reach Tvarkom. Check that your server can make outgoing HTTPS requests and try again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'server'                 => array( 'error', __( 'Something went wrong on our side.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . ' ' . $try_later ),
 	);
+}
+
+/**
+ * A notice's text: for a re-sent report, with the date it was generated and the date a new one
+ * can be (from the last result).
+ *
+ * @param string               $code The result code.
+ * @param string               $text Its message.
+ * @param array<string, mixed> $last The stored last result.
+ * @return string
+ */
+function tvarkom_csa_notice_text( $code, $text, array $last ) {
+	if ( 'cached_pro' !== $code && 'cached' !== $code ) {
+		return $text;
+	}
+	$day = function ( $key ) use ( $last ) {
+		return ! empty( $last[ $key ] ) ? wp_date( get_option( 'date_format' ), (int) $last[ $key ] ) : '?';
+	};
+	return sprintf( $text, $day( 'collected_at' ), $day( 'next_eligible_at' ) );
 }
 
 /**
@@ -85,7 +109,7 @@ function tvarkom_csa_date( $time ) {
 }
 
 /**
- * Whether the store has Pro audits left, from tvarkom_csa_status().
+ * Whether the store is on Pro, from tvarkom_csa_status().
  *
  * @param array<string, mixed>|string $status Status.
  * @return bool
@@ -95,7 +119,8 @@ function tvarkom_csa_is_pro( $status ) {
 }
 
 /**
- * Plan line under the API key: plan, Pro audits left, free usage and the link to buy Pro.
+ * Plan line under the API key: plan, when Pro ends, free usage and the link to buy Pro. The
+ * gateway offers the link only to a store that isn't on Pro.
  *
  * @param array<string, mixed>|string $status From tvarkom_csa_status().
  * @return void
@@ -108,18 +133,14 @@ function tvarkom_csa_render_plan( $status ) {
 	$parts = array();
 	if ( tvarkom_csa_is_pro( $status ) ) {
 		$parts[] = sprintf(
-			/* translators: 1: Pro audits left, 2: Pro audits bought, 3: date. */
-			__( 'Plan: Pro, %1$d of %2$d detailed audits left, to use by %3$s. Every audit you run now is a detailed one.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-			(int) $status['pro_scans_left'],
-			(int) $status['pro_scans_total'],
+			/* translators: %s: date. */
+			__( 'Plan: Pro, current subscription period until %s. Every audit you run is a full Pro diagnostic, and a Pro report is emailed to you every week. A Pro report is reused for 7 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 			tvarkom_csa_date( $status['license_expires_at'] )
 		);
 	} else {
-		if ( isset( $status['license_ended'] ) && 'used' === $status['license_ended'] ) {
-			$parts[] = __( 'You\'ve used all your Pro audits. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' );
-		} elseif ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
+		if ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
 			/* translators: %s: date. */
-			$parts[] = sprintf( __( 'Your Pro audits ended on %s. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
+			$parts[] = sprintf( __( 'Your Pro subscription period ended on %s. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
 		} else {
 			$parts[] = __( 'Plan: free.', 'tvarkom-checkout-speed-audit-for-woocommerce' );
 		}
@@ -136,7 +157,7 @@ function tvarkom_csa_render_plan( $status ) {
 			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
 			esc_url( $status['upgrade_url'] ),
 			esc_html__( 'Buy Pro', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-			esc_html__( 'Pro: a one-time payment for 4 detailed reports to use within 12 months. Tvarkom analyzes your Store diagnostics and a checkout profile, and sends a report with a fix plan: what to fix first, step by step, with estimated hours.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
+			esc_html__( 'Pro: an annual subscription with a full Pro report every week. Tvarkom analyzes your Store diagnostics and a checkout profile, and sends a report with a fix plan: what to fix first, step by step, with estimated hours.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
 		);
 	}
 }
@@ -172,7 +193,7 @@ function tvarkom_csa_render_page() {
 		<h1><?php esc_html_e( 'Tvarkom Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h1>
 
 		<?php if ( isset( $messages[ $notice ] ) ) : ?>
-			<div class="notice notice-<?php echo esc_attr( $messages[ $notice ][0] ); ?>"><p><?php echo esc_html( $messages[ $notice ][1] ); ?></p></div>
+			<div class="notice notice-<?php echo esc_attr( $messages[ $notice ][0] ); ?>"><p><?php echo esc_html( tvarkom_csa_notice_text( $notice, $messages[ $notice ][1], $settings['last'] ) ); ?></p></div>
 		<?php endif; ?>
 
 		<p><?php esc_html_e( 'Get a free store health report from Tvarkom, scored from 0 to 100: server and checkout speed, caching, page weight and, if you allow it below, your database, PHP setup and background tasks.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>

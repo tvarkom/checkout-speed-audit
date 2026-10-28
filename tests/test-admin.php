@@ -66,6 +66,54 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringContainsString( $this->notice_text( 'queued' ), $this->render() );
 	}
 
+	public function test_a_pro_subscriber_is_never_offered_pro_again() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$this->respond(
+			'GET',
+			'/v1/client',
+			200,
+			array_merge(
+				$this->client_status( true ),
+				array(
+					'license_expires_at' => '2027-10-28T12:00:00Z',
+					'upgrade_url'        => null,
+				)
+			)
+		);
+
+		$page = $this->render();
+
+		$this->assertStringContainsString( 'Plan: Pro, current subscription period until', $page );
+		$this->assertStringContainsString( 'a Pro report is emailed to you every week', $page );
+		$this->assertStringNotContainsString( 'Buy Pro', $page );
+		$this->assertStringNotContainsString( 'audits left', $page );
+	}
+
+	public function test_a_free_store_is_offered_the_subscription() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$this->respond(
+			'GET',
+			'/v1/client',
+			200,
+			array_merge(
+				$this->client_status( false ),
+				array(
+					'monthly_limit'       => 4,
+					'audits_last_30_days' => 1,
+					'upgrade_url'         => 'https://buy.stripe.com/test?client_reference_id=tvkx',
+				)
+			)
+		);
+
+		$page = $this->render();
+
+		$this->assertStringContainsString( 'Buy Pro', $page );
+		$this->assertStringContainsString( 'an annual subscription', $page );
+		$this->assertStringNotContainsString( 'one-time', $page );
+	}
+
 	public function test_a_code_without_text_shows_the_server_notice() {
 		$this->sign_in_shop_manager();
 		$_GET['csa_result'] = 'upstream_error';
