@@ -41,7 +41,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
 
-Tvarkom keeps each report, with the store data in it, so it can send it to you again: a request within 7 days of a report gets that report instead of a new check. Reports are deleted after 24 months, or sooner on request (see the privacy policy).
+Tvarkom keeps each report, with the store data in it, so it can send it to you again: a request within 7 days of a report gets that report instead of a new check. Reports are deleted automatically 15 days after they're created (see the privacy policy).
 
 **Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your store's plan each time you open its page and before each audit.
 
