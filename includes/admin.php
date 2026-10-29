@@ -137,13 +137,11 @@ function tvarkom_csa_render_plan( $status ) {
 			__( 'Plan: Pro, current subscription period until %s. Every audit you run is a full Pro diagnostic, and a Pro report is emailed to you every week. A Pro report is reused for 7 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 			tvarkom_csa_date( $status['license_expires_at'] )
 		);
+	} elseif ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
+		/* translators: %s: date. */
+		$parts[] = sprintf( __( 'Your Pro subscription period ended on %s. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
 	} else {
-		if ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
-			/* translators: %s: date. */
-			$parts[] = sprintf( __( 'Your Pro subscription period ended on %s. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
-		} else {
-			$parts[] = __( 'Plan: free.', 'tvarkom-checkout-speed-audit-for-woocommerce' );
-		}
+		$parts[] = __( 'Plan: free.', 'tvarkom-checkout-speed-audit-for-woocommerce' );
 	}
 	echo '<p class="description">' . esc_html( implode( ' ', $parts ) ) . '</p>';
 

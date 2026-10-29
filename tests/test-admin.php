@@ -126,7 +126,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 			array_merge(
 				$this->client_status( false ),
 				array(
-					'monthly_limit'       => 4, // an older gateway's answer
+					'monthly_limit'       => 4, // An older gateway's answer.
 					'audits_last_30_days' => 1,
 					'upgrade_url'         => null,
 				)
