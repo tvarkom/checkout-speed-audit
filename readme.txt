@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.8.1
+Stable tag: 0.8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,11 +23,9 @@ Adds a **WooCommerce → Speed Audit** page with two parts.
 * Page weight, number of files and marketing trackers
 * With your permission: autoloaded options and database size, PHP version support, active plugins, object cache, and Action Scheduler and WP-Cron health
 
-The free plan includes 4 audits per 30 days. Reports go to the site's admin email by default; you can change the address. Store diagnostics and Profile my checkout are free and unlimited, and work without the audit service.
+Run an audit whenever you like. If your store already has a report from the last 7 days, Tvarkom emails you that report again, with the date it was generated, instead of running a new check; after 7 days a new audit runs. Reports go to the site's admin email by default; you can change the address. Store diagnostics and Profile my checkout are free and unlimited, and work without the audit service.
 
 The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
-
-**Pro** is a paid Tvarkom report service that isn't offered for sale in this version. Its code is part of the plugin: only a store that Tvarkom has given a Pro license runs Pro audits, and every store without one uses the free plan described above.
 
 == External services ==
 
@@ -43,11 +41,13 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
 
-**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your plan and usage each time you open its page.
+Tvarkom keeps each report, with the store data in it, so it can send it to you again: a request within 7 days of a report gets that report instead of a new check. Reports are deleted after 24 months, or sooner on request (see the privacy policy).
 
-**Stores with a Pro license only.** Pro audits (only with the box ticked) also send the store diagnostics: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin or theme matches, each with the name of the switched-off or not-installed plugin or theme it likely belongs to; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. While a store has a Pro license, Tvarkom's server also asks it about once a week, with a request signed with the store's key, to run a Pro audit; the plugin then sends the same data as above to `https://api.tvarkom.com/v1/audits` and answers with only the audit's result. It uses the REST route `/wp-json/tvarkom/v1/monitor`, which refuses any request not signed with the store's key. A store without a Pro license never sends this data and is never asked.
+**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your store's plan each time you open its page and before each audit.
 
-No customer data, order contents or revenue figures are ever sent. The report is emailed to you, with a copy to hello@tvarkom.com.
+**Only stores Tvarkom has issued a license key to.** Most stores never get one. Their audits (only with the box ticked) also send the store diagnostics: the names and sizes of the 20 largest autoloaded options (never their contents); names, sizes and estimated row counts of database tables no active plugin or theme matches, each with the name of the switched-off or not-installed plugin or theme it likely belongs to; `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on; failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed); and the hook names and times of tasks more than 15 minutes late (never their arguments). For the checkout profile they also send: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time. While the license runs, Tvarkom's server also asks the store about once a week, with a request signed with the store's key, to run the same audit; the plugin then sends the same data as above to `https://api.tvarkom.com/v1/audits` and answers with only the audit's result. It uses the REST route `/wp-json/tvarkom/v1/monitor`, which refuses any request not signed with the store's key. A store without such a license never sends this data and is never asked.
+
+No customer data, order contents or revenue figures are ever sent. The report is emailed to you, with a copy to Tvarkom's inbox (hello@tvarkom.com).
 
 Terms of use: https://tvarkom.com/terms/
 
@@ -72,15 +72,11 @@ Tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a 
 
 = How often can I run the free audit? =
 
-The free plan allows 4 audits per 30 days, at most one per store and email address per day.
+Whenever you like. If your store has a report from the last 7 days, you get that report again by email, with the date it was generated, and no new check runs; the 7 days count from that report. After 7 days, the next audit is a new one.
 
 = The report didn't arrive =
 
 Reports come from checkoutspeedaudit@tvarkom.com within a few minutes. Check your spam folder and that the Report email on the plugin page is one you read.
-
-= Is there a paid version? =
-
-Not for sale in this version. Everything this plugin does on your store is free, and the free report needs no payment or card.
 
 = What happens to my data if I uninstall? =
 
@@ -88,7 +84,7 @@ Uninstalling removes the plugin's settings from your database. Run the plugin ag
 
 = Where do I get help? =
 
-Use the plugin's support forum on WordPress.org, or email hello@tvarkom.com.
+Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 == Screenshots ==
 
@@ -97,7 +93,7 @@ Use the plugin's support forum on WordPress.org, or email hello@tvarkom.com.
 
 == Changelog ==
 
-= 0.8.1 =
+= 0.8.2 =
 * First release on WordPress.org.
 * Store diagnostics and Profile my checkout in your admin, free and sent nowhere.
-* Free store health report from Tvarkom, scored from 0 to 100, emailed within minutes; 4 audits per 30 days.
+* Free store health report from Tvarkom, scored from 0 to 100, emailed within minutes. A report from the last 7 days is sent again instead of running a new check.

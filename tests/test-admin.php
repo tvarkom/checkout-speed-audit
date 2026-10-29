@@ -114,6 +114,33 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringNotContainsString( 'one-time', $page );
 	}
 
+	public function test_a_free_store_sees_no_pro_and_no_audit_count() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$_GET['csa_preview'] = '1';
+		$_GET['_wpnonce']    = wp_create_nonce( 'tvarkom_csa_preview' );
+		$this->respond(
+			'GET',
+			'/v1/client',
+			200,
+			array_merge(
+				$this->client_status( false ),
+				array(
+					'monthly_limit'       => 4, // An older gateway's answer.
+					'audits_last_30_days' => 1,
+					'upgrade_url'         => null,
+				)
+			)
+		);
+
+		$page = $this->render();
+		unset( $_GET['csa_preview'], $_GET['_wpnonce'] );
+
+		$this->assertStringContainsString( 'Plan: free.', $page );
+		$this->assertStringContainsString( 'from the last 7 days', $page );
+		$this->assertDoesNotMatchRegularExpression( '/\bPro\b|Buy |subscription|audits used|per 30 days|hello@/', wp_strip_all_tags( $page ) );
+	}
+
 	public function test_a_code_without_text_shows_the_server_notice() {
 		$this->sign_in_shop_manager();
 		$_GET['csa_result'] = 'upstream_error';
