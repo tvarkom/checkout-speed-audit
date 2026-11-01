@@ -29,6 +29,10 @@ if ( ! defined( 'TVARKOM_CSA_API_URL' ) ) {
 	define( 'TVARKOM_CSA_API_URL', 'https://api.tvarkom.com' );
 }
 
+// The audit service's terms and privacy policy, linked from the plugin page and the readme.
+define( 'TVARKOM_CSA_TERMS_URL', 'https://tvarkom.com/terms/' );
+define( 'TVARKOM_CSA_PRIVACY_URL', 'https://tvarkom.com/privacy/' );
+
 require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/api.php';
 require_once __DIR__ . '/includes/rest.php';
@@ -51,6 +55,7 @@ tvarkom_csa_profile_maybe_start();
 add_action( 'admin_menu', 'tvarkom_csa_admin_menu', 99 );
 add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
+add_action( 'admin_init', 'tvarkom_csa_privacy_policy_content' );
 
 // Store diagnostics: the local checkout profile button (includes/diagnostics.php).
 add_action( 'admin_post_tvarkom_csa_profile', 'tvarkom_csa_handle_profile' );

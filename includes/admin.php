@@ -156,6 +156,75 @@ function tvarkom_csa_render_plan( $status ) {
 }
 
 /**
+ * The privacy points shown on the plugin page and suggested for the site's privacy policy.
+ * Keep them in line with tvarkom.com/privacy/.
+ *
+ * @return string[]
+ */
+function tvarkom_csa_privacy_points() {
+	return array(
+		__( 'Free reports, with any store data in them, are deleted 15 days after they are created. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Each audit request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Reports are emailed only to the report email. Tvarkom keeps no copy in its mailbox.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Customer data, order contents and revenue are never sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+	);
+}
+
+/**
+ * Renders the terms and privacy notice shown before an audit is run.
+ *
+ * @return void
+ */
+function tvarkom_csa_render_legal() {
+	$link = '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>';
+	?>
+	<p class="description">
+		<?php
+		printf(
+			/* translators: 1: link to the Terms of Use, 2: link to the Privacy Policy. */
+			esc_html__( 'By running an audit you agree to Tvarkom\'s %1$s. Tvarkom\'s %2$s explains what it keeps and for how long.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+			sprintf( $link, esc_url( TVARKOM_CSA_TERMS_URL ), esc_html__( 'Terms of Use', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
+			sprintf( $link, esc_url( TVARKOM_CSA_PRIVACY_URL ), esc_html__( 'Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
+		);
+		?>
+	</p>
+	<details>
+		<summary><?php esc_html_e( 'Privacy summary', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></summary>
+		<ul class="ul-disc">
+			<?php foreach ( tvarkom_csa_privacy_points() as $point ) : ?>
+				<li><?php echo esc_html( $point ); ?></li>
+			<?php endforeach; ?>
+			<li><?php esc_html_e( 'Privacy requests: privacy@tvarkom.com. Help with the plugin or a report: support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></li>
+		</ul>
+	</details>
+	<?php
+}
+
+/**
+ * Suggests text for the site's privacy policy (Settings → Privacy → Policy Guide).
+ *
+ * @return void
+ */
+function tvarkom_csa_privacy_policy_content() {
+	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
+		return;
+	}
+	$content  = '<p>' . esc_html__( 'This site uses the Tvarkom Checkout Speed Audit for WooCommerce plugin. When an administrator runs an audit, the store\'s address, its cart and checkout page addresses and the report email are sent to Tvarkom (MB Tvarkom Software, Lithuania), and optionally aggregate store data such as software versions, database sizes and an order-count range. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content .= '<ul>';
+	foreach ( tvarkom_csa_privacy_points() as $point ) {
+		$content .= '<li>' . esc_html( $point ) . '</li>';
+	}
+	$content .= '</ul>';
+	$content .= '<p>' . sprintf(
+		/* translators: %s: link to Tvarkom's Privacy Policy. */
+		esc_html__( 'Details: %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		'<a href="' . esc_url( TVARKOM_CSA_PRIVACY_URL ) . '">' . esc_html__( 'Tvarkom Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</a>'
+	) . '</p>';
+	wp_add_privacy_policy_content( 'Tvarkom Checkout Speed Audit for WooCommerce', wp_kses_post( $content ) );
+}
+
+/**
  * Renders the page.
  *
  * @return void
@@ -240,6 +309,7 @@ function tvarkom_csa_render_page() {
 				</tr>
 			</table>
 			<p class="description"><?php esc_html_e( 'When you run an audit, your store address, its cart and checkout URLs, the report email and (if checked) the store data above are sent to Tvarkom (tvarkom.com). Nothing is sent until you click the button.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+			<?php tvarkom_csa_render_legal(); ?>
 			<p class="submit">
 				<button type="submit" name="csa_do" value="audit" class="button button-primary"><?php echo esc_html( $is_pro ? __( 'Run Pro audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ) : __( 'Run free audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ); ?></button>
 				<button type="submit" name="csa_do" value="save" class="button"><?php esc_html_e( 'Save settings', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>

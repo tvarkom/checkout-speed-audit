@@ -51,7 +51,9 @@ No customer data, order contents or revenue figures are ever sent. The report is
 
 Terms of use: https://tvarkom.com/terms/
 
-Privacy policy: https://tvarkom.com/privacy
+Privacy policy: https://tvarkom.com/privacy/
+
+The plugin page links to both before you run an audit, with a short privacy summary, and the plugin suggests text for your own privacy policy under **Settings → Privacy**.
 
 == Installation ==
 
