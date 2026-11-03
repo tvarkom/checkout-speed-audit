@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Tvarkom Checkout Speed Audit for WooCommerce
+ * Plugin Name:       Checkout Speed Audit
  * Description:       A free store health report from Tvarkom, emailed as a PDF: server and checkout speed, caching and, with a Full Scan, your database, PHP setup, background tasks and a checkout profile.
  * Version:           0.9.0
  * Requires at least: 6.5

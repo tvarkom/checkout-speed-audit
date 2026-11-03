@@ -1,4 +1,4 @@
-=== Tvarkom Checkout Speed Audit for WooCommerce ===
+=== Checkout Speed Audit ===
 Contributors: tvarkom
 Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
@@ -67,7 +67,7 @@ Both ship with the plugin in its `legal` folder. The plugin page links to them b
 
 == Installation ==
 
-1. Install from **Plugins → Add New**: search for "Tvarkom Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
+1. Install from **Plugins → Add New**: search for "Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
 2. Activate the plugin.
 3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Partial Scan** or **Full Scan**. The first scan registers your store with Tvarkom; the report arrives by email within a few minutes.
 

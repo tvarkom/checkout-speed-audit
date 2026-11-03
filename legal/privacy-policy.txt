@@ -1,7 +1,7 @@
 PRIVACY POLICY
-Tvarkom Checkout Speed Audit for WooCommerce
+Checkout Speed Audit
 
-What personal data the Tvarkom Checkout Speed Audit for WooCommerce plugin's audit service and Tvarkom's website handle, why, who processes it for us and how long we keep it.
+What personal data the Checkout Speed Audit plugin's audit service and Tvarkom's website handle, why, who processes it for us and how long we keep it.
 
 Last updated: 3 November 2026
 
@@ -13,7 +13,7 @@ The data controller is MB Tvarkom Software ("Tvarkom", "we", "us"), a small part
 The plugin's audit service
 --------------------------
 
-The Tvarkom Checkout Speed Audit for WooCommerce plugin sends nothing until an administrator clicks Partial Scan or Full Scan. Then:
+The Checkout Speed Audit plugin sends nothing until an administrator clicks Partial Scan or Full Scan. Then:
 
 * Registration (first audit only): your store's address, the report email and the address of the plugin's verification endpoint. We fetch a one-time token from that endpoint to confirm the request comes from your store, then issue a key for your domain. Unfinished registrations are deleted after 7 days.
 

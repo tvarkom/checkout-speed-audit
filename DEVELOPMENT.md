@@ -102,3 +102,14 @@ To test against a local gateway, set `TVARKOM_CSA_API_URL` in `wp-config.php`.
      -o tvarkom-checkout-speed-audit-for-woocommerce-<version>.zip HEAD \
      checkout-speed-audit.php includes legal readme.txt uninstall.php
    ```
+
+### WordPress.org banner
+
+`docs/wporg-assets/banner.html` is the source of `assets/banner-1544x500.png` and
+`assets/banner-772x250.png` in the SVN working copy (fonts from the website repo, next to this
+one). Render it with headless Chrome:
+
+```sh
+chrome --headless=new --hide-scrollbars --window-size=1544,500 --screenshot=banner-1544x500.png docs/wporg-assets/banner.html
+chrome --headless=new --hide-scrollbars --window-size=1544,500 --force-device-scale-factor=0.5 --screenshot=banner-772x250.png docs/wporg-assets/banner.html
+```

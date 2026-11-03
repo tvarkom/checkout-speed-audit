@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function tvarkom_csa_admin_menu() {
 	add_submenu_page(
 		'woocommerce',
-		__( 'Tvarkom Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		'manage_woocommerce',
 		'tvarkom-csa',
@@ -153,7 +153,7 @@ function tvarkom_csa_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
-	$content  = '<p>' . esc_html__( 'This site uses the Tvarkom Checkout Speed Audit for WooCommerce plugin. When an administrator runs a scan, the store\'s address, its cart and checkout page addresses and the report email are sent to Tvarkom (MB Tvarkom Software, Lithuania). A Full Scan also sends aggregate store data, such as software versions, database sizes, background task counts and an order-count range, and a profile of one checkout page load. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by Tvarkom. When an administrator runs a scan, the store\'s address, its cart and checkout page addresses and the report email are sent to Tvarkom (MB Tvarkom Software, Lithuania). A Full Scan also sends aggregate store data, such as software versions, database sizes, background task counts and an order-count range, and a profile of one checkout page load. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
 	$content .= '<ul>';
 	foreach ( tvarkom_csa_privacy_points() as $point ) {
 		$content .= '<li>' . esc_html( $point ) . '</li>';
@@ -164,7 +164,7 @@ function tvarkom_csa_privacy_policy_content() {
 		esc_html__( 'Details: %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		'<a href="' . esc_url( tvarkom_csa_legal_url( 'privacy-policy.txt' ) ) . '">' . esc_html__( 'Tvarkom Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</a>'
 	) . '</p>';
-	wp_add_privacy_policy_content( 'Tvarkom Checkout Speed Audit for WooCommerce', wp_kses_post( $content ) );
+	wp_add_privacy_policy_content( 'Checkout Speed Audit', wp_kses_post( $content ) );
 }
 
 /**
@@ -209,7 +209,7 @@ function tvarkom_csa_render_page() {
 	$next_scan = tvarkom_csa_next_scan_at( $status );
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Tvarkom Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h1>
+		<h1><?php esc_html_e( 'Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h1>
 
 		<?php if ( isset( $messages[ $notice ] ) ) : ?>
 			<div class="notice notice-<?php echo esc_attr( $messages[ $notice ][0] ); ?>"><p><?php echo esc_html( tvarkom_csa_notice_text( $notice, $messages[ $notice ][1], $settings['last'] ) ); ?></p></div>

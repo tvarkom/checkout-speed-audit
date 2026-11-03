@@ -1,7 +1,7 @@
 TERMS OF USE
-Tvarkom Checkout Speed Audit for WooCommerce
+Checkout Speed Audit
 
-The terms for using the audit service of the Tvarkom Checkout Speed Audit for WooCommerce plugin.
+The terms for using the audit service of the Checkout Speed Audit plugin for WooCommerce, by Tvarkom.
 
 Last updated: 3 November 2026
 
@@ -10,7 +10,7 @@ Who we are
 
 The service is provided by MB Tvarkom Software ("Tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. Contact: contact@tvarkom.com; for help with the plugin or a report, support@tvarkom.com.
 
-By running an audit with the Tvarkom Checkout Speed Audit for WooCommerce plugin ("the plugin"), you agree to these terms. If you use the service for a company, you confirm you may accept them on its behalf.
+By running an audit with the Checkout Speed Audit plugin ("the plugin"), you agree to these terms. If you use the service for a company, you confirm you may accept them on its behalf.
 
 What the service does
 ---------------------
