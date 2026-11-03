@@ -29,14 +29,14 @@ What a report contains. Your store's address, the health score and risk level, t
 
 One report a week. Each store can request one free report per week, with either scan. We use the store's audit requests to apply this.
 
-We don't keep your report. We email it to the report email and keep no copy of it, or of the store data in it, once it's sent (see the working copy below).
+Where your report goes. We email it to the report email, with a copy to our report mailbox (checkoutspeedaudit@tvarkom.com), so we can answer questions about it and keep a record of what we sent. Our database keeps no copy of the report or of the store data in it once it's sent (see the working copy below).
 
 Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking Full Scan (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by using Partial Scan instead: no store data is sent. To have your data deleted sooner, email privacy@tvarkom.com.
 
 Emails we send
 --------------
 
-We email reports only to the report email, from checkoutspeedaudit@tvarkom.com, and we don't keep a copy of them in our mailbox. Once an email reaches your inbox, it stays there until you delete it.
+We email reports to the report email, from checkoutspeedaudit@tvarkom.com, with a copy to that same mailbox. Once an email reaches your inbox, it stays there until you delete it.
 
 If something goes wrong, for example our scanner can't reach your store or a report can't be delivered, our team gets an alert in our mailbox naming your store and the report email, so we can fix it or run the audit by hand. Alerts never contain your report.
 
@@ -93,7 +93,7 @@ These periods are applied automatically by our software:
 
 Other copies:
 
-* Our mailbox holds alerts, copies of past waitlist sign-ups and enquiries, and the emails you send us. It has no automatic deletion: we keep these messages for as long as we need them to deal with your request and any follow-up, and longer only where the law requires it, for example for records of work we do for you.
+* Our mailboxes hold copies of the reports we email (with the store data in them), alerts, copies of past waitlist sign-ups and enquiries, and the emails you send us. It has no automatic deletion: we keep these messages for as long as we need them to deal with your request and any follow-up, and longer only where the law requires it, for example for records of work we do for you.
 
 * Database snapshots: our hosting provider takes daily snapshots of our databases, plus one before each update, and deletes each after 5 days. Data we've deleted can remain in a snapshot until it expires. We use snapshots only to restore our service, and if we restore one, we delete again anything that had already been deleted.
 

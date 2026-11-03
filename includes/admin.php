@@ -77,16 +77,6 @@ function tvarkom_csa_notice_text( $code, $text, array $last ) {
 }
 
 /**
- * "tvk_abcd…wxyz"
- *
- * @param string $key API key.
- * @return string
- */
-function tvarkom_csa_mask_key( $key ) {
-	return strlen( $key ) > 12 ? substr( $key, 0, 8 ) . '…' . substr( $key, -4 ) : $key;
-}
-
-/**
  * "15 October 2027" in the site's date format, from an RFC 3339 time.
  *
  * @param string $time RFC 3339 time.
@@ -105,10 +95,10 @@ function tvarkom_csa_date( $time ) {
  */
 function tvarkom_csa_privacy_points() {
 	return array(
-		__( 'Tvarkom keeps no copy of your report or of the store data in it once it is emailed. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'A copy of each report email goes to Tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Each audit request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'Reports are emailed only to the report email. Tvarkom keeps no copy in its mailbox.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Reports are emailed to the report email, with that copy to Tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Customer data, order contents and revenue are never sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 	);
 }
@@ -238,16 +228,6 @@ function tvarkom_csa_render_page() {
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Store', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></th>
 					<td><code><?php echo esc_html( home_url( '/' ) ); ?></code></td>
-				</tr>
-				<tr>
-					<th scope="row"><?php esc_html_e( 'API key', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></th>
-					<td>
-						<?php if ( '' !== $settings['api_key'] ) : ?>
-							<code><?php echo esc_html( tvarkom_csa_mask_key( $settings['api_key'] ) ); ?></code>
-						<?php else : ?>
-							<?php esc_html_e( 'Not registered yet. Your first audit registers this store and issues a free key for this domain.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?>
-						<?php endif; ?>
-					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="csa-email"><?php esc_html_e( 'Report email', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></label></th>

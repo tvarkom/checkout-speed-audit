@@ -190,6 +190,9 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringContainsString( 'legal/terms-of-use.txt', $page );
 		$this->assertStringContainsString( 'legal/privacy-policy.txt', $page );
 		$this->assertDoesNotMatchRegularExpression( '/Store diagnostics|Preview data|Profile my checkout|Largest autoloaded options/', $page );
+		// The API key is internal: never on the page, not even masked.
+		$this->assertStringNotContainsString( 'API key', $page );
+		$this->assertStringNotContainsString( 'tvk_', $page );
 	}
 
 	public function test_inside_the_week_the_scan_buttons_are_disabled() {
