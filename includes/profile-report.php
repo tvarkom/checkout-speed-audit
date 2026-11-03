@@ -1,6 +1,6 @@
 <?php
 /**
- * Pro checkout profile, end of the profiled request: query shapes, component names, and the
+ * Full Scan checkout profile, end of the profiled request: query shapes, component names, and the
  * result built from the profiler state and left in a transient for the audit (see profile.php).
  *
  * @package CheckoutSpeedAudit

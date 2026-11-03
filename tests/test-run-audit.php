@@ -11,18 +11,16 @@
 class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 
 	/**
-	 * A registered store on the given plan.
-	 *
-	 * @param bool $pro On Pro.
+	 * A registered store.
 	 */
-	private function store( $pro ) {
+	private function store() {
 		tvarkom_csa_update_settings(
 			array(
 				'api_key' => 'tvk_test',
 				'email'   => 'owner@example.org',
 			)
 		);
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( $pro ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 	}
 
 	/**
@@ -47,7 +45,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_partial_scan_sends_only_the_store_addresses() {
-		$this->store( false );
+		$this->store();
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		tvarkom_csa_run_audit( false );
@@ -68,7 +66,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_free_full_scan_sends_the_metrics_and_the_diagnostics() {
-		$this->store( false );
+		$this->store();
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		tvarkom_csa_run_audit( true );
@@ -80,18 +78,9 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( 'queued_full', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_pro_partial_scan_is_refused_before_it_is_sent() {
-		$this->store( true );
-
-		tvarkom_csa_run_audit( false );
-
-		$this->assertSame( array( 'GET /v1/client' ), $this->request_lines(), 'no Pro audit used' );
-		$this->assertSame( 'consent_required', tvarkom_csa_settings()['last']['code'] );
-	}
-
-	public function test_pro_full_scan_sends_the_diagnostics_and_a_checkout_profile() {
-		$this->store( true );
-		$this->respond( 'POST', '/v1/audits', 202, array( 'detailed' => true ) );
+	public function test_full_scan_sends_a_checkout_profile() {
+		$this->store();
+		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		tvarkom_csa_run_audit( true );
 
@@ -108,7 +97,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			$body['detailed']['checkout_profile']
 		);
 		$this->assertFalse( get_transient( TVARKOM_CSA_PROFILE_TOKEN ), 'the single-use token is gone' );
-		$this->assertSame( 'queued_detailed', tvarkom_csa_settings()['last']['code'] );
+		$this->assertSame( 'queued_full', tvarkom_csa_settings()['last']['code'] );
 	}
 
 	/**
@@ -138,7 +127,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	 * @param bool         $key_kept Whether the API key stays.
 	 */
 	public function test_gateway_answers( $status, $body, $code, $key_kept ) {
-		$this->store( false );
+		$this->store();
 		$this->respond( 'POST', '/v1/audits', $status, $body );
 
 		tvarkom_csa_run_audit();
@@ -146,50 +135,6 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$settings = tvarkom_csa_settings();
 		$this->assertSame( $code, $settings['last']['code'] );
 		$this->assertSame( $key_kept ? 'tvk_test' : '', $settings['api_key'] );
-	}
-
-	public function test_a_reused_pro_report_says_when_it_was_generated() {
-		$this->store( true );
-		$this->respond(
-			'POST',
-			'/v1/audits',
-			202,
-			array(
-				'status'           => 'cached',
-				'detailed'         => true,
-				'report_id'        => 9,
-				'collected_at'     => 1793000000,
-				'next_eligible_at' => 1793600000,
-			)
-		);
-
-		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit( true ) );
-
-		$last = tvarkom_csa_settings()['last'];
-		$this->assertSame( 'cached_pro', $last['code'] );
-		$this->assertSame( 1793000000, $last['collected_at'] );
-		$this->assertSame( 1793600000, $last['next_eligible_at'] );
-		$messages = tvarkom_csa_messages();
-		$text     = tvarkom_csa_notice_text( 'cached_pro', $messages['cached_pro'][1], $last );
-		$this->assertStringContainsString( 'no new check was run', $text );
-		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), 1793000000 ), $text );
-		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), 1793600000 ), $text );
-	}
-
-	public function test_a_report_in_progress_is_not_a_new_audit() {
-		$this->store( true );
-		$this->respond(
-			'POST',
-			'/v1/audits',
-			202,
-			array(
-				'status'   => 'in_progress',
-				'detailed' => false,
-			)
-		);
-
-		$this->assertSame( 'in_progress', tvarkom_csa_run_audit( true ) );
-		$this->assertSame( 'in_progress', tvarkom_csa_settings()['last']['code'] );
 	}
 
 	public function test_inside_the_week_nothing_is_sent() {
@@ -200,7 +145,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 		$next = time() + 3 * DAY_IN_SECONDS;
-		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status( false ), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
+		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status(), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
 
 		$this->assertSame( 'too_soon', tvarkom_csa_run_audit( true ) );
 
@@ -209,7 +154,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_the_gateway_week_refusal_keeps_its_date() {
-		$this->store( false );
+		$this->store();
 		$this->respond(
 			'POST',
 			'/v1/audits',

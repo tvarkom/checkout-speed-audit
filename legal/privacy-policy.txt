@@ -27,9 +27,11 @@ What the scan reads. Our scanner then loads your store's public homepage, cart a
 
 What a report contains. Your store's address, the health score and risk level, the findings and recommendations, and the measurements: response times, page weight, files, caching and marketing trackers. After a Full Scan, the report also contains the store data and what we found in it. A report never contains your email address.
 
-One report a week. Each store can request one free report per week, with either scan. We use the store's audit requests (not the reports) to apply this. We keep each free report for 15 days after it's created, then delete it automatically.
+One report a week. Each store can request one free report per week, with either scan. We use the store's audit requests to apply this.
 
-Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking Full Scan (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by using Partial Scan instead: no store data is sent. To have a stored report deleted sooner, email privacy@tvarkom.com.
+We don't keep your report. We email it to the report email and keep no copy of it, or of the store data in it, once it's sent (see the working copy below).
+
+Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking Full Scan (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by using Partial Scan instead: no store data is sent. To have your data deleted sooner, email privacy@tvarkom.com.
 
 Emails we send
 --------------
@@ -77,13 +79,11 @@ How long we keep it
 
 These periods are applied automatically by our software:
 
-* Free plugin reports, with the store data in them: 15 days after they're created.
-
 * Failed audits (the request and any store data sent with it): 15 days after they failed. If our scanning service is restarted in the middle of an audit too many times, it keeps that audit for our engineers to inspect for 15 days.
 
 * Audit requests (store, page addresses and time): 24 months, for our limits and records. The email address and IP address in them are erased after 90 days.
 
-* Records of each report email (recipient, status and times): deleted with the plugin report, and in any case after 90 days.
+* Records of each report email (recipient, status and times), for reports of audits requested on tvarkom.com: 90 days.
 
 * Reports of audits requested on tvarkom.com: 24 months.
 

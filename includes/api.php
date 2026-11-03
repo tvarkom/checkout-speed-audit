@@ -1,6 +1,6 @@
 <?php
 /**
- * Tvarkom API gateway client: requests, plan status, license keys, registration (free API key
+ * Tvarkom API gateway client: requests, store status (the next scan date), registration (free API key
  * for this domain) and the gateway's error codes. The audit itself is in audit.php.
  *
  * @package CheckoutSpeedAudit
@@ -43,8 +43,8 @@ function tvarkom_csa_post( $path, array $body, $api_key = '' ) {
 }
 
 /**
- * The store's plan and usage from GET /v1/client. Never cached: right after a
- * purchase the page must show Pro, not the Buy Pro button.
+ * The store's status from GET /v1/client: when it may scan again (next_scan_at). Never cached:
+ * right after a scan the page must disable its buttons.
  *
  * @param string $api_key Key to ask about (default: the stored one).
  * @param int    $timeout Seconds to wait for the gateway (short when only showing the page).
@@ -72,37 +72,6 @@ function tvarkom_csa_status( $api_key = '', $timeout = 15 ) {
 		return isset( $body['error'] ) && is_string( $body['error'] ) ? sanitize_key( $body['error'] ) : 'server';
 	}
 	return $body;
-}
-
-/**
- * Checks a pasted license key with the gateway and, if it belongs to this store, stores it.
- *
- * @param string $key License key.
- * @return string "license_saved", or an error code.
- */
-function tvarkom_csa_save_license( $key ) {
-	if ( ! preg_match( '/^tvk_[A-Za-z0-9_-]{20,}$/', $key ) ) {
-		return 'license_invalid';
-	}
-	$status = tvarkom_csa_status( $key );
-	if ( 'invalid_key' === $status ) {
-		return 'license_invalid';
-	}
-	if ( ! is_array( $status ) ) {
-		return $status;
-	}
-	$host = wp_parse_url( home_url(), PHP_URL_HOST );
-	$own  = wp_parse_url( (string) $status['origin'], PHP_URL_HOST );
-	if ( ! is_string( $host ) || ! is_string( $own ) || preg_replace( '/^www\./', '', strtolower( $host ) ) !== preg_replace( '/^www\./', '', strtolower( $own ) ) ) {
-		return 'license_other_store';
-	}
-	tvarkom_csa_update_settings(
-		array(
-			'api_key' => $key,
-			'plan'    => sanitize_key( (string) $status['plan'] ),
-		)
-	);
-	return 'license_saved';
 }
 
 /**
@@ -150,11 +119,6 @@ function tvarkom_csa_register( $email ) {
 	if ( 200 !== $verify['status'] || empty( $verify['body']['api_key'] ) ) {
 		return tvarkom_csa_error_code( $verify );
 	}
-	tvarkom_csa_update_settings(
-		array(
-			'api_key' => (string) $verify['body']['api_key'],
-			'plan'    => isset( $verify['body']['plan'] ) ? sanitize_key( $verify['body']['plan'] ) : 'free',
-		)
-	);
+	tvarkom_csa_update_settings( array( 'api_key' => (string) $verify['body']['api_key'] ) );
 	return '';
 }

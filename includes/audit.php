@@ -16,8 +16,7 @@ define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
 /**
  * Requests the audit: a Partial Scan sends the store's addresses and the report email only; a
  * Full Scan also collects and sends the store metrics and the detailed diagnostics, with a
- * checkout profile. The gateway treats a free store's audit with the detailed data as a Full
- * Scan; on Pro every audit is a Pro diagnostic and needs it.
+ * checkout profile. The gateway treats an audit with the detailed data as a Full Scan.
  *
  * A free store scans once a week (founder decision of 3 Nov 2026): inside the week nothing is
  * sent, and the result says when the next scan is possible. The gateway enforces it too.
@@ -47,10 +46,7 @@ function tvarkom_csa_run_audit( $full_scan = false ) {
 			'checkout' => wc_get_checkout_url(),
 		),
 	);
-	// On Pro, every audit is a Pro audit, and a new one needs the store data.
-	$status = tvarkom_csa_status();
-	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
-	$next   = tvarkom_csa_next_scan_at( $status );
+	$next = tvarkom_csa_next_scan_at( tvarkom_csa_status() );
 	if ( $next > 0 ) {
 		tvarkom_csa_update_settings(
 			array(
@@ -63,17 +59,6 @@ function tvarkom_csa_run_audit( $full_scan = false ) {
 		);
 		return 'too_soon';
 	}
-	if ( $is_pro && ! $full_scan ) {
-		tvarkom_csa_update_settings(
-			array(
-				'last' => array(
-					'code' => 'consent_required',
-					'time' => time(),
-				),
-			)
-		);
-		return 'consent_required';
-	}
 	if ( $full_scan ) {
 		$body['metrics']  = tvarkom_csa_collect_metrics();
 		$body['detailed'] = tvarkom_csa_collect_detailed();
@@ -84,22 +69,7 @@ function tvarkom_csa_run_audit( $full_scan = false ) {
 	if ( is_wp_error( $response ) ) {
 		$code = 'network';
 	} elseif ( 202 === $response['status'] ) {
-		$detailed = ! empty( $response['body']['detailed'] );
-		$status   = isset( $response['body']['status'] ) ? (string) $response['body']['status'] : 'queued';
-		if ( 'cached' === $status ) {
-			// A report from the last 7 days was emailed again: when it was made, and when a new one can be.
-			$code = $detailed ? 'cached_pro' : 'cached';
-			$last = array(
-				'collected_at'     => isset( $response['body']['collected_at'] ) ? (int) $response['body']['collected_at'] : 0,
-				'next_eligible_at' => isset( $response['body']['next_eligible_at'] ) ? (int) $response['body']['next_eligible_at'] : 0,
-			);
-		} elseif ( 'in_progress' === $status ) {
-			$code = 'in_progress';
-		} elseif ( $detailed ) {
-			$code = 'queued_detailed';
-		} else {
-			$code = $full_scan ? 'queued_full' : 'queued';
-		}
+		$code = $full_scan ? 'queued_full' : 'queued';
 	} else {
 		$code = tvarkom_csa_error_code( $response );
 		if ( 'too_soon' === $code && isset( $response['body']['next_eligible_at'] ) ) {
@@ -141,7 +111,7 @@ function tvarkom_csa_next_scan_at( $status ) {
 
 /**
  * Takes the lock that lets one audit run at a time on this store: the admin's clicks and the
- * weekly Pro report alike. A click can outlast the browser's wait behind a proxy (the admin
+ * and the queued audit of an older version alike. A click can outlast the browser's wait behind a proxy (the admin
  * sees an error although the audit was sent), so a second click must not send a second audit
  * while the first is still running.
  *

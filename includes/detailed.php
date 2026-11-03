@@ -1,7 +1,6 @@
 <?php
 /**
- * Detailed diagnostics, collected only for a Full Scan (the admin's click) or a Pro store's
- * weekly report. Names, sizes and counts:
+ * Detailed diagnostics, collected only for a Full Scan (the admin's click). Names, sizes and counts:
  * never option values, task arguments or customer data. Error messages are
  * scrubbed of emails, links, IP addresses and long numbers before they leave.
  *

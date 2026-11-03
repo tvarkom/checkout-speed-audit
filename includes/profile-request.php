@@ -1,6 +1,6 @@
 <?php
 /**
- * Pro checkout profile, audit side: picks the product for the temporary cart, requests this
+ * Full Scan checkout profile, audit side: picks the product for the temporary cart, requests this
  * store's own checkout with the single-use token and reads the result (see profile.php).
  *
  * @package CheckoutSpeedAudit
@@ -41,7 +41,7 @@ function tvarkom_csa_profile_product() {
 
 /**
  * Runs the profiled checkout request and returns its result (or why there is none).
- * Called by the audit job on a Pro detailed audit.
+ * Called by the audit on a Full Scan.
  *
  * @return array<string, mixed>
  */

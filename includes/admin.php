@@ -37,26 +37,17 @@ function tvarkom_csa_messages() {
 		'pending'                => array( 'info', __( 'Your audit is being prepared in the background. Reload this page in a minute to see if it was sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'queued'                 => array( 'success', __( 'Partial Scan requested. The report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'queued_full'            => array( 'success', __( 'Full Scan requested. The report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'queued_detailed'        => array( 'success', __( 'Pro audit requested. A new Pro report will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		/* translators: 1: date the report was generated, 2: date a new report can be generated. */
-		'cached_pro'             => array( 'info', __( 'Your store already has a Pro report from the last 7 days, so no new check was run. We emailed you that report again; it was generated on %1$s. A new Pro report can be generated after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		/* translators: 1: date the report was generated, 2: date a new report can be generated. */
-		'cached'                 => array( 'info', __( 'This store already has a free report from the last 7 days that covers this scan, so no new check was run. We emailed you that report again; it was generated on %1$s. A new audit can run after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		/* translators: %s: date a new scan can run. */
 		'too_soon'               => array( 'info', __( 'You can request one report per week. Your next scan is available on %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'in_progress'            => array( 'info', __( 'A report for this store is being generated right now, so this click didn\'t start another one. It will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'audit_running'          => array( 'info', __( 'An audit for this store is already running, so this click didn\'t send another one. Reload this page in a minute to see its result.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Click Full Scan instead.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'license_saved'          => array( 'success', __( 'License key saved.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'license_invalid'        => array( 'error', __( 'That license key isn\'t valid. Paste it exactly as it appears in your email, starting with tvk_.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'license_other_store'    => array( 'error', __( 'That license key belongs to a different store address.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_email'          => array( 'error', __( 'Enter a valid email address you read, e.g. you@company.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_website'        => array( 'error', __( 'This store can\'t be audited: its address must be a public https domain, not localhost or an IP address.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_verify_url'     => array( 'error', __( 'This store can\'t be registered: its REST API is on a different domain than the store.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'verification_failed'    => array( 'error', __( 'We couldn\'t confirm this domain. Tvarkom must be able to reach /wp-json/tvarkom/v1/verify on your store; check that the REST API isn\'t blocked by a security plugin or firewall.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'registration_not_found' => array( 'error', __( 'The registration expired. Click Partial Scan or Full Scan again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'origin_taken'           => array( 'error', __( 'This domain is already set up with Tvarkom another way. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'invalid_key'            => array( 'error', __( 'Your key was replaced or revoked. If Tvarkom sent you a license key, paste it below; otherwise run a scan to register this store again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'invalid_key'            => array( 'error', __( 'Your key was replaced or revoked. Run a scan to register this store again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'key_expired'            => array( 'error', __( 'Your API key has expired. Email support@tvarkom.com to renew it.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'client_disabled'        => array( 'error', __( 'Audits are paused for this store. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'website_not_allowed'    => array( 'error', __( 'This store\'s address changed since it was registered. Run a scan to register it again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -82,13 +73,7 @@ function tvarkom_csa_notice_text( $code, $text, array $last ) {
 	$day = function ( $key ) use ( $last ) {
 		return ! empty( $last[ $key ] ) ? wp_date( get_option( 'date_format' ), (int) $last[ $key ] ) : '?';
 	};
-	if ( 'too_soon' === $code ) {
-		return sprintf( $text, $day( 'next_eligible_at' ) );
-	}
-	if ( 'cached_pro' !== $code && 'cached' !== $code ) {
-		return $text;
-	}
-	return sprintf( $text, $day( 'collected_at' ), $day( 'next_eligible_at' ) );
+	return 'too_soon' === $code ? sprintf( $text, $day( 'next_eligible_at' ) ) : $text;
 }
 
 /**
@@ -113,53 +98,6 @@ function tvarkom_csa_date( $time ) {
 }
 
 /**
- * Whether the store is on Pro, from tvarkom_csa_status().
- *
- * @param array<string, mixed>|string $status Status.
- * @return bool
- */
-function tvarkom_csa_is_pro( $status ) {
-	return is_array( $status ) && 'pro' === $status['plan'];
-}
-
-/**
- * Plan line under the API key: plan, when Pro ends, and the link to buy Pro. The
- * gateway offers the link only to a store that isn't on Pro.
- *
- * @param array<string, mixed>|string $status From tvarkom_csa_status().
- * @return void
- */
-function tvarkom_csa_render_plan( $status ) {
-	if ( ! is_array( $status ) ) {
-		echo '<p class="description">' . esc_html__( 'Plan details are unavailable right now.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
-		return;
-	}
-	$parts = array();
-	if ( tvarkom_csa_is_pro( $status ) ) {
-		$parts[] = sprintf(
-			/* translators: %s: date. */
-			__( 'Plan: Pro, current subscription period until %s. Every audit you run is a full Pro diagnostic, and a Pro report is emailed to you every week. A Pro report is reused for 7 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-			tvarkom_csa_date( $status['license_expires_at'] )
-		);
-	} elseif ( isset( $status['license_ended'] ) && 'expired' === $status['license_ended'] ) {
-		/* translators: %s: date. */
-		$parts[] = sprintf( __( 'Your Pro subscription period ended on %s. The store is on the free plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ), tvarkom_csa_date( $status['license_expires_at'] ) );
-	} else {
-		$parts[] = __( 'Plan: free.', 'tvarkom-checkout-speed-audit-for-woocommerce' );
-	}
-	echo '<p class="description">' . esc_html( implode( ' ', $parts ) ) . '</p>';
-
-	if ( ! empty( $status['upgrade_url'] ) ) {
-		printf(
-			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
-			esc_url( $status['upgrade_url'] ),
-			esc_html__( 'Buy Pro', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-			esc_html__( 'Pro: an annual subscription with comparison with your earlier reports.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
-		);
-	}
-}
-
-/**
  * The privacy points shown on the plugin page and suggested for the site's privacy policy.
  * Keep them in line with legal/privacy-policy.txt.
  *
@@ -167,7 +105,7 @@ function tvarkom_csa_render_plan( $status ) {
  */
 function tvarkom_csa_privacy_points() {
 	return array(
-		__( 'Free reports, with any store data in them, are deleted 15 days after they are created. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Tvarkom keeps no copy of your report or of the store data in it once it is emailed. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Each audit request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Reports are emailed only to the report email. Tvarkom keeps no copy in its mailbox.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
@@ -276,7 +214,6 @@ function tvarkom_csa_render_page() {
 		$notice = 'server';
 	}
 	$status = '' !== $settings['api_key'] ? tvarkom_csa_status( '', 5 ) : null;
-	$is_pro = tvarkom_csa_is_pro( $status );
 	// One scan a week: until the next one is possible, say when (next to the last result) and
 	// disable the scan buttons.
 	$next_scan = tvarkom_csa_next_scan_at( $status );
@@ -307,17 +244,9 @@ function tvarkom_csa_render_page() {
 					<td>
 						<?php if ( '' !== $settings['api_key'] ) : ?>
 							<code><?php echo esc_html( tvarkom_csa_mask_key( $settings['api_key'] ) ); ?></code>
-							<?php tvarkom_csa_render_plan( $status ); ?>
 						<?php else : ?>
 							<?php esc_html_e( 'Not registered yet. Your first audit registers this store and issues a free key for this domain.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?>
 						<?php endif; ?>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="csa-license"><?php esc_html_e( 'License key', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></label></th>
-					<td>
-						<input type="password" id="csa-license" name="csa_license" class="regular-text" autocomplete="off" placeholder="tvk_…" value="">
-						<p class="description"><?php esc_html_e( 'Only if Tvarkom sent you a license key by email: paste it here. It replaces the current key. Most stores never need this.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -330,9 +259,7 @@ function tvarkom_csa_render_page() {
 			</table>
 			<?php tvarkom_csa_render_legal(); ?>
 			<p class="submit">
-				<?php if ( ! $is_pro ) : ?>
 				<button type="submit" name="csa_do" value="partial" class="button" <?php disabled( $next_scan > 0 ); ?>><?php esc_html_e( 'Partial Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
-				<?php endif; ?>
 				<button type="submit" name="csa_do" value="full" class="button button-primary" <?php disabled( $next_scan > 0 ); ?>><?php esc_html_e( 'Full Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
 				<button type="submit" name="csa_do" value="save" class="button"><?php esc_html_e( 'Save settings', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
 			</p>
@@ -355,20 +282,13 @@ function tvarkom_csa_handle_form() {
 	}
 	check_admin_referer( 'tvarkom_csa_form' );
 
-	$email   = isset( $_POST['csa_email'] ) ? sanitize_email( wp_unslash( $_POST['csa_email'] ) ) : '';
-	$license = isset( $_POST['csa_license'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['csa_license'] ) ) ) : '';
-	$do      = isset( $_POST['csa_do'] ) ? sanitize_key( wp_unslash( $_POST['csa_do'] ) ) : 'save';
+	$email = isset( $_POST['csa_email'] ) ? sanitize_email( wp_unslash( $_POST['csa_email'] ) ) : '';
+	$do    = isset( $_POST['csa_do'] ) ? sanitize_key( wp_unslash( $_POST['csa_do'] ) ) : 'save';
 
 	if ( ! is_email( $email ) ) {
 		tvarkom_csa_redirect( 'invalid_email' );
 	}
 	tvarkom_csa_update_settings( array( 'email' => $email ) );
-	if ( '' !== $license ) {
-		$result = tvarkom_csa_save_license( $license );
-		if ( 'license_saved' !== $result || ! in_array( $do, array( 'partial', 'full' ), true ) ) {
-			tvarkom_csa_redirect( $result );
-		}
-	}
 	if ( ! in_array( $do, array( 'partial', 'full' ), true ) ) {
 		tvarkom_csa_redirect( 'saved' );
 	}
@@ -387,8 +307,7 @@ function tvarkom_csa_handle_form() {
 
 	// Run the audit now rather than in the background: WordPress's background queue
 	// (Action Scheduler, WP-Cron) is often what's broken or backed up on the stores we
-	// audit, and the admin gets the real result at once. tvarkom_csa_run_audit() also
-	// refuses a Pro audit without the store data, without using one.
+	// audit, and the admin gets the real result at once.
 	wc_set_time_limit( 120 );
 	tvarkom_csa_run_audit( 'full' === $do );
 	tvarkom_csa_audit_unlock();

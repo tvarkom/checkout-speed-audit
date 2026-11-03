@@ -1,6 +1,6 @@
 <?php
 /**
- * Pro checkout profile: where the server's time goes on one checkout page load.
+ * Full Scan checkout profile: where the server's time goes on one checkout page load.
  *
  * The detailed audit job (tvarkom_csa_profile_checkout) requests this store's own
  * checkout page once, with a single-use token in a header. Only on that request,

@@ -34,7 +34,7 @@ The scan runs on Tvarkom's servers and loads your public pages like a visitor wo
 
 == External services ==
 
-This plugin uses the Tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to Tvarkom until an administrator clicks **Partial Scan** or **Full Scan**, or pastes a license key Tvarkom sent them (the key is then checked with Tvarkom).
+This plugin uses the Tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to Tvarkom until an administrator clicks **Partial Scan** or **Full Scan**.
 
 **Registration** (first scan only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. Tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
 
@@ -53,9 +53,9 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed), and the hook names and times of tasks more than 15 minutes late (never their arguments)
 * The checkout profile: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time
 
-Tvarkom's database keeps each free report, with the store data in it, for 15 days after it's created, then deletes it automatically (see the privacy policy for other copies, such as backups).
+Tvarkom doesn't keep the report: it's emailed to the report email, and no copy of it or of the store data in it is kept once it's sent (see the privacy policy for the short-lived working copy and backups).
 
-**Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your store's plan each time you open its page and before each scan.
+**Next scan date**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan.
 
 No customer data, order contents or revenue figures are ever sent. The report is emailed only to the report email.
 

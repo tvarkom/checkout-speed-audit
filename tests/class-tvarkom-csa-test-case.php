@@ -146,16 +146,14 @@ abstract class Tvarkom_CSA_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Gateway status for a store with the given plan.
+	 * Gateway status for a store that may scan now.
 	 *
-	 * @param bool $pro Pro audits left.
 	 * @return array
 	 */
-	protected function client_status( $pro ) {
+	protected function client_status() {
 		return array(
-			'plan'               => $pro ? 'pro' : 'free',
-			'origin'             => home_url(),
-			'detailed_available' => $pro,
+			'origin'       => home_url(),
+			'next_scan_at' => null,
 		);
 	}
 }

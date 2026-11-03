@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Stored settings: API key, plan, report email and the last result. Versions before 0.9.0
+ * Stored settings: API key, report email and the last result. Versions before 0.9.0
  * also stored "consent" (the store data checkbox); 0.9.0 asks with each click instead (Partial
  * Scan or Full Scan) and ignores it.
  *
- * @return array{api_key: string, plan: string, email: string, last: array<string, mixed>}
+ * @return array{api_key: string, email: string, last: array<string, mixed>}
  */
 function tvarkom_csa_settings() {
 	$saved = get_option( TVARKOM_CSA_OPTION, array() );
@@ -22,7 +22,6 @@ function tvarkom_csa_settings() {
 		is_array( $saved ) ? $saved : array(),
 		array(
 			'api_key' => '',
-			'plan'    => '',
 			'email'   => get_option( 'admin_email' ),
 			'last'    => array(),
 		)

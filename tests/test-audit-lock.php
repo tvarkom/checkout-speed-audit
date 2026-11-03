@@ -64,7 +64,7 @@ class Tvarkom_CSA_Audit_Lock_Test extends Tvarkom_CSA_Test_Case {
 
 	public function test_a_queued_audit_runs_and_releases_the_lock() {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		do_action( TVARKOM_CSA_ACTION );

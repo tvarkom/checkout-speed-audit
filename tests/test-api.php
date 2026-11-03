@@ -1,6 +1,6 @@
 <?php
 /**
- * Gateway client: plan status, license keys and registration (includes/api.php).
+ * Gateway client: store status and registration (includes/api.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -10,7 +10,6 @@
  */
 class Tvarkom_CSA_Api_Test extends Tvarkom_CSA_Test_Case {
 
-	const LICENSE = 'tvk_abcdefghijklmnopqrstuvwxyz';
 
 	public function test_status_of_an_unregistered_store_asks_nothing() {
 		$this->assertSame( 'not_registered', tvarkom_csa_status() );
@@ -47,42 +46,10 @@ class Tvarkom_CSA_Api_Test extends Tvarkom_CSA_Test_Case {
 
 	public function test_status_sends_the_key() {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_stored' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( true ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 
-		$this->assertSame( $this->client_status( true ), tvarkom_csa_status() );
+		$this->assertSame( $this->client_status(), tvarkom_csa_status() );
 		$this->assertSame( 'Bearer tvk_stored', $this->requests[0]['headers']['Authorization'] );
-	}
-
-	public function test_a_malformed_license_is_refused_without_asking_the_gateway() {
-		$this->assertSame( 'license_invalid', tvarkom_csa_save_license( 'tvk_short' ) );
-		$this->assertSame( 'license_invalid', tvarkom_csa_save_license( 'abc_abcdefghijklmnopqrstuvwxyz' ) );
-		$this->assertSame( array(), $this->request_lines() );
-	}
-
-	public function test_a_license_the_gateway_rejects_is_invalid() {
-		$this->respond( 'GET', '/v1/client', 401, array( 'error' => 'invalid_key' ) );
-		$this->assertSame( 'license_invalid', tvarkom_csa_save_license( self::LICENSE ) );
-	}
-
-	public function test_a_license_for_another_store_is_not_saved() {
-		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_current' ) );
-		$status           = $this->client_status( true );
-		$status['origin'] = 'https://another-store.example';
-		$this->respond( 'GET', '/v1/client', 200, $status );
-
-		$this->assertSame( 'license_other_store', tvarkom_csa_save_license( self::LICENSE ) );
-		$this->assertSame( 'tvk_current', tvarkom_csa_settings()['api_key'] );
-	}
-
-	public function test_a_license_for_this_store_is_saved_with_its_plan() {
-		$status           = $this->client_status( true );
-		$status['origin'] = 'https://www.' . strtoupper( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ); // www. and case don't make it another store.
-		$this->respond( 'GET', '/v1/client', 200, $status );
-
-		$this->assertSame( 'license_saved', tvarkom_csa_save_license( self::LICENSE ) );
-		$this->assertSame( self::LICENSE, tvarkom_csa_settings()['api_key'] );
-		$this->assertSame( 'pro', tvarkom_csa_settings()['plan'] );
-		$this->assertSame( 'Bearer ' . self::LICENSE, $this->requests[0]['headers']['Authorization'] );
 	}
 
 	public function test_registration_proves_the_domain_and_stores_the_key() {
@@ -107,7 +74,7 @@ class Tvarkom_CSA_Api_Test extends Tvarkom_CSA_Test_Case {
 					array(
 						'api_key' => 'tvk_new',
 						'plan'    => 'free',
-					),
+					), // An older gateway's plan is ignored.
 				);
 			}
 		);
@@ -127,7 +94,6 @@ class Tvarkom_CSA_Api_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( 'tok_1', $token_while_verifying );
 		$this->assertFalse( get_transient( TVARKOM_CSA_TOKEN ), 'token removed after use' );
 		$this->assertSame( 'tvk_new', tvarkom_csa_settings()['api_key'] );
-		$this->assertSame( 'free', tvarkom_csa_settings()['plan'] );
 	}
 
 	public function test_a_failed_verification_stores_no_key() {

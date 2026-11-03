@@ -66,7 +66,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringContainsString( $this->notice_text( 'queued' ), $this->render() );
 	}
 
-	public function test_a_pro_subscriber_is_never_offered_pro_again() {
+	public function test_the_page_shows_no_plan_or_purchase() {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
 		$this->respond(
@@ -74,68 +74,19 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 			'/v1/client',
 			200,
 			array_merge(
-				$this->client_status( true ),
-				array(
-					'license_expires_at' => '2027-10-28T12:00:00Z',
-					'upgrade_url'        => null,
-				)
-			)
-		);
-
-		$page = $this->render();
-
-		$this->assertStringContainsString( 'Plan: Pro, current subscription period until', $page );
-		$this->assertStringContainsString( 'a Pro report is emailed to you every week', $page );
-		$this->assertStringNotContainsString( 'Buy Pro', $page );
-		$this->assertStringNotContainsString( 'audits left', $page );
-	}
-
-	public function test_a_free_store_is_offered_the_subscription() {
-		$this->sign_in_shop_manager();
-		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond(
-			'GET',
-			'/v1/client',
-			200,
-			array_merge(
-				$this->client_status( false ),
-				array(
-					'monthly_limit'       => 4,
-					'audits_last_30_days' => 1,
-					'upgrade_url'         => 'https://buy.stripe.com/test?client_reference_id=tvkx',
-				)
-			)
-		);
-
-		$page = $this->render();
-
-		$this->assertStringContainsString( 'Buy Pro', $page );
-		$this->assertStringContainsString( 'an annual subscription', $page );
-		$this->assertStringNotContainsString( 'one-time', $page );
-	}
-
-	public function test_a_free_store_sees_no_pro_and_no_audit_count() {
-		$this->sign_in_shop_manager();
-		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond(
-			'GET',
-			'/v1/client',
-			200,
-			array_merge(
-				$this->client_status( false ),
+				$this->client_status(),
 				array(
 					'monthly_limit'       => 4, // An older gateway's answer.
 					'audits_last_30_days' => 1,
-					'upgrade_url'         => null,
+					'upgrade_url'         => 'https://buy.example', // Ignored: there is nothing to buy.
 				)
 			)
 		);
 
 		$page = $this->render();
 
-		$this->assertStringContainsString( 'Plan: free.', $page );
 		$this->assertStringContainsString( 'one report per week', $page );
-		$this->assertDoesNotMatchRegularExpression( '/\bPro\b|Buy |subscription|audits used|per 30 days|hello@/', wp_strip_all_tags( $page ) );
+		$this->assertDoesNotMatchRegularExpression( '/\bPro\b|Buy |subscription|License key|Plan:|audits used|per 30 days|hello@|buy\.example/', wp_strip_all_tags( $page ) . $page );
 	}
 
 	public function test_a_code_without_text_shows_the_server_notice() {
@@ -208,7 +159,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 	public function test_an_audit_runs_now_and_releases_the_lock() {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
@@ -218,7 +169,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 	public function test_full_scan_sends_the_store_data() {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		$this->assertSame( 'queued_full', $this->submit( array( 'csa_do' => 'full' ) ) );
@@ -229,7 +180,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 	public function test_the_page_offers_both_scans_and_shows_no_results() {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 
 		$page = $this->render();
 
@@ -245,7 +196,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
 		$next = time() + 2 * DAY_IN_SECONDS;
-		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status( false ), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
+		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status(), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
 
 		$page = $this->render();
 
@@ -268,7 +219,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 		$this->respond( 'POST', '/v1/register/verify', 200, array( 'api_key' => 'tvk_new' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
 		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
@@ -282,19 +233,5 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 
 		$this->assertSame( 'invalid_website', $this->submit( array( 'csa_do' => 'partial' ) ) );
 		$this->assertFalse( $this->lock_is_held() );
-	}
-
-	public function test_a_license_key_is_checked_before_the_audit() {
-		$this->sign_in_shop_manager();
-		$this->assertSame(
-			'license_invalid',
-			$this->submit(
-				array(
-					'csa_license' => 'nope',
-					'csa_do'      => 'full',
-				)
-			)
-		);
-		$this->assertSame( array(), $this->request_lines() );
 	}
 }
