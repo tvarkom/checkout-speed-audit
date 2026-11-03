@@ -1,7 +1,7 @@
 <?php
 /**
- * Pro detailed diagnostics, collected only for a Pro store's detailed audit (the
- * gateway decides) and only with the admin's consent. Names, sizes and counts:
+ * Detailed diagnostics, collected only for a Full Scan (the admin's click) or a Pro store's
+ * weekly report. Names, sizes and counts:
  * never option values, task arguments or customer data. Error messages are
  * scrubbed of emails, links, IP addresses and long numbers before they leave.
  *

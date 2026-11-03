@@ -1,6 +1,6 @@
 <?php
 /**
- * One audit: what is sent, with and without consent, and the stored outcome (includes/audit.php).
+ * One audit: what a Partial Scan and a Full Scan send, and the stored outcome (includes/audit.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -11,17 +11,15 @@
 class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 
 	/**
-	 * A registered store on the given plan, with or without consent.
+	 * A registered store on the given plan.
 	 *
-	 * @param bool $pro     Pro audits left.
-	 * @param bool $consent Store data allowed.
+	 * @param bool $pro On Pro.
 	 */
-	private function store( $pro, $consent ) {
+	private function store( $pro ) {
 		tvarkom_csa_update_settings(
 			array(
 				'api_key' => 'tvk_test',
 				'email'   => 'owner@example.org',
-				'consent' => $consent,
 			)
 		);
 		$this->respond( 'GET', '/v1/client', 200, $this->client_status( $pro ) );
@@ -48,11 +46,11 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( 'invalid_key', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_free_audit_without_consent_sends_only_the_store_addresses() {
-		$this->store( false, false );
+	public function test_partial_scan_sends_only_the_store_addresses() {
+		$this->store( false );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit();
+		tvarkom_csa_run_audit( 0, false );
 
 		$this->assertSame(
 			array(
@@ -69,31 +67,33 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( 'queued', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_free_audit_with_consent_adds_the_metrics_only() {
-		$this->store( false, true );
+	public function test_free_full_scan_sends_the_metrics_and_the_diagnostics() {
+		$this->store( false );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit();
+		tvarkom_csa_run_audit( 0, true );
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
-		$this->assertArrayNotHasKey( 'detailed', $body );
+		$this->assertSame( 2, $body['detailed']['schema'] );
+		$this->assertArrayHasKey( 'checkout_profile', $body['detailed'] );
+		$this->assertSame( 'queued_full', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_pro_audit_without_consent_is_refused_before_it_is_sent() {
-		$this->store( true, false );
+	public function test_pro_partial_scan_is_refused_before_it_is_sent() {
+		$this->store( true );
 
-		tvarkom_csa_run_audit();
+		tvarkom_csa_run_audit( 0, false );
 
 		$this->assertSame( array( 'GET /v1/client' ), $this->request_lines(), 'no Pro audit used' );
 		$this->assertSame( 'consent_required', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_pro_audit_with_consent_sends_the_diagnostics_and_a_checkout_profile() {
-		$this->store( true, true );
+	public function test_pro_full_scan_sends_the_diagnostics_and_a_checkout_profile() {
+		$this->store( true );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'detailed' => true ) );
 
-		tvarkom_csa_run_audit();
+		tvarkom_csa_run_audit( 0, true );
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
@@ -138,7 +138,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	 * @param bool         $key_kept Whether the API key stays.
 	 */
 	public function test_gateway_answers( $status, $body, $code, $key_kept ) {
-		$this->store( false, false );
+		$this->store( false );
 		$this->respond( 'POST', '/v1/audits', $status, $body );
 
 		tvarkom_csa_run_audit();
@@ -149,7 +149,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_a_reused_pro_report_says_when_it_was_generated() {
-		$this->store( true, true );
+		$this->store( true );
 		$this->respond(
 			'POST',
 			'/v1/audits',
@@ -163,7 +163,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 
-		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit() );
+		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit( 0, true ) );
 
 		$last = tvarkom_csa_settings()['last'];
 		$this->assertSame( 'cached_pro', $last['code'] );
@@ -177,7 +177,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_a_report_in_progress_is_not_a_new_audit() {
-		$this->store( true, true );
+		$this->store( true );
 		$this->respond(
 			'POST',
 			'/v1/audits',
@@ -188,7 +188,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 
-		$this->assertSame( 'in_progress', tvarkom_csa_run_audit() );
+		$this->assertSame( 'in_progress', tvarkom_csa_run_audit( 0, true ) );
 		$this->assertSame( 'in_progress', tvarkom_csa_settings()['last']['code'] );
 	}
 }

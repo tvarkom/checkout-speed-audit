@@ -7,15 +7,15 @@ follows one click through them.
 ## The picture
 
 ```
-WooCommerce → Speed Audit, "Run free audit"
+WooCommerce → Speed Audit, "Partial Scan" or "Full Scan"
    │  admin-post.php?action=tvarkom_csa_form
    ▼
 tvarkom_csa_handle_form (admin.php) ── lock ── register if needed ──▶ api.tvarkom.com/v1/register (+ /verify)
    │                                                  ▲                       │ GETs /wp-json/tvarkom/v1/verify (rest.php)
    ▼                                                  └───────────────────────┘
 tvarkom_csa_run_audit (audit.php) ── plan ──▶ api.tvarkom.com/v1/client
-   │ metrics.php, detailed.php (with consent)
-   │ └─ Pro: profile-request.php ──▶ this store's own checkout ──▶ profile.php measures, profile-report.php builds the result
+   │ Full Scan only: metrics.php, detailed.php
+   │ └─ profile-request.php ──▶ this store's own checkout ──▶ profile.php measures, profile-report.php builds the result
    ▼
 POST api.tvarkom.com/v1/audits ──▶ gateway ──▶ audit tool ──▶ report email
    │
@@ -23,24 +23,25 @@ POST api.tvarkom.com/v1/audits ──▶ gateway ──▶ audit tool ──▶ 
 result code stored (settings.php) ──▶ redirect back to the admin page, which shows the message
 ```
 
-The plugin never runs the audit itself: it collects aggregate store data (only with consent),
-sends it to the Tvarkom API gateway, and shows the gateway's answer. The report arrives by email.
+The plugin never runs the audit itself: on a Full Scan it collects aggregate store data and the
+detailed diagnostics, sends the request to the Tvarkom API gateway, and shows the gateway's
+answer. Results are never shown on the page: the report arrives by email as a PDF.
 
 ## The audit, step by step
 
 | # | What happens | Where | If it fails |
 |---|---|---|---|
 | 1 | The admin page shows the form, the plan (from the gateway) and the last result | `tvarkom_csa_render_page`, `tvarkom_csa_render_plan` (`admin.php`), `tvarkom_csa_status` (`api.php`) | the plan box shows the error |
-| 2 | The click posts to `admin-post.php`: capability (`manage_woocommerce`) and nonce checked, email and consent saved | `tvarkom_csa_handle_form` (`admin.php`), `tvarkom_csa_update_settings` (`settings.php`) | 403, `invalid_email` |
+| 2 | The click posts to `admin-post.php`: capability (`manage_woocommerce`) and nonce checked, email saved; the button (`csa_do`: `partial` or `full`) picks the scan | `tvarkom_csa_handle_form` (`admin.php`), `tvarkom_csa_update_settings` (`settings.php`) | 403, `invalid_email` |
 | 3 | A pasted license key is checked against the gateway and must belong to this store | `tvarkom_csa_save_license` (`api.php`) | `license_invalid`, `license_other_store` |
 | 4 | One audit at a time: an atomic option row is the lock (stale after 5 minutes) | `tvarkom_csa_audit_lock` (`audit.php`) | `audit_running` |
 | 5 | No API key yet: register. The gateway gets a token, fetches it from this site's REST route to prove the domain, and returns a free key | `tvarkom_csa_register` (`api.php`), `tvarkom_csa_register_routes` (`rest.php`) | `network`, the gateway's code (e.g. `origin_taken`) |
-| 6 | The plan now: on Pro, every audit is a Pro audit and needs the store data | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status` | `consent_required` (nothing sent) |
-| 7 | With consent: aggregate store metrics (versions, sizes, counts, an order range) | `tvarkom_csa_collect_metrics` (`metrics.php`) | — |
-| 8 | Pro only: autoloaded options, leftover tables, PHP settings, failed and late tasks | `tvarkom_csa_collect_detailed` (`detailed.php`) | — |
-| 9 | Pro only: the checkout profile. A single-use token is stored; the plugin loads its own checkout once with the token in a header; on that request only, the profiler times every hook, query and outgoing call, then stores the result | `tvarkom_csa_profile_checkout` (`profile-request.php`) → `tvarkom_csa_profile_maybe_start` (`profile.php`, runs at load) → `tvarkom_csa_profile_finish` (`profile-report.php`) | the profile says why it's unavailable (`request_failed`, `redirected`, `not_profiled`); the audit still runs |
+| 6 | The plan now: on Pro, every audit is a Pro audit and needs the store data (a Full Scan) | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status` | `consent_required` (nothing sent) |
+| 7 | Full Scan: aggregate store metrics (versions, sizes, counts, an order range) | `tvarkom_csa_collect_metrics` (`metrics.php`) | — |
+| 8 | Full Scan: autoloaded options, leftover tables, PHP settings, failed and late tasks | `tvarkom_csa_collect_detailed` (`detailed.php`) | — |
+| 9 | Full Scan: the checkout profile. A single-use token is stored; the plugin loads its own checkout once with the token in a header; on that request only, the profiler times every hook, query and outgoing call, then stores the result | `tvarkom_csa_profile_checkout` (`profile-request.php`) → `tvarkom_csa_profile_maybe_start` (`profile.php`, runs at load) → `tvarkom_csa_profile_finish` (`profile-report.php`) | the profile says why it's unavailable (`request_failed`, `redirected`, `not_profiled`); the audit still runs |
 | 10 | `POST /v1/audits` with the API key: website, cart and checkout URLs, email, and the data above | `tvarkom_csa_post` (`api.php`) | `network`, or the gateway's code via `tvarkom_csa_error_code` |
-| 11 | The answer is stored as the last result: `queued`/`queued_detailed`, `cached_pro`/`cached` (a report from the last 7 days was emailed again; its generation date and the next date are kept for the message) or `in_progress`; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
+| 11 | The answer is stored as the last result: `queued` (Partial Scan), `queued_full` (Full Scan) or `queued_detailed` (Pro), `cached_pro`/`cached` (a report from the last 7 days was emailed again; its generation date and the next date are kept for the message) or `in_progress`; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
 | 12 | The lock is released and the admin is redirected back with the result code, shown as a message | `tvarkom_csa_audit_unlock`, `tvarkom_csa_redirect`, `tvarkom_csa_messages` (`admin.php`) | — |
 
 What leaves the store, field by field, is in `readme.txt` ("External services") and the
@@ -58,15 +59,14 @@ While the store is on Pro, the gateway asks the plugin about once a week for a P
 2. `tvarkom_csa_handle_monitor` refuses an unregistered store, a bad signature, another store,
    a request more than 5 minutes off, an audit already running (the same lock as a click), and
    an attempt id not greater than the last one answered (option `tvarkom_csa_monitor_seen`).
-3. `tvarkom_csa_run_audit( $attempt )` sends the same data as a Pro audit the admin runs (only
-   with consent) to `POST /v1/audits` with `monitor_attempt`, and returns the gateway's result
+3. `tvarkom_csa_run_audit( $attempt )` sends the same data as a Full Scan to `POST /v1/audits` with `monitor_attempt`, and returns the gateway's result
    code. It doesn't touch the admin page's last result.
 4. The endpoint answers the gateway with that code only, e.g. `{"code":"queued_detailed"}`.
 ## The other flows, in one paragraph each
 
-- **Store diagnostics and "Profile my checkout"** run locally and send nothing:
-  `tvarkom_csa_render_diagnostics` shows the same Pro diagnostics as step 8, and the button
-  (`tvarkom_csa_handle_profile`, `diagnostics.php`) runs step 9 and shows the result on the page.
+- **No local results**: since 0.9.0 the page shows no diagnostics (Store diagnostics and
+  "Profile my checkout" were removed, founder decision of 3 Nov 2026); steps 8 and 9 run only
+  for a Full Scan, and their results reach the admin in the emailed report.
 - **Buying Pro**: when the gateway's plan status includes an `upgrade_url` (the Stripe Payment
   Link with this store's reference), the plan box shows **Buy Pro** (`tvarkom_csa_render_plan`).
   Payment and the license happen in Stripe and the gateway; the plugin sees Pro the next time

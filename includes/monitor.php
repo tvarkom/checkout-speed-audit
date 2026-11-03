@@ -3,8 +3,8 @@
  * REST route: POST /wp-json/tvarkom/v1/monitor, Tvarkom's weekly Pro report.
  *
  * About once a week, for a store on Pro, the Tvarkom gateway asks this endpoint for a new full
- * Pro diagnostic. The plugin then runs the same audit as the Run Pro audit button
- * (tvarkom_csa_run_audit()): it collects the same store data (only with consent) and sends it
+ * Pro diagnostic. The plugin then runs the same audit as the Full Scan button
+ * (tvarkom_csa_run_audit()): it collects the same store data and sends it
  * to the gateway with the store's API key, naming the gateway's attempt. The answer to the
  * gateway is only that audit's result code: no store data leaves through this endpoint.
  *

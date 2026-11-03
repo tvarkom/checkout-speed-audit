@@ -117,8 +117,6 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 	public function test_a_free_store_sees_no_pro_and_no_audit_count() {
 		$this->sign_in_shop_manager();
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$_GET['csa_preview'] = '1';
-		$_GET['_wpnonce']    = wp_create_nonce( 'tvarkom_csa_preview' );
 		$this->respond(
 			'GET',
 			'/v1/client',
@@ -134,7 +132,6 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		);
 
 		$page = $this->render();
-		unset( $_GET['csa_preview'], $_GET['_wpnonce'] );
 
 		$this->assertStringContainsString( 'Plan: free.', $page );
 		$this->assertStringContainsString( 'from the last 7 days', $page );
@@ -183,20 +180,18 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( get_option( 'admin_email' ), tvarkom_csa_settings()['email'] );
 	}
 
-	public function test_save_stores_the_email_and_consent_and_sends_nothing() {
+	public function test_save_stores_the_email_and_sends_nothing() {
 		$this->sign_in_shop_manager();
 		$this->assertSame(
 			'saved',
 			$this->submit(
 				array(
-					'csa_email'   => 'reports@example.org',
-					'csa_consent' => '1',
-					'csa_do'      => 'save',
+					'csa_email' => 'reports@example.org',
+					'csa_do'    => 'save',
 				)
 			)
 		);
 		$this->assertSame( 'reports@example.org', tvarkom_csa_settings()['email'] );
-		$this->assertTrue( tvarkom_csa_settings()['consent'] );
 		$this->assertSame( array(), $this->request_lines() );
 	}
 
@@ -205,7 +200,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
 		tvarkom_csa_audit_lock();
 
-		$this->assertSame( 'audit_running', $this->submit( array( 'csa_do' => 'audit' ) ) );
+		$this->assertSame( 'audit_running', $this->submit( array( 'csa_do' => 'partial' ) ) );
 		$this->assertSame( array(), $this->request_lines() );
 		$this->assertTrue( $this->lock_is_held(), 'the running audit keeps its lock' );
 	}
@@ -216,8 +211,34 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'audit' ) ) );
+		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
 		$this->assertFalse( $this->lock_is_held() );
+	}
+
+	public function test_full_scan_sends_the_store_data() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
+
+		$this->assertSame( 'queued_full', $this->submit( array( 'csa_do' => 'full' ) ) );
+		$this->assertArrayHasKey( 'detailed', $this->requests[1]['body'] );
+		$this->assertArrayHasKey( 'metrics', $this->requests[1]['body'] );
+	}
+
+	public function test_the_page_offers_both_scans_and_shows_no_results() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
+
+		$page = $this->render();
+
+		$this->assertStringContainsString( 'value="partial"', $page );
+		$this->assertStringContainsString( 'value="full"', $page );
+		$this->assertStringContainsString( 'Full Scan also sends store data', $page );
+		$this->assertStringContainsString( 'legal/terms-of-use.txt', $page );
+		$this->assertStringContainsString( 'legal/privacy-policy.txt', $page );
+		$this->assertDoesNotMatchRegularExpression( '/Store diagnostics|Preview data|Profile my checkout|Largest autoloaded options/', $page );
 	}
 
 	public function test_the_first_audit_registers_the_store() {
@@ -235,7 +256,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->respond( 'GET', '/v1/client', 200, $this->client_status( false ) );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'audit' ) ) );
+		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
 		$this->assertSame( array( 'POST /v1/register', 'POST /v1/register/verify', 'GET /v1/client', 'POST /v1/audits' ), $this->request_lines() );
 		$this->assertSame( 'Bearer tvk_new', $this->requests[3]['headers']['Authorization'] );
 	}
@@ -244,7 +265,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->sign_in_shop_manager();
 		$this->respond( 'POST', '/v1/register', 400, array( 'error' => 'invalid_website' ) );
 
-		$this->assertSame( 'invalid_website', $this->submit( array( 'csa_do' => 'audit' ) ) );
+		$this->assertSame( 'invalid_website', $this->submit( array( 'csa_do' => 'partial' ) ) );
 		$this->assertFalse( $this->lock_is_held() );
 	}
 
@@ -255,7 +276,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 			$this->submit(
 				array(
 					'csa_license' => 'nope',
-					'csa_do'      => 'audit',
+					'csa_do'      => 'full',
 				)
 			)
 		);

@@ -1,0 +1,87 @@
+TERMS OF USE
+Tvarkom Checkout Speed Audit for WooCommerce
+
+The terms for using the audit service of the Tvarkom Checkout Speed Audit for WooCommerce plugin.
+
+Last updated: 3 November 2026
+
+Who we are
+----------
+
+The service is provided by MB Tvarkom Software ("Tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. Contact: contact@tvarkom.com; for help with the plugin or a report, support@tvarkom.com.
+
+By running an audit with the Tvarkom Checkout Speed Audit for WooCommerce plugin ("the plugin"), you agree to these terms. If you use the service for a company, you confirm you may accept them on its behalf.
+
+What the service does
+---------------------
+
+When you click Partial Scan or Full Scan, Tvarkom audits your store and emails you a report as a PDF. Our scanner loads your store's public pages like a visitor would and measures response times, page weight and caching. A Partial Scan uses only these measurements. A Full Scan also uses data the plugin reads from your store, including a profile of one checkout page load on your store's server, as described in our Privacy Policy (privacy-policy.txt, shipped with the plugin). Neither the scanner nor the plugin changes anything on your store. Results are sent only by email; the plugin doesn't show them on its page.
+
+Reports describe your store at the moment of the audit. Results can vary between audits with traffic, hosting and caching.
+
+Your store and your key
+-----------------------
+
+* You may only audit stores you own or are authorized to manage.
+
+* The plugin registers your store by confirming that the request comes from its domain, and issues an API key for that domain only. Keep the key private; it lets anyone use your store's audits.
+
+* If your store's address changes, the plugin registers it again.
+
+Free service and its limits
+---------------------------
+
+The audits, the reports and the plugin are free. To keep the service sustainable and protect the stores whose addresses are submitted, audits have these limits:
+
+* You can request an audit whenever you like. If your store has a report from the last 7 days, we email you that report again, with the date it was generated, instead of a new check; after 7 days a new audit runs.
+
+* A report can be sent again up to 3 times in 24 hours and 7 times in 7 days.
+
+* Each store can run at most 3 new checks in 24 hours, failed ones included, and 3 requests an hour from the store's server.
+
+* We may change these limits or features. We'll update these terms when we do.
+
+Acceptable use
+--------------
+
+Don't use the service to audit stores you don't control, to get around its limits (for example with multiple keys or email addresses for the same store), to overload our systems or other websites, or to resell audits without our written agreement. We may suspend a key or block audits that break these terms.
+
+Reports and advice
+------------------
+
+Reports are information to help you decide what to improve. They aren't a guarantee of any result, and you decide which changes to make. Back up your store before making changes, and test them on a staging copy where possible.
+
+Availability and changes
+------------------------
+
+We work to keep the service available, but we don't promise it will be uninterrupted or error-free. We may change or discontinue features.
+
+Liability
+---------
+
+To the extent the law allows, our total liability to you for the service is limited to the amount you paid us in the 12 months before the claim, and we aren't liable for indirect or consequential losses such as lost profit or lost data. Nothing in these terms limits liability that can't be limited by law, or rights you have as a consumer.
+
+Your data
+---------
+
+How we handle personal data is described in our Privacy Policy (privacy-policy.txt, shipped with the plugin).
+
+Ending
+------
+
+You can stop using the service at any time by deleting the plugin. We may suspend or end your access if you break these terms.
+
+Changes to these terms
+----------------------
+
+We may update these terms. We'll change the date at the top of this file and ship the new version with the plugin.
+
+Governing law
+-------------
+
+These terms are governed by the law of the Republic of Lithuania. Disputes go to the courts of Lithuania, unless you're a consumer and the law of your country gives you the right to bring them where you live.
+
+Contact
+-------
+
+Questions about these terms: contact@tvarkom.com.

@@ -1,8 +1,8 @@
 <?php
 /**
- * One audit: what is collected (only with consent) and sent to the gateway, and the outcome
- * stored for the admin page. Runs when the admin clicks the button (admin.php), and for the
- * weekly Pro report when the gateway asks (monitor.php).
+ * One audit: what is collected and sent to the gateway, and the outcome stored for the admin
+ * page. Runs when the admin clicks Partial Scan or Full Scan (admin.php), and for the weekly Pro
+ * report when the gateway asks (monitor.php). Store data is sent only with a Full Scan.
  *
  * @package CheckoutSpeedAudit
  */
@@ -14,19 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
 
 /**
- * Collects the store metrics (only with consent) and requests the audit.
+ * Requests the audit: a Partial Scan sends the store's addresses and the report email only; a
+ * Full Scan also collects and sends the store metrics and the detailed diagnostics, with a
+ * checkout profile. The gateway treats a free store's audit with the detailed data as a Full
+ * Scan; on Pro every audit is a Pro diagnostic and needs it.
  *
- * A weekly Pro report ($monitor_attempt, from monitor.php) sends the same data as a Pro audit
- * the admin runs, naming the gateway's attempt; the gateway decides it's a Pro diagnostic. Its
- * result goes back to the gateway only: the admin page's last result is left alone.
+ * A weekly Pro report ($monitor_attempt, from monitor.php) sends the same data as a Full Scan,
+ * naming the gateway's attempt: weekly reports are part of the Pro subscription. Its result goes
+ * back to the gateway only: the admin page's last result is left alone.
  *
- * @param int $monitor_attempt The gateway's weekly attempt, or 0 for the admin's audit.
+ * @param int  $monitor_attempt The gateway's weekly attempt, or 0 for the admin's audit.
+ * @param bool $full_scan       The admin clicked Full Scan.
  * @return string The result code (the admin page's codes).
  */
-function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
+function tvarkom_csa_run_audit( $monitor_attempt = 0, $full_scan = false ) {
 	$settings = tvarkom_csa_settings();
 	if ( $monitor_attempt > 0 ) {
-		$body = array(
+		$body     = array(
 			'website'         => home_url( '/' ),
 			'email'           => $settings['email'],
 			'pages'           => array(
@@ -34,11 +38,9 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
 				'checkout' => wc_get_checkout_url(),
 			),
 			'monitor_attempt' => $monitor_attempt,
+			'metrics'         => tvarkom_csa_collect_metrics(),
+			'detailed'        => tvarkom_csa_collect_detailed(),
 		);
-		if ( $settings['consent'] ) {
-			$body['metrics']  = tvarkom_csa_collect_metrics();
-			$body['detailed'] = tvarkom_csa_collect_detailed();
-		}
 		$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
 		if ( is_wp_error( $response ) ) {
 			return 'network';
@@ -68,7 +70,7 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
 	// On Pro, every audit is a Pro audit, and a new one needs the store data.
 	$status = tvarkom_csa_status();
 	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
-	if ( $is_pro && ! $settings['consent'] ) {
+	if ( $is_pro && ! $full_scan ) {
 		tvarkom_csa_update_settings(
 			array(
 				'last' => array(
@@ -79,11 +81,9 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
 		);
 		return 'consent_required';
 	}
-	if ( $settings['consent'] ) {
-		$body['metrics'] = tvarkom_csa_collect_metrics();
-		if ( $is_pro ) {
-			$body['detailed'] = tvarkom_csa_collect_detailed();
-		}
+	if ( $full_scan ) {
+		$body['metrics']  = tvarkom_csa_collect_metrics();
+		$body['detailed'] = tvarkom_csa_collect_detailed();
 	}
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
@@ -102,8 +102,10 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0 ) {
 			);
 		} elseif ( 'in_progress' === $status ) {
 			$code = 'in_progress';
+		} elseif ( $detailed ) {
+			$code = 'queued_detailed';
 		} else {
-			$code = $detailed ? 'queued_detailed' : 'queued';
+			$code = $full_scan ? 'queued_full' : 'queued';
 		}
 	} else {
 		$code = tvarkom_csa_error_code( $response );
@@ -165,8 +167,9 @@ function tvarkom_csa_audit_unlock() {
 }
 
 /**
- * An audit queued by version 0.6.0 (Action Scheduler), run under the same lock as a click. If an
- * audit is running already, the queued one is dropped: it would only repeat that audit.
+ * An audit queued by version 0.6.0 (Action Scheduler), run under the same lock as a click, as a
+ * Partial Scan: 0.9.0 sends store data only when the admin clicks Full Scan. If an audit is
+ * running already, the queued one is dropped: it would only repeat that audit.
  *
  * @return void
  */

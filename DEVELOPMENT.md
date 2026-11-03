@@ -1,7 +1,7 @@
 # Development
 
 `readme.txt` is the WordPress.org readme for store owners. This file is for working on the code.
-**New here? Read [docs/request-flow.md](docs/request-flow.md)**: it follows one "Run free audit"
+**New here? Read [docs/request-flow.md](docs/request-flow.md)**: it follows one "Full Scan"
 click through the code, step by step, and says where to change things.
 
 The plugin is procedural WordPress code: a main file, `includes/`, and every function, constant
@@ -13,18 +13,17 @@ needs WooCommerce.
 | File | What it holds |
 |---|---|
 | `checkout-speed-audit.php` | Plugin header, constants, the include list and every hook the plugin registers at load |
-| `includes/settings.php` | The stored settings (option `tvarkom_csa`): API key, plan, email, consent, last result |
+| `includes/settings.php` | The stored settings (option `tvarkom_csa`): API key, plan, email, last result (versions before 0.9.0 also stored `consent`, now ignored) |
 | `includes/api.php` | The Tvarkom API gateway client: requests, plan status, license keys, registration, error codes |
 | `includes/rest.php` | `GET /wp-json/tvarkom/v1/verify`, which the gateway fetches to check the domain at registration |
 | `includes/monitor.php` | `POST /wp-json/tvarkom/v1/monitor`: the gateway's signed weekly request for a Pro audit (its header explains the signature and the replay checks) |
-| `includes/audit.php` | One audit: what is collected (only with consent) and sent, and the stored outcome; the lock that allows one audit at a time |
-| `includes/metrics.php` | Store metrics sent with every audit that has consent |
-| `includes/detailed.php` | Pro diagnostics: autoloaded options, orphaned tables, PHP setup, failed background tasks |
+| `includes/audit.php` | One audit: Partial Scan (addresses only) or Full Scan (with store data), what is sent, and the stored outcome; the lock that allows one audit at a time |
+| `includes/metrics.php` | Store metrics sent with every Full Scan |
+| `includes/detailed.php` | Detailed diagnostics (Full Scan): autoloaded options, orphaned tables, PHP setup, failed background tasks |
 | `includes/class-tvarkom-csa-profiler.php` | The checkout profiler's state |
 | `includes/profile.php` | The profiler inside the profiled checkout request (its header describes what is measured and what leaves the store) |
 | `includes/profile-report.php` | Building the profile result at the end of that request |
 | `includes/profile-request.php` | The audit side: requesting the store's own checkout with a single-use token |
-| `includes/diagnostics.php` | The Store diagnostics section and the local checkout profile |
 | `includes/admin.php` | The WooCommerce → Speed Audit page, its form handler and script |
 | `uninstall.php` | Removes the plugin's options and transients |
 | `tests/` | PHPUnit tests (not shipped): `class-tvarkom-csa-test-case.php` has the fake gateway they all use |
@@ -38,7 +37,6 @@ All in `checkout-speed-audit.php`:
 | `admin_menu` (priority 99) | `tvarkom_csa_admin_menu` |
 | `admin_post_tvarkom_csa_form` | `tvarkom_csa_handle_form` (save settings, license, run an audit) |
 | `admin_enqueue_scripts` | `tvarkom_csa_admin_scripts` |
-| `admin_post_tvarkom_csa_profile` | `tvarkom_csa_handle_profile` (the "Profile my checkout" button) |
 | `rest_api_init` | `tvarkom_csa_register_routes` (`/verify`, and `/monitor` through `tvarkom_csa_register_monitor_route`) |
 | `tvarkom_csa_run_audit` | `tvarkom_csa_run_queued_audit`; only for audits queued by versions up to 0.6.0 |
 
@@ -82,7 +80,7 @@ vendor/bin/phpunit
 (WordPress and WooCommerce versions included).
 
 Not covered by the tests: the profiled checkout request itself (it changes the whole process:
-`SAVEQUERIES`, wrapped hooks) and the Store diagnostics tables' contents. Check those in
+`SAVEQUERIES`, wrapped hooks) and the Full Scan report's detailed sections. Check those in
 WordPress Playground before a release, with Plugin Check.
 
 ### Before a release
@@ -103,5 +101,5 @@ To test against a local gateway, set `TVARKOM_CSA_API_URL` in `wp-config.php`.
    ```sh
    git archive --format=zip --prefix=tvarkom-checkout-speed-audit-for-woocommerce/ \
      -o tvarkom-checkout-speed-audit-for-woocommerce-<version>.zip HEAD \
-     checkout-speed-audit.php includes readme.txt uninstall.php
+     checkout-speed-audit.php includes legal readme.txt uninstall.php
    ```

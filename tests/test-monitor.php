@@ -11,7 +11,7 @@
 class Tvarkom_CSA_Monitor_Test extends Tvarkom_CSA_Test_Case {
 
 	/**
-	 * Fires rest_api_init on a fresh server, for a registered store with consent.
+	 * Fires rest_api_init on a fresh server, for a registered store.
 	 */
 	public function set_up() {
 		parent::set_up();
@@ -22,7 +22,6 @@ class Tvarkom_CSA_Monitor_Test extends Tvarkom_CSA_Test_Case {
 			array(
 				'api_key' => 'tvk_test',
 				'email'   => 'reports@example.org',
-				'consent' => true,
 				'last'    => array( 'code' => 'queued' ),
 			)
 		);
@@ -94,15 +93,14 @@ class Tvarkom_CSA_Monitor_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertFalse( (bool) get_option( TVARKOM_CSA_AUDIT_LOCK ), 'the lock is released' );
 	}
 
-	public function test_without_consent_no_store_data_is_sent() {
-		tvarkom_csa_update_settings( array( 'consent' => false ) );
-		$this->respond( 'POST', '/v1/audits', 400, array( 'error' => 'consent_required' ) );
+	public function test_the_weekly_report_sends_the_full_scan_data() {
+		// 0.9.0 has no store data setting: the weekly Pro report is a Full Scan, as the subscription says.
+		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		$response = $this->monitor();
+		$this->monitor();
 
-		$this->assertSame( array( 'code' => 'consent_required' ), $response->get_data() );
-		$this->assertArrayNotHasKey( 'detailed', $this->requests[0]['body'] );
-		$this->assertArrayNotHasKey( 'metrics', $this->requests[0]['body'] );
+		$this->assertArrayHasKey( 'metrics', $this->requests[0]['body'] );
+		$this->assertArrayHasKey( 'detailed', $this->requests[0]['body'] );
 	}
 
 	/**

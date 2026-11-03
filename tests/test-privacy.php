@@ -59,7 +59,7 @@ class Tvarkom_CSA_Privacy_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( '10-50', tvarkom_csa_order_tier() );
 	}
 
-	public function test_metrics_sent_with_consent() {
+	public function test_metrics_sent_with_a_full_scan() {
 		// The fields the gateway's metrics schema 1 expects; a change here is a contract change.
 		$this->assertSame(
 			array(
