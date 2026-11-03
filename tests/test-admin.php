@@ -134,7 +134,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$page = $this->render();
 
 		$this->assertStringContainsString( 'Plan: free.', $page );
-		$this->assertStringContainsString( 'from the last 7 days', $page );
+		$this->assertStringContainsString( 'one report per week', $page );
 		$this->assertDoesNotMatchRegularExpression( '/\bPro\b|Buy |subscription|audits used|per 30 days|hello@/', wp_strip_all_tags( $page ) );
 	}
 
