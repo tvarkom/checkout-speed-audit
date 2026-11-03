@@ -53,7 +53,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed), and the hook names and times of tasks more than 15 minutes late (never their arguments)
 * The checkout profile: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time
 
-The report is emailed to the report email, with a copy to Tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records. Tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
+The report is emailed to the report email, with a copy to Tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, deleted after 12 months. Tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
 
 **Next scan date**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan.
 

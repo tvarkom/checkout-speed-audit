@@ -95,7 +95,7 @@ function tvarkom_csa_date( $time ) {
  */
 function tvarkom_csa_privacy_points() {
 	return array(
-		__( 'A copy of each report email goes to Tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'A copy of each report email goes to Tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, and is deleted after 12 months. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Each audit request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Reports are emailed to the report email, with that copy to Tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
