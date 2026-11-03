@@ -13,7 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'tvarkom_csa' );
 delete_option( 'tvarkom_csa_local_profile' ); // Profile my checkout's last result, before 0.9.0.
 delete_option( 'tvarkom_csa_audit_lock' );
-delete_option( 'tvarkom_csa_monitor_seen' );
+delete_option( 'tvarkom_csa_monitor_seen' ); // The weekly Pro report's last attempt, before 0.9.0.
 delete_transient( 'tvarkom_csa_verify_token' );
 delete_transient( 'tvarkom_csa_status' );
 if ( function_exists( 'as_unschedule_all_actions' ) ) {

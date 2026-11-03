@@ -33,9 +33,7 @@ Free service and its limits
 
 The audits, the reports and the plugin are free. To keep the service sustainable and protect the stores whose addresses are submitted, audits have these limits:
 
-* You can request an audit whenever you like. If your store has a report from the last 7 days, we email you that report again, with the date it was generated, instead of a new check; after 7 days a new audit runs.
-
-* A report can be sent again up to 3 times in 24 hours and 7 times in 7 days.
+* Each store can request one report per week, with either scan. Until 7 days have passed since the last scan, the plugin shows the date of the next one and doesn't send another. A scan that failed doesn't count.
 
 * Each store can run at most 3 new checks in 24 hours, failed ones included, and 3 requests an hour from the store's server.
 

@@ -36,7 +36,6 @@ define( 'TVARKOM_CSA_FILE', __FILE__ );
 require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/api.php';
 require_once __DIR__ . '/includes/rest.php';
-require_once __DIR__ . '/includes/monitor.php';
 require_once __DIR__ . '/includes/metrics.php';
 require_once __DIR__ . '/includes/detailed.php';
 require_once __DIR__ . '/includes/audit.php';
@@ -56,7 +55,7 @@ add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
 add_action( 'admin_init', 'tvarkom_csa_privacy_policy_content' );
 
-// Domain check for registration, and the weekly Pro report (includes/rest.php, includes/monitor.php).
+// Domain check for registration (includes/rest.php).
 add_action( 'rest_api_init', 'tvarkom_csa_register_routes' );
 
 // Audits run when the admin clicks Partial Scan or Full Scan (admin.php). Version 0.6.0 and earlier queued

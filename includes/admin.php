@@ -42,6 +42,8 @@ function tvarkom_csa_messages() {
 		'cached_pro'             => array( 'info', __( 'Your store already has a Pro report from the last 7 days, so no new check was run. We emailed you that report again; it was generated on %1$s. A new Pro report can be generated after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		/* translators: 1: date the report was generated, 2: date a new report can be generated. */
 		'cached'                 => array( 'info', __( 'This store already has a free report from the last 7 days that covers this scan, so no new check was run. We emailed you that report again; it was generated on %1$s. A new audit can run after %2$s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		/* translators: %s: date a new scan can run. */
+		'too_soon'               => array( 'info', __( 'You can request one report per week. Your next scan is available on %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'in_progress'            => array( 'info', __( 'A report for this store is being generated right now, so this click didn\'t start another one. It will arrive by email in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'audit_running'          => array( 'info', __( 'An audit for this store is already running, so this click didn\'t send another one. Reload this page in a minute to see its result.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'consent_required'       => array( 'error', __( 'Pro audits need your store data. Click Full Scan instead.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -77,12 +79,15 @@ function tvarkom_csa_messages() {
  * @return string
  */
 function tvarkom_csa_notice_text( $code, $text, array $last ) {
-	if ( 'cached_pro' !== $code && 'cached' !== $code ) {
-		return $text;
-	}
 	$day = function ( $key ) use ( $last ) {
 		return ! empty( $last[ $key ] ) ? wp_date( get_option( 'date_format' ), (int) $last[ $key ] ) : '?';
 	};
+	if ( 'too_soon' === $code ) {
+		return sprintf( $text, $day( 'next_eligible_at' ) );
+	}
+	if ( 'cached_pro' !== $code && 'cached' !== $code ) {
+		return $text;
+	}
 	return sprintf( $text, $day( 'collected_at' ), $day( 'next_eligible_at' ) );
 }
 
@@ -149,7 +154,7 @@ function tvarkom_csa_render_plan( $status ) {
 			'<p><a class="button" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span class="description">%3$s</span></p>',
 			esc_url( $status['upgrade_url'] ),
 			esc_html__( 'Buy Pro', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-			esc_html__( 'Pro: an annual subscription with weekly monitoring of your store and comparison with your earlier reports.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
+			esc_html__( 'Pro: an annual subscription with comparison with your earlier reports.', 'tvarkom-checkout-speed-audit-for-woocommerce' )
 		);
 	}
 }
@@ -272,6 +277,9 @@ function tvarkom_csa_render_page() {
 	}
 	$status = '' !== $settings['api_key'] ? tvarkom_csa_status( '', 5 ) : null;
 	$is_pro = tvarkom_csa_is_pro( $status );
+	// One scan a week: until the next one is possible, say when (next to the last result) and
+	// disable the scan buttons.
+	$next_scan = tvarkom_csa_next_scan_at( $status );
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Tvarkom Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h1>
@@ -279,9 +287,12 @@ function tvarkom_csa_render_page() {
 		<?php if ( isset( $messages[ $notice ] ) ) : ?>
 			<div class="notice notice-<?php echo esc_attr( $messages[ $notice ][0] ); ?>"><p><?php echo esc_html( tvarkom_csa_notice_text( $notice, $messages[ $notice ][1], $settings['last'] ) ); ?></p></div>
 		<?php endif; ?>
+		<?php if ( $next_scan > 0 && 'too_soon' !== $notice ) : ?>
+			<div class="notice notice-info"><p><?php echo esc_html( tvarkom_csa_notice_text( 'too_soon', $messages['too_soon'][1], array( 'next_eligible_at' => $next_scan ) ) ); ?></p></div>
+		<?php endif; ?>
 
 		<p><?php esc_html_e( 'Get a free store health report from Tvarkom, scored from 0 to 100 and emailed to you as a PDF: server and checkout speed, caching and page weight and, with a Full Scan, your database, PHP setup, background tasks, a checkout profile and a fix plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
-		<p><?php esc_html_e( 'The scan runs on Tvarkom\'s servers and loads your public pages like a visitor would. Nothing on your store is changed. You can run a scan at any time: if your store has a report from the last 7 days, we email you that report again instead of running a new check.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+		<p><?php esc_html_e( 'The scan runs on Tvarkom\'s servers and loads your public pages like a visitor would. Nothing on your store is changed. You can request one report per week, with either scan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 
 		<form id="tvarkom-csa-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="tvarkom_csa_form">
@@ -320,9 +331,9 @@ function tvarkom_csa_render_page() {
 			<?php tvarkom_csa_render_legal(); ?>
 			<p class="submit">
 				<?php if ( ! $is_pro ) : ?>
-				<button type="submit" name="csa_do" value="partial" class="button"><?php esc_html_e( 'Partial Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
+				<button type="submit" name="csa_do" value="partial" class="button" <?php disabled( $next_scan > 0 ); ?>><?php esc_html_e( 'Partial Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
 				<?php endif; ?>
-				<button type="submit" name="csa_do" value="full" class="button button-primary"><?php esc_html_e( 'Full Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
+				<button type="submit" name="csa_do" value="full" class="button button-primary" <?php disabled( $next_scan > 0 ); ?>><?php esc_html_e( 'Full Scan', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
 				<button type="submit" name="csa_do" value="save" class="button"><?php esc_html_e( 'Save settings', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></button>
 			</p>
 			<?php tvarkom_csa_render_scan_note(); ?>
@@ -379,7 +390,7 @@ function tvarkom_csa_handle_form() {
 	// audit, and the admin gets the real result at once. tvarkom_csa_run_audit() also
 	// refuses a Pro audit without the store data, without using one.
 	wc_set_time_limit( 120 );
-	tvarkom_csa_run_audit( 0, 'full' === $do );
+	tvarkom_csa_run_audit( 'full' === $do );
 	tvarkom_csa_audit_unlock();
 	$last = tvarkom_csa_settings()['last'];
 	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );

@@ -50,7 +50,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->store( false );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit( 0, false );
+		tvarkom_csa_run_audit( false );
 
 		$this->assertSame(
 			array(
@@ -71,7 +71,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->store( false );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit( 0, true );
+		tvarkom_csa_run_audit( true );
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
@@ -83,7 +83,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 	public function test_pro_partial_scan_is_refused_before_it_is_sent() {
 		$this->store( true );
 
-		tvarkom_csa_run_audit( 0, false );
+		tvarkom_csa_run_audit( false );
 
 		$this->assertSame( array( 'GET /v1/client' ), $this->request_lines(), 'no Pro audit used' );
 		$this->assertSame( 'consent_required', tvarkom_csa_settings()['last']['code'] );
@@ -93,7 +93,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->store( true );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'detailed' => true ) );
 
-		tvarkom_csa_run_audit( 0, true );
+		tvarkom_csa_run_audit( true );
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
@@ -163,7 +163,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 
-		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit( 0, true ) );
+		$this->assertSame( 'cached_pro', tvarkom_csa_run_audit( true ) );
 
 		$last = tvarkom_csa_settings()['last'];
 		$this->assertSame( 'cached_pro', $last['code'] );
@@ -188,7 +188,43 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 
-		$this->assertSame( 'in_progress', tvarkom_csa_run_audit( 0, true ) );
+		$this->assertSame( 'in_progress', tvarkom_csa_run_audit( true ) );
 		$this->assertSame( 'in_progress', tvarkom_csa_settings()['last']['code'] );
+	}
+
+	public function test_inside_the_week_nothing_is_sent() {
+		tvarkom_csa_update_settings(
+			array(
+				'api_key' => 'tvk_test',
+				'email'   => 'owner@example.org',
+			)
+		);
+		$next = time() + 3 * DAY_IN_SECONDS;
+		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status( false ), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
+
+		$this->assertSame( 'too_soon', tvarkom_csa_run_audit( true ) );
+
+		$this->assertSame( array( 'GET /v1/client' ), $this->request_lines(), 'no scan sent' );
+		$this->assertSame( $next, tvarkom_csa_settings()['last']['next_eligible_at'] );
+	}
+
+	public function test_the_gateway_week_refusal_keeps_its_date() {
+		$this->store( false );
+		$this->respond(
+			'POST',
+			'/v1/audits',
+			429,
+			array(
+				'error'            => 'too_soon',
+				'next_eligible_at' => 1793600000,
+			)
+		);
+
+		$this->assertSame( 'too_soon', tvarkom_csa_run_audit( false ) );
+
+		$last     = tvarkom_csa_settings()['last'];
+		$messages = tvarkom_csa_messages();
+		$this->assertSame( 1793600000, $last['next_eligible_at'] );
+		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), 1793600000 ), tvarkom_csa_notice_text( 'too_soon', $messages['too_soon'][1], $last ) );
 	}
 }

@@ -241,6 +241,21 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertDoesNotMatchRegularExpression( '/Store diagnostics|Preview data|Profile my checkout|Largest autoloaded options/', $page );
 	}
 
+	public function test_inside_the_week_the_scan_buttons_are_disabled() {
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		$next = time() + 2 * DAY_IN_SECONDS;
+		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status( false ), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
+
+		$page = $this->render();
+
+		$this->assertMatchesRegularExpression( '/value="partial"[^>]*disabled/', $page );
+		$this->assertMatchesRegularExpression( '/value="full"[^>]*disabled/', $page );
+		$this->assertStringContainsString( 'one report per week', $page );
+		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), $next ), $page );
+		$this->assertDoesNotMatchRegularExpression( '/value="save"[^>]*disabled/', $page );
+	}
+
 	public function test_the_first_audit_registers_the_store() {
 		$this->sign_in_shop_manager();
 		$this->respond(

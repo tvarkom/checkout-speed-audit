@@ -27,7 +27,7 @@ What the scan reads. Our scanner then loads your store's public homepage, cart a
 
 What a report contains. Your store's address, the health score and risk level, the findings and recommendations, and the measurements: response times, page weight, files, caching and marketing trackers. After a Full Scan, the report also contains the store data and what we found in it. A report never contains your email address.
 
-Why we keep reports. If your store asks for another free audit within 7 days of a report, we email you that report again, with the date it was generated, instead of scanning your store again. A Full Scan is answered only with a Full Scan report. That keeps the free service sustainable and avoids repeated scans.
+One report a week. Each store can request one free report per week, with either scan. We use the store's audit requests (not the reports) to apply this. We keep each free report for 15 days after it's created, then delete it automatically.
 
 Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking Full Scan (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by using Partial Scan instead: no store data is sent. To have a stored report deleted sooner, email privacy@tvarkom.com.
 

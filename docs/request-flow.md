@@ -36,32 +36,18 @@ answer. Results are never shown on the page: the report arrives by email as a PD
 | 3 | A pasted license key is checked against the gateway and must belong to this store | `tvarkom_csa_save_license` (`api.php`) | `license_invalid`, `license_other_store` |
 | 4 | One audit at a time: an atomic option row is the lock (stale after 5 minutes) | `tvarkom_csa_audit_lock` (`audit.php`) | `audit_running` |
 | 5 | No API key yet: register. The gateway gets a token, fetches it from this site's REST route to prove the domain, and returns a free key | `tvarkom_csa_register` (`api.php`), `tvarkom_csa_register_routes` (`rest.php`) | `network`, the gateway's code (e.g. `origin_taken`) |
-| 6 | The plan now: on Pro, every audit is a Pro audit and needs the store data (a Full Scan) | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status` | `consent_required` (nothing sent) |
+| 6 | The plan now: a free store inside its week (`next_scan_at`) sends nothing (`too_soon`, with the date); on Pro, every audit is a Pro audit and needs the store data (a Full Scan) | `tvarkom_csa_run_audit` (`audit.php`) → `tvarkom_csa_status`, `tvarkom_csa_next_scan_at` | `too_soon`, `consent_required` (nothing sent) |
 | 7 | Full Scan: aggregate store metrics (versions, sizes, counts, an order range) | `tvarkom_csa_collect_metrics` (`metrics.php`) | — |
 | 8 | Full Scan: autoloaded options, leftover tables, PHP settings, failed and late tasks | `tvarkom_csa_collect_detailed` (`detailed.php`) | — |
 | 9 | Full Scan: the checkout profile. A single-use token is stored; the plugin loads its own checkout once with the token in a header; on that request only, the profiler times every hook, query and outgoing call, then stores the result | `tvarkom_csa_profile_checkout` (`profile-request.php`) → `tvarkom_csa_profile_maybe_start` (`profile.php`, runs at load) → `tvarkom_csa_profile_finish` (`profile-report.php`) | the profile says why it's unavailable (`request_failed`, `redirected`, `not_profiled`); the audit still runs |
 | 10 | `POST /v1/audits` with the API key: website, cart and checkout URLs, email, and the data above | `tvarkom_csa_post` (`api.php`) | `network`, or the gateway's code via `tvarkom_csa_error_code` |
-| 11 | The answer is stored as the last result: `queued` (Partial Scan), `queued_full` (Full Scan) or `queued_detailed` (Pro), `cached_pro`/`cached` (a report from the last 7 days was emailed again; its generation date and the next date are kept for the message) or `in_progress`; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
+| 11 | The answer is stored as the last result: `queued` (Partial Scan), `queued_full` (Full Scan) or `queued_detailed` (Pro), `too_soon` (the gateway's weekly refusal; its date is kept for the message), `cached_pro`/`cached` (Pro: a report from the last 7 days was emailed again) or `in_progress`; a revoked or moved key is cleared so the next audit registers again | `tvarkom_csa_run_audit`, `tvarkom_csa_update_settings` | — |
 | 12 | The lock is released and the admin is redirected back with the result code, shown as a message | `tvarkom_csa_audit_unlock`, `tvarkom_csa_redirect`, `tvarkom_csa_messages` (`admin.php`) | — |
 
 What leaves the store, field by field, is in `readme.txt` ("External services") and the
 privacy policy; the profiler's header in `profile.php` lists what the profile sends and never sends.
 
 
-## The weekly Pro report
-
-While the store is on Pro, the gateway asks the plugin about once a week for a Pro audit
-(`includes/monitor.php`):
-
-1. The gateway POSTs `{"v":1,"store":…,"attempt":…,"ts":…}` to `/wp-json/tvarkom/v1/monitor`
-   (as `/?rest_route=…`, which works without pretty permalinks), signed in `X-Tvarkom-Signature`
-   with HMAC-SHA256 over the exact body, keyed by the SHA-256 of the store's API key.
-2. `tvarkom_csa_handle_monitor` refuses an unregistered store, a bad signature, another store,
-   a request more than 5 minutes off, an audit already running (the same lock as a click), and
-   an attempt id not greater than the last one answered (option `tvarkom_csa_monitor_seen`).
-3. `tvarkom_csa_run_audit( $attempt )` sends the same data as a Full Scan to `POST /v1/audits` with `monitor_attempt`, and returns the gateway's result
-   code. It doesn't touch the admin page's last result.
-4. The endpoint answers the gateway with that code only, e.g. `{"code":"queued_detailed"}`.
 ## The other flows, in one paragraph each
 
 - **No local results**: since 0.9.0 the page shows no diagnostics (Store diagnostics and

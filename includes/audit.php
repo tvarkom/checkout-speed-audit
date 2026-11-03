@@ -1,8 +1,8 @@
 <?php
 /**
  * One audit: what is collected and sent to the gateway, and the outcome stored for the admin
- * page. Runs when the admin clicks Partial Scan or Full Scan (admin.php), and for the weekly Pro
- * report when the gateway asks (monitor.php). Store data is sent only with a Full Scan.
+ * page. Runs when the admin clicks Partial Scan or Full Scan (admin.php). Store data is sent
+ * only with a Full Scan.
  *
  * @package CheckoutSpeedAudit
  */
@@ -19,34 +19,14 @@ define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
  * checkout profile. The gateway treats a free store's audit with the detailed data as a Full
  * Scan; on Pro every audit is a Pro diagnostic and needs it.
  *
- * A weekly Pro report ($monitor_attempt, from monitor.php) sends the same data as a Full Scan,
- * naming the gateway's attempt: weekly reports are part of the Pro subscription. Its result goes
- * back to the gateway only: the admin page's last result is left alone.
+ * A free store scans once a week (founder decision of 3 Nov 2026): inside the week nothing is
+ * sent, and the result says when the next scan is possible. The gateway enforces it too.
  *
- * @param int  $monitor_attempt The gateway's weekly attempt, or 0 for the admin's audit.
- * @param bool $full_scan       The admin clicked Full Scan.
+ * @param bool $full_scan The admin clicked Full Scan.
  * @return string The result code (the admin page's codes).
  */
-function tvarkom_csa_run_audit( $monitor_attempt = 0, $full_scan = false ) {
+function tvarkom_csa_run_audit( $full_scan = false ) {
 	$settings = tvarkom_csa_settings();
-	if ( $monitor_attempt > 0 ) {
-		$body     = array(
-			'website'         => home_url( '/' ),
-			'email'           => $settings['email'],
-			'pages'           => array(
-				'cart'     => wc_get_cart_url(),
-				'checkout' => wc_get_checkout_url(),
-			),
-			'monitor_attempt' => $monitor_attempt,
-			'metrics'         => tvarkom_csa_collect_metrics(),
-			'detailed'        => tvarkom_csa_collect_detailed(),
-		);
-		$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
-		if ( is_wp_error( $response ) ) {
-			return 'network';
-		}
-		return 202 === $response['status'] ? 'queued_detailed' : tvarkom_csa_error_code( $response );
-	}
 	if ( '' === $settings['api_key'] ) {
 		tvarkom_csa_update_settings(
 			array(
@@ -70,6 +50,19 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0, $full_scan = false ) {
 	// On Pro, every audit is a Pro audit, and a new one needs the store data.
 	$status = tvarkom_csa_status();
 	$is_pro = is_array( $status ) && ! empty( $status['detailed_available'] );
+	$next   = tvarkom_csa_next_scan_at( $status );
+	if ( $next > 0 ) {
+		tvarkom_csa_update_settings(
+			array(
+				'last' => array(
+					'code'             => 'too_soon',
+					'time'             => time(),
+					'next_eligible_at' => $next,
+				),
+			)
+		);
+		return 'too_soon';
+	}
 	if ( $is_pro && ! $full_scan ) {
 		tvarkom_csa_update_settings(
 			array(
@@ -109,6 +102,9 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0, $full_scan = false ) {
 		}
 	} else {
 		$code = tvarkom_csa_error_code( $response );
+		if ( 'too_soon' === $code && isset( $response['body']['next_eligible_at'] ) ) {
+			$last = array( 'next_eligible_at' => (int) $response['body']['next_eligible_at'] );
+		}
 	}
 
 	$changes = array(
@@ -126,6 +122,21 @@ function tvarkom_csa_run_audit( $monitor_attempt = 0, $full_scan = false ) {
 	}
 	tvarkom_csa_update_settings( $changes );
 	return $code;
+}
+
+/**
+ * When a free store may scan again (Unix seconds), from the gateway's plan status, or 0 when it
+ * may scan now (or the status didn't say).
+ *
+ * @param array<string, mixed>|string|null $status From tvarkom_csa_status().
+ * @return int
+ */
+function tvarkom_csa_next_scan_at( $status ) {
+	if ( ! is_array( $status ) || empty( $status['next_scan_at'] ) || ! is_string( $status['next_scan_at'] ) ) {
+		return 0;
+	}
+	$next = strtotime( $status['next_scan_at'] );
+	return $next && $next > time() ? $next : 0;
 }
 
 /**
@@ -177,6 +188,6 @@ function tvarkom_csa_run_queued_audit() {
 	if ( ! tvarkom_csa_audit_lock() ) {
 		return;
 	}
-	tvarkom_csa_run_audit();
+	tvarkom_csa_run_audit( false );
 	tvarkom_csa_audit_unlock();
 }

@@ -28,7 +28,7 @@ Adds a **WooCommerce → Speed Audit** page with two buttons. Both are free, and
 * A profile of one checkout page load: which plugins, hooks, database queries and outside services take the time
 * A fix plan: what to fix first, step by step, with estimated developer hours
 
-Run a scan whenever you like. If your store already has a report from the last 7 days, Tvarkom emails you that report again, with the date it was generated, instead of running a new check; after 7 days a new scan runs. Reports go to the site's admin email by default; you can change the address.
+You can request one report per week, with either scan. Until 7 days have passed, the scan buttons are disabled and the page shows the date of your next scan. A scan that failed doesn't count. Reports go to the site's admin email by default; you can change the address.
 
 The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Full Scan's checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
 
@@ -53,11 +53,9 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed), and the hook names and times of tasks more than 15 minutes late (never their arguments)
 * The checkout profile: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time
 
-Tvarkom keeps each free report, with the store data in it, so it can send it to you again: a request within 7 days of a report gets that report instead of a new check. Tvarkom's database deletes free reports automatically 15 days after they're created (see the privacy policy for other copies, such as backups).
+Tvarkom's database keeps each free report, with the store data in it, for 15 days after it's created, then deletes it automatically (see the privacy policy for other copies, such as backups).
 
 **Plan status**: the plugin asks `https://api.tvarkom.com/v1/client` for your store's plan each time you open its page and before each scan.
-
-**Only stores Tvarkom has issued a license key to.** Most stores never get one. While the license runs, Tvarkom's server also asks the store about once a week, with a request signed with the store's key, to run a Full Scan; the plugin then sends the same data as above to `https://api.tvarkom.com/v1/audits` and answers with only the scan's result. It uses the REST route `/wp-json/tvarkom/v1/monitor`, which refuses any request not signed with the store's key. Reports for these stores are kept for 24 months. A store without such a license is never asked.
 
 No customer data, order contents or revenue figures are ever sent. The report is emailed only to the report email.
 
@@ -85,7 +83,7 @@ Tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a 
 
 = How often can I run a scan? =
 
-Whenever you like. If your store has a report from the last 7 days, you get that report again by email, with the date it was generated, and no new check runs; the 7 days count from that report. A Full Scan is answered only with a Full Scan report. After 7 days, the next scan is a new one. Each store can run at most 3 new scans in 24 hours.
+Once a week, with either scan. The 7 days count from your last scan; until then the scan buttons are disabled and the page shows the date of your next scan. A scan that failed doesn't count, so you can try again (at most 3 new scans in 24 hours).
 
 = What is the difference between Partial Scan and Full Scan? =
 
@@ -115,5 +113,5 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 = 0.9.0 =
 * First release on WordPress.org.
-* Free store health report from Tvarkom, scored from 0 to 100 and emailed as a PDF: Partial Scan (outside measurements) or Full Scan (with store data, a checkout profile and a fix plan). A report from the last 7 days is sent again instead of running a new check.
+* Free store health report from Tvarkom, scored from 0 to 100 and emailed as a PDF: Partial Scan (outside measurements) or Full Scan (with store data, a checkout profile and a fix plan). One report per week.
 * Terms of use and privacy policy ship with the plugin.
