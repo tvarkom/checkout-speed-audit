@@ -24,7 +24,7 @@ result code stored (settings.php) ──▶ redirect back to the admin page, whi
 ```
 
 The plugin never runs the audit itself: on a Full Scan it collects aggregate store data and the
-detailed diagnostics, sends the request to the Tvarkom API gateway, and shows the gateway's
+detailed diagnostics, sends the request to the tvarkom API gateway, and shows the gateway's
 answer. Results are never shown on the page: the report arrives by email as a PDF.
 
 ## The audit, step by step

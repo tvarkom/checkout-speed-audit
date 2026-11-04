@@ -14,7 +14,7 @@ needs WooCommerce.
 |---|---|
 | `checkout-speed-audit.php` | Plugin header, constants, the include list and every hook the plugin registers at load |
 | `includes/settings.php` | The stored settings (option `tvarkom_csa`): API key, plan, email, last result (versions before 0.9.0 also stored `consent`, now ignored) |
-| `includes/api.php` | The Tvarkom API gateway client: requests, plan status, license keys, registration, error codes |
+| `includes/api.php` | The tvarkom API gateway client: requests, plan status, license keys, registration, error codes |
 | `includes/rest.php` | `GET /wp-json/tvarkom/v1/verify`, which the gateway fetches to check the domain at registration |
 | `includes/audit.php` | One audit: Partial Scan (addresses only) or Full Scan (with store data), what is sent, and the stored outcome; the lock that allows one audit at a time |
 | `includes/metrics.php` | Store metrics sent with every Full Scan |
