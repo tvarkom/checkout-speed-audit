@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.9.2
+Stable tag: 0.9.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Speed Audit page: the report email, the Partial Scan and Full Scan buttons, and what each sends.
 
 == Changelog ==
+
+= 0.9.3 =
+* The checkout profile's request is named "tvarkom checkout profiler" in your server logs.
 
 = 0.9.2 =
 * The brand is written tvarkom; the legal name is MB TVARKOM SOFTWARE.
