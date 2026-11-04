@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.9.3
+Stable tag: 0.9.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,15 +12,15 @@ A free WooCommerce health report from tvarkom, scored 0 to 100 and emailed as a 
 
 == Description ==
 
-Adds a **WooCommerce → Speed Audit** page with two buttons. Both are free, and the report arrives by email as a PDF within a few minutes.
+Adds a **WooCommerce → Speed Audit** page with one button, **Full Scan**. It's free, and the report arrives by email as a PDF within a few minutes.
 
-**Partial Scan**: tvarkom's scanner measures your store from outside, the way a visitor's request would reach it:
+tvarkom's scanner measures your store from outside, the way a visitor's request would reach it:
 
 * Server response time of your homepage, cart and checkout
 * Caching of your pages and static files
 * Page weight, number of files and marketing trackers
 
-**Full Scan**: everything in the Partial Scan, plus what the plugin reads from your store:
+It adds what the plugin reads from your store:
 
 * Autoloaded options and database size, with the largest autoloaded options and the database tables left by removed plugins
 * PHP version and settings, active plugins and object cache
@@ -28,19 +28,19 @@ Adds a **WooCommerce → Speed Audit** page with two buttons. Both are free, and
 * A profile of one checkout page load: which plugins, hooks, database queries and outside services take the time
 * A fix plan: what to fix first, step by step, with estimated developer hours
 
-You can request one report per week, with either scan. Until 7 days have passed, the scan buttons are disabled and the page shows the date of your next scan. A scan that failed doesn't count. Reports go to the site's admin email by default; you can change the address.
+You can request one report per week. Until 7 days have passed, the Full Scan button is disabled and the page shows the date of your next scan. A scan that failed doesn't count. Reports go to the site's admin email by default; you can change the address.
 
 The scan runs on tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Full Scan's checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
 
 == External services ==
 
-This plugin uses the tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to tvarkom until an administrator clicks **Partial Scan** or **Full Scan**.
+This plugin uses the tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to tvarkom until an administrator clicks **Full Scan**, right under a list of what it sends and the line "By clicking Full Scan, you agree to send this data to tvarkom and accept tvarkom's Terms of Use and Privacy Policy".
 
 **Registration** (first scan only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
 
-**Each scan**: your store's home URL, cart and checkout URLs and the report email are sent to `https://api.tvarkom.com/v1/audits`. tvarkom's scanner then loads your homepage, cart and checkout pages. A Partial Scan sends nothing else.
+**Each scan**: your store's home URL, cart and checkout URLs and the report email are sent to `https://api.tvarkom.com/v1/audits`. tvarkom's scanner then loads your homepage, cart and checkout pages.
 
-**Full Scan only**: these values are sent as well. The plugin lists them next to the Full Scan button.
+**Store data**: these values are sent as well. The plugin lists them above the Full Scan button.
 
 * PHP, WordPress and WooCommerce versions
 * Database and options table sizes, autoloaded options size
@@ -69,7 +69,7 @@ Both ship with the plugin in its `legal` folder. The plugin page links to them b
 
 1. Install from **Plugins → Add New**: search for "Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
 2. Activate the plugin.
-3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Partial Scan** or **Full Scan**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
+3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Full Scan**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
 
 == Frequently Asked Questions ==
 
@@ -83,11 +83,7 @@ tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a 
 
 = How often can I run a scan? =
 
-Once a week, with either scan. The 7 days count from your last scan; until then the scan buttons are disabled and the page shows the date of your next scan. A scan that failed doesn't count, so you can try again (at most 3 new scans in 24 hours).
-
-= What is the difference between Partial Scan and Full Scan? =
-
-A Partial Scan measures your public pages from outside and sends no store data. A Full Scan also sends the store data listed under External services, so the report covers your database, PHP setup, background tasks and a checkout profile, with a fix plan. Both are free.
+Once a week. The 7 days count from your last scan; until then the Full Scan button is disabled and the page shows the date of your next scan. A scan that failed doesn't count, so you can try again (at most 3 new scans in 24 hours).
 
 = Why don't I see results on the plugin page? =
 
@@ -107,9 +103,12 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 == Screenshots ==
 
-1. The Speed Audit page: the report email, the Partial Scan and Full Scan buttons, and what each sends.
+1. The Speed Audit page: the report email, what a Full Scan sends, and the Full Scan button.
 
 == Changelog ==
+
+= 0.9.4 =
+* One button, Full Scan, with what it sends and your agreement right above it. The Partial Scan button is gone.
 
 = 0.9.3 =
 * The checkout profile's request is named "tvarkom checkout profiler" in your server logs.

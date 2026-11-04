@@ -1,8 +1,8 @@
 <?php
 /**
  * One audit: what is collected and sent to the gateway, and the outcome stored for the admin
- * page. Runs when the admin clicks Partial Scan or Full Scan (admin.php). Store data is sent
- * only with a Full Scan.
+ * page. Runs when the admin clicks Full Scan (admin.php), the only scan the page offers since
+ * 0.9.4; a Partial Scan (no store data) is left for an audit queued by an older version.
  *
  * @package CheckoutSpeedAudit
  */

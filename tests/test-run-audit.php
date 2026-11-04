@@ -1,6 +1,7 @@
 <?php
 /**
- * One audit: what a Partial Scan and a Full Scan send, and the stored outcome (includes/audit.php).
+ * One audit: what a Full Scan sends (and the Partial Scan an older version's queued audit runs), and
+ * the stored outcome (includes/audit.php).
  *
  * @package CheckoutSpeedAudit
  */

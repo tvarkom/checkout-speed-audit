@@ -151,7 +151,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
 		tvarkom_csa_audit_lock();
 
-		$this->assertSame( 'audit_running', $this->submit( array( 'csa_do' => 'partial' ) ) );
+		$this->assertSame( 'audit_running', $this->submit( array( 'csa_do' => 'full' ) ) );
 		$this->assertSame( array(), $this->request_lines() );
 		$this->assertTrue( $this->lock_is_held(), 'the running audit keeps its lock' );
 	}
@@ -162,7 +162,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
+		$this->assertSame( 'queued_full', $this->submit( array( 'csa_do' => 'full' ) ) );
 		$this->assertFalse( $this->lock_is_held() );
 	}
 
@@ -184,9 +184,13 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 
 		$page = $this->render();
 
-		$this->assertStringContainsString( 'value="partial"', $page );
+		$this->assertStringNotContainsString( 'value="partial"', $page );
 		$this->assertStringContainsString( 'value="full"', $page );
-		$this->assertStringContainsString( 'Full Scan also sends store data', $page );
+		// What is sent, then the agreement, then the button: the admin reads both before clicking.
+		$data    = strpos( $page, 'It also sends this store data' );
+		$consent = strpos( $page, 'By clicking Full Scan, you agree to send this data to tvarkom' );
+		$button  = strpos( $page, 'value="full"' );
+		$this->assertTrue( false !== $data && false !== $consent && $data < $consent && $consent < $button, 'data, consent, button in that order' );
 		$this->assertStringContainsString( 'legal/terms-of-use.txt', $page );
 		$this->assertStringContainsString( 'legal/privacy-policy.txt', $page );
 		$this->assertDoesNotMatchRegularExpression( '/Store diagnostics|Preview data|Profile my checkout|Largest autoloaded options/', $page );
@@ -203,11 +207,19 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 
 		$page = $this->render();
 
-		$this->assertMatchesRegularExpression( '/value="partial"[^>]*disabled/', $page );
 		$this->assertMatchesRegularExpression( '/value="full"[^>]*disabled/', $page );
 		$this->assertStringContainsString( 'one report per week', $page );
 		$this->assertStringContainsString( wp_date( get_option( 'date_format' ), $next ), $page );
 		$this->assertDoesNotMatchRegularExpression( '/value="save"[^>]*disabled/', $page );
+	}
+
+	public function test_a_stale_partial_scan_click_only_saves() {
+		// A page loaded before 0.9.4 still has the Partial Scan button: it never agreed to send store data.
+		$this->sign_in_shop_manager();
+		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+
+		$this->assertSame( 'saved', $this->submit( array( 'csa_do' => 'partial' ) ) );
+		$this->assertSame( array(), $this->request_lines() );
 	}
 
 	public function test_the_first_audit_registers_the_store() {
@@ -225,7 +237,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		$this->assertSame( 'queued', $this->submit( array( 'csa_do' => 'partial' ) ) );
+		$this->assertSame( 'queued_full', $this->submit( array( 'csa_do' => 'full' ) ) );
 		$this->assertSame( array( 'POST /v1/register', 'POST /v1/register/verify', 'GET /v1/client', 'POST /v1/audits' ), $this->request_lines() );
 		$this->assertSame( 'Bearer tvk_new', $this->requests[3]['headers']['Authorization'] );
 	}
@@ -234,7 +246,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->sign_in_shop_manager();
 		$this->respond( 'POST', '/v1/register', 400, array( 'error' => 'invalid_website' ) );
 
-		$this->assertSame( 'invalid_website', $this->submit( array( 'csa_do' => 'partial' ) ) );
+		$this->assertSame( 'invalid_website', $this->submit( array( 'csa_do' => 'full' ) ) );
 		$this->assertFalse( $this->lock_is_held() );
 	}
 }
