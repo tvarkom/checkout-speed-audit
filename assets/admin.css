@@ -1,0 +1,97 @@
+/* Checkout Speed Audit: the plugin page (WooCommerce → Checkout Speed Audit), in tvarkom's
+   website style. Everything is scoped to .tcsa, so nothing else in wp-admin changes.
+   Fonts: Geist and Geist Mono (SIL Open Font License, fonts/OFL.txt), shipped with the plugin. */
+
+@font-face { font-family: "Tcsa Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Tcsa Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+.tcsa {
+	--ink: #1c1d1b;
+	--paper: #f8f8f4;
+	--panel: #efefe9;
+	--surface: #fff;
+	--line: #e0e0d8;
+	--line-strong: #c9c9c0;
+	--muted: #585a55;
+	--green: #00ff41;
+	--green-dark: #00992e;
+	--sans: "Tcsa Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--mono: "Tcsa Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+	max-width: 920px;
+	margin: 20px 20px 40px 0;
+	font-family: var(--sans);
+	color: var(--ink);
+}
+.tcsa *, .tcsa *::before, .tcsa *::after { box-sizing: border-box; }
+.tcsa :where(p) { margin: 0; } /* zero specificity, so each element sets its own spacing */
+.tcsa a { color: var(--ink); text-decoration-color: var(--green-dark); text-underline-offset: 3px; }
+.tcsa a:focus, .tcsa button:focus, .tcsa input:focus { outline: 2px solid var(--green-dark); outline-offset: 2px; box-shadow: none; }
+
+/* The card that holds the whole page */
+.tcsa__card { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+
+/* Header */
+.tcsa__eyebrow { display: flex; align-items: center; gap: 8px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.tcsa__eyebrow::before { content: ""; width: 8px; height: 8px; background: var(--green); flex-shrink: 0; }
+.tcsa h1.tcsa__title { margin: 14px 0 10px; padding: 0; font: 700 32px/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); }
+.tcsa__lead { max-width: 640px; font-size: 16px; line-height: 1.6; color: var(--muted); }
+
+/* What the report covers */
+.tcsa__covers { display: grid; gap: 8px 24px; margin: 20px 0 0; padding: 0; list-style: none; }
+.tcsa__covers li { position: relative; margin: 0; padding-left: 26px; font-size: 14px; line-height: 1.5; }
+.tcsa__covers li::before { content: ""; position: absolute; left: 2px; top: 5px; width: 10px; height: 6px; border-left: 2px solid var(--green-dark); border-bottom: 2px solid var(--green-dark); transform: rotate(-45deg); }
+.tcsa__meta { margin-top: 18px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
+
+/* Notices (the plugin's own, kept in place with .inline) */
+.tcsa .notice.tcsa__notice { margin: 0 0 20px; padding: 12px 16px; border: 1px solid var(--line); border-left-width: 4px; border-radius: 10px; background: var(--surface); box-shadow: none; }
+.tcsa .notice.tcsa__notice p { margin: 0; padding: 0; font-size: 14px; line-height: 1.5; }
+.tcsa .notice-success.tcsa__notice { border-left-color: var(--green-dark); }
+.tcsa .notice-info.tcsa__notice { border-left-color: var(--ink); }
+.tcsa .notice-warning.tcsa__notice { border-left-color: #b26b00; }
+.tcsa .notice-error.tcsa__notice { border-left-color: #c0392b; }
+
+/* Sections inside the card */
+.tcsa__section { margin-top: 24px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.tcsa h2.tcsa__h2 { margin: 0 0 14px; padding: 0; font: 600 17px/1.3 var(--sans); letter-spacing: -0.01em; color: var(--ink); }
+
+/* Settings */
+.tcsa__fields { display: grid; gap: 16px; }
+.tcsa__label { display: block; margin-bottom: 6px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tcsa__store { display: inline-block; padding: 8px 12px; border-radius: 8px; background: var(--panel); font: 400 14px/1.4 var(--mono); word-break: break-all; }
+.tcsa input.tcsa__input { width: 100%; max-width: 420px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); font: 400 15px/1.4 var(--sans); color: var(--ink); box-shadow: none; }
+.tcsa input.tcsa__input:focus { border-color: var(--ink); }
+.tcsa__help { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.tcsa__save { margin-top: 14px; }
+
+/* What Full Scan sends */
+.tcsa__sends { display: grid; gap: 16px; margin: 0; }
+.tcsa__sends dt { font: 600 14px/1.4 var(--sans); color: var(--ink); }
+.tcsa__sends dd { margin: 4px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.tcsa__sends dt::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: var(--green); vertical-align: 1px; }
+.tcsa__sends .tcsa__never dt::before { background: var(--ink); }
+
+/* Consent and the button */
+.tcsa__consent { margin-top: 24px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+.tcsa__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
+.tcsa .tcsa__btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 6px; font: 600 15px/1.2 var(--sans); text-decoration: none; cursor: pointer; box-shadow: none; }
+.tcsa .tcsa__btn--primary { background: var(--ink); color: var(--paper); }
+.tcsa .tcsa__btn--primary:hover { background: #000; color: var(--paper); }
+.tcsa .tcsa__btn--primary svg { color: var(--green); flex-shrink: 0; }
+.tcsa .tcsa__btn--secondary { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.tcsa .tcsa__btn--secondary:hover { border-color: var(--ink); }
+.tcsa .tcsa__btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+/* Privacy summary and contacts */
+.tcsa__details { margin-top: 20px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.tcsa__details summary { cursor: pointer; font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+.tcsa__details ul { margin: 10px 0 0 18px; list-style: disc; }
+.tcsa__footer { margin-top: 16px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
+
+/* ≥782px: wp-admin's desktop layout */
+@media (min-width: 782px) {
+	.tcsa__card { padding: 40px; }
+	.tcsa h1.tcsa__title { font-size: 40px; }
+	.tcsa__covers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.tcsa__section { padding: 24px 28px; }
+	.tcsa__fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+}

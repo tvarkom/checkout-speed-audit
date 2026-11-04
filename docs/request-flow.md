@@ -7,7 +7,7 @@ follows one click through them.
 ## The picture
 
 ```
-WooCommerce → Speed Audit, "Partial Scan" or "Full Scan"
+WooCommerce → Checkout Speed Audit, "Full Scan"
    │  admin-post.php?action=tvarkom_csa_form
    ▼
 tvarkom_csa_handle_form (admin.php) ── lock ── register if needed ──▶ api.tvarkom.com/v1/register (+ /verify)

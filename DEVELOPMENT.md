@@ -23,7 +23,8 @@ needs WooCommerce.
 | `includes/profile.php` | The profiler inside the profiled checkout request (its header describes what is measured and what leaves the store) |
 | `includes/profile-report.php` | Building the profile result at the end of that request |
 | `includes/profile-request.php` | The audit side: requesting the store's own checkout with a single-use token |
-| `includes/admin.php` | The WooCommerce → Speed Audit page, its form handler and script |
+| `includes/admin.php` | The WooCommerce → Checkout Speed Audit page, its form handler and script |
+| `assets/admin.css`, `assets/fonts/` | The page's styles, in tvarkom's website style (scoped to `.tcsa`), and its Geist fonts (OFL) |
 | `uninstall.php` | Removes the plugin's options and transients |
 | `tests/` | PHPUnit tests (not shipped): `class-tvarkom-csa-test-case.php` has the fake gateway they all use |
 
@@ -100,7 +101,7 @@ To test against a local gateway, set `TVARKOM_CSA_API_URL` in `wp-config.php`.
    ```sh
    git archive --format=zip --prefix=tvarkom-checkout-speed-audit-for-woocommerce/ \
      -o tvarkom-checkout-speed-audit-for-woocommerce-<version>.zip HEAD \
-     checkout-speed-audit.php includes legal readme.txt uninstall.php
+     checkout-speed-audit.php includes legal assets readme.txt uninstall.php
    ```
 
 ### WordPress.org banner

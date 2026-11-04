@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce → Speed Audit: the notice on the page and the form handler (includes/admin.php).
+ * WooCommerce → Checkout Speed Audit: the notice on the page and the form handler (includes/admin.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -85,7 +85,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 
 		$page = $this->render();
 
-		$this->assertStringContainsString( 'one report per week', $page );
+		$this->assertStringContainsString( 'One report per week', $page );
 		$this->assertDoesNotMatchRegularExpression( '/\bPro\b|Buy |subscription|License key|Plan:|audits used|per 30 days|hello@|buy\.example/', wp_strip_all_tags( $page ) . $page );
 	}
 
@@ -187,7 +187,7 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringNotContainsString( 'value="partial"', $page );
 		$this->assertStringContainsString( 'value="full"', $page );
 		// What is sent, then the agreement, then the button: the admin reads both before clicking.
-		$data    = strpos( $page, 'It also sends this store data' );
+		$data    = strpos( $page, 'What Full Scan sends to tvarkom' );
 		$consent = strpos( $page, 'By clicking Full Scan, you agree to send this data to tvarkom' );
 		$button  = strpos( $page, 'value="full"' );
 		$this->assertTrue( false !== $data && false !== $consent && $data < $consent && $consent < $button, 'data, consent, button in that order' );

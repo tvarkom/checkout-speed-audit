@@ -12,7 +12,7 @@ A free WooCommerce health report from tvarkom, scored 0 to 100 and emailed as a 
 
 == Description ==
 
-Adds a **WooCommerce → Speed Audit** page with one button, **Full Scan**. It's free, and the report arrives by email as a PDF within a few minutes.
+Adds a **WooCommerce → Checkout Speed Audit** page with one button, **Full Scan**. It's free, and the report arrives by email as a PDF within a few minutes.
 
 tvarkom's scanner measures your store from outside, the way a visitor's request would reach it:
 
@@ -69,7 +69,7 @@ Both ship with the plugin in its `legal` folder. The plugin page links to them b
 
 1. Install from **Plugins → Add New**: search for "Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
 2. Activate the plugin.
-3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Full Scan**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
+3. Go to **WooCommerce → Checkout Speed Audit**, check the **Report email**, and click **Full Scan**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
 
 == Frequently Asked Questions ==
 
@@ -103,12 +103,13 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 == Screenshots ==
 
-1. The Speed Audit page: the report email, what a Full Scan sends, and the Full Scan button.
+1. The Checkout Speed Audit page: the report email, what a Full Scan sends, and the Full Scan button.
 
 == Changelog ==
 
 = 0.9.4 =
-* One button, Full Scan, with what it sends and your agreement right above it. The Partial Scan button is gone.
+* A redesigned page: one button, Full Scan, with what it sends and your agreement right above it. The Partial Scan button is gone.
+* The menu item is now WooCommerce → Checkout Speed Audit.
 
 = 0.9.3 =
 * The checkout profile's request is named "tvarkom checkout profiler" in your server logs.
