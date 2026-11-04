@@ -290,7 +290,7 @@ function tvarkom_csa_handle_form() {
 	// (Action Scheduler, WP-Cron) is often what's broken or backed up on the stores we
 	// audit, and the admin gets the real result at once.
 	wc_set_time_limit( 120 );
-	tvarkom_csa_run_audit( 'full' === $do );
+	tvarkom_csa_run_audit( true ); // Full Scan: the only scan the page offers.
 	tvarkom_csa_audit_unlock();
 	$last = tvarkom_csa_settings()['last'];
 	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );
