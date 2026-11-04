@@ -2,11 +2,11 @@
 /**
  * Plugin Name:       Checkout Speed Audit
  * Description:       A free store health report from Tvarkom, emailed as a PDF: server and checkout speed, caching and, with a Full Scan, your database, PHP setup, background tasks and a checkout profile.
- * Version:           0.9.1
+ * Version:           0.9.2
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
- * Author:            Tvarkom
+ * Author:            tvarkom
  * Author URI:        https://tvarkom.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TVARKOM_CSA_VERSION', '0.9.1' );
+define( 'TVARKOM_CSA_VERSION', '0.9.2' );
 define( 'TVARKOM_CSA_OPTION', 'tvarkom_csa' );
 define( 'TVARKOM_CSA_TOKEN', 'tvarkom_csa_verify_token' );
 define( 'TVARKOM_CSA_ACTION', 'tvarkom_csa_run_audit' );

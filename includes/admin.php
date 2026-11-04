@@ -44,9 +44,9 @@ function tvarkom_csa_messages() {
 		'invalid_email'          => array( 'error', __( 'Enter a valid email address you read, e.g. you@company.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_website'        => array( 'error', __( 'This store can\'t be audited: its address must be a public https domain, not localhost or an IP address.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_verify_url'     => array( 'error', __( 'This store can\'t be registered: its REST API is on a different domain than the store.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'verification_failed'    => array( 'error', __( 'We couldn\'t confirm this domain. Tvarkom must be able to reach /wp-json/tvarkom/v1/verify on your store; check that the REST API isn\'t blocked by a security plugin or firewall.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'verification_failed'    => array( 'error', __( 'We couldn\'t confirm this domain. tvarkom must be able to reach /wp-json/tvarkom/v1/verify on your store; check that the REST API isn\'t blocked by a security plugin or firewall.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'registration_not_found' => array( 'error', __( 'The registration expired. Click Partial Scan or Full Scan again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'origin_taken'           => array( 'error', __( 'This domain is already set up with Tvarkom another way. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'origin_taken'           => array( 'error', __( 'This domain is already set up with tvarkom another way. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_key'            => array( 'error', __( 'Your key was replaced or revoked. Run a scan to register this store again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'key_expired'            => array( 'error', __( 'Your API key has expired. Email support@tvarkom.com to renew it.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'client_disabled'        => array( 'error', __( 'Audits are paused for this store. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -55,7 +55,7 @@ function tvarkom_csa_messages() {
 		'rate_limited'           => array( 'error', __( 'Too many audits or registrations for this store or email today.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . ' ' . $try_later ),
 		'not_woocommerce'        => array( 'error', __( 'Our scanner couldn\'t detect WooCommerce on your public homepage.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'busy'                   => array( 'error', __( 'The scanner is busy right now. Try again in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'network'                => array( 'error', __( 'Couldn\'t reach Tvarkom. Check that your server can make outgoing HTTPS requests and try again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
+		'network'                => array( 'error', __( 'Couldn\'t reach tvarkom. Check that your server can make outgoing HTTPS requests and try again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'server'                 => array( 'error', __( 'Something went wrong on our side.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . ' ' . $try_later ),
 	);
 }
@@ -95,10 +95,10 @@ function tvarkom_csa_date( $time ) {
  */
 function tvarkom_csa_privacy_points() {
 	return array(
-		__( 'A copy of each report email goes to Tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, and is deleted after 12 months. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'A copy of each report email goes to tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, and is deleted after 12 months. Failed audits are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Each audit request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'Reports are emailed to the report email, with that copy to Tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Reports are emailed to the report email, with that copy to tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Customer data, order contents and revenue are never sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 	);
 }
@@ -126,7 +126,7 @@ function tvarkom_csa_render_legal() {
 		<?php
 		printf(
 			/* translators: 1: link to the Terms of Use, 2: link to the Privacy Policy. */
-			esc_html__( 'By running an audit you agree to Tvarkom\'s %1$s. Tvarkom\'s %2$s explains what it keeps and for how long.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+			esc_html__( 'By running an audit you agree to tvarkom\'s %1$s. tvarkom\'s %2$s explains what it keeps and for how long.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 			sprintf( $link, esc_url( tvarkom_csa_legal_url( 'terms-of-use.txt' ) ), esc_html__( 'Terms of Use', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
 			sprintf( $link, esc_url( tvarkom_csa_legal_url( 'privacy-policy.txt' ) ), esc_html__( 'Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
 		);
@@ -153,7 +153,7 @@ function tvarkom_csa_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
-	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by Tvarkom. When an administrator runs a scan, the store\'s address, its cart and checkout page addresses and the report email are sent to Tvarkom (MB Tvarkom Software, Lithuania). A Full Scan also sends aggregate store data, such as software versions, database sizes, background task counts and an order-count range, and a profile of one checkout page load. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator runs a scan, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB tvarkom Software, Lithuania). A Full Scan also sends aggregate store data, such as software versions, database sizes, background task counts and an order-count range, and a profile of one checkout page load. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
 	$content .= '<ul>';
 	foreach ( tvarkom_csa_privacy_points() as $point ) {
 		$content .= '<li>' . esc_html( $point ) . '</li>';
@@ -162,7 +162,7 @@ function tvarkom_csa_privacy_policy_content() {
 	$content .= '<p>' . sprintf(
 		/* translators: %s: link to Tvarkom's Privacy Policy. */
 		esc_html__( 'Details: %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		'<a href="' . esc_url( tvarkom_csa_legal_url( 'privacy-policy.txt' ) ) . '">' . esc_html__( 'Tvarkom Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</a>'
+		'<a href="' . esc_url( tvarkom_csa_legal_url( 'privacy-policy.txt' ) ) . '">' . esc_html__( 'tvarkom Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</a>'
 	) . '</p>';
 	wp_add_privacy_policy_content( 'Checkout Speed Audit', wp_kses_post( $content ) );
 }
@@ -174,7 +174,7 @@ function tvarkom_csa_privacy_policy_content() {
  */
 function tvarkom_csa_render_scan_note() {
 	?>
-	<p class="description"><?php esc_html_e( 'Both scans send your store address, its cart and checkout page addresses and the report email to Tvarkom (tvarkom.com), and email you the report as a PDF. Nothing is sent until you click a scan button.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Both scans send your store address, its cart and checkout page addresses and the report email to tvarkom (tvarkom.com), and email you the report as a PDF. Nothing is sent until you click a scan button.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 	<p class="description"><?php esc_html_e( 'Full Scan also sends store data: PHP, WordPress and WooCommerce versions; database, options table and autoloaded options sizes, with the names and sizes of the largest autoloaded options and of database tables left by removed plugins; the number of active plugins and the object cache type; background task and WP-Cron counts, and the names of failed and late tasks, with error messages stripped of emails, links, IP addresses and long numbers; PHP settings such as the memory limit; your monthly order volume as a range (e.g. 50–200); and a profile of one checkout page load on your server: plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 	<p class="description"><?php esc_html_e( 'Never customer data, order details, revenue, option contents or task arguments.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 	<?php
@@ -218,8 +218,8 @@ function tvarkom_csa_render_page() {
 			<div class="notice notice-info"><p><?php echo esc_html( tvarkom_csa_notice_text( 'too_soon', $messages['too_soon'][1], array( 'next_eligible_at' => $next_scan ) ) ); ?></p></div>
 		<?php endif; ?>
 
-		<p><?php esc_html_e( 'Get a free store health report from Tvarkom, scored from 0 to 100 and emailed to you as a PDF: server and checkout speed, caching and page weight and, with a Full Scan, your database, PHP setup, background tasks, a checkout profile and a fix plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
-		<p><?php esc_html_e( 'The scan runs on Tvarkom\'s servers and loads your public pages like a visitor would. Nothing on your store is changed. You can request one report per week, with either scan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+		<p><?php esc_html_e( 'Get a free store health report from tvarkom, scored from 0 to 100 and emailed to you as a PDF: server and checkout speed, caching and page weight and, with a Full Scan, your database, PHP setup, background tasks, a checkout profile and a fix plan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+		<p><?php esc_html_e( 'The scan runs on tvarkom\'s servers and loads your public pages like a visitor would. Nothing on your store is changed. You can request one report per week, with either scan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 
 		<form id="tvarkom-csa-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="tvarkom_csa_form">

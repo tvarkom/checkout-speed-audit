@@ -1,14 +1,14 @@
 PRIVACY POLICY
 Checkout Speed Audit
 
-What personal data the Checkout Speed Audit plugin's audit service and Tvarkom's website handle, why, who processes it for us and how long we keep it.
+What personal data the Checkout Speed Audit plugin's audit service and tvarkom's website handle, why, who processes it for us and how long we keep it.
 
 Last updated: 3 November 2026
 
 Who we are
 ----------
 
-The data controller is MB Tvarkom Software ("Tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. For privacy questions and data requests, email privacy@tvarkom.com.
+The data controller is MB TVARKOM SOFTWARE ("tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. For privacy questions and data requests, email privacy@tvarkom.com.
 
 The plugin's audit service
 --------------------------
@@ -43,7 +43,7 @@ If something goes wrong, for example our scanner can't reach your store or a rep
 Forms on our former website
 ---------------------------
 
-Until November 2026, tvarkom.com had a free store audit form, an early-access waitlist for Tvarkom Lead Time Management and an engineering enquiry form. These forms have been removed and we no longer collect data through tvarkom.com. Data that was already sent is kept only for the periods below:
+Until November 2026, tvarkom.com had a free store audit form, an early-access waitlist for tvarkom Lead Time Management and an engineering enquiry form. These forms have been removed and we no longer collect data through tvarkom.com. Data that was already sent is kept only for the periods below:
 
 * Free audits requested on tvarkom.com: the store's address, the email address and the IP address, used to run the scan, email the report and apply our limits.
 
@@ -51,7 +51,7 @@ Until November 2026, tvarkom.com had a free store audit form, an early-access wa
 
 * Engineering enquiries: the name, email address, store or agency address if given, message and IP address, used to reply. A copy of each sign-up and enquiry was emailed to our mailbox.
 
-Tvarkom's website
+tvarkom's website
 -----------------
 
 tvarkom.com uses no cookies, no analytics and no browser storage, and it has no forms. When you visit it, our hosting provider and Cloudflare process your IP address and the pages you request to deliver the site and protect it from abuse. Legal basis: our legitimate interest in running a secure website (Art. 6(1)(f)).

@@ -4,17 +4,17 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.9.1
+Stable tag: 0.9.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A free WooCommerce health report from Tvarkom, scored 0 to 100 and emailed as a PDF: speed, caching, database, background tasks and checkout.
+A free WooCommerce health report from tvarkom, scored 0 to 100 and emailed as a PDF: speed, caching, database, background tasks and checkout.
 
 == Description ==
 
 Adds a **WooCommerce → Speed Audit** page with two buttons. Both are free, and the report arrives by email as a PDF within a few minutes.
 
-**Partial Scan**: Tvarkom's scanner measures your store from outside, the way a visitor's request would reach it:
+**Partial Scan**: tvarkom's scanner measures your store from outside, the way a visitor's request would reach it:
 
 * Server response time of your homepage, cart and checkout
 * Caching of your pages and static files
@@ -30,15 +30,15 @@ Adds a **WooCommerce → Speed Audit** page with two buttons. Both are free, and
 
 You can request one report per week, with either scan. Until 7 days have passed, the scan buttons are disabled and the page shows the date of your next scan. A scan that failed doesn't count. Reports go to the site's admin email by default; you can change the address.
 
-The scan runs on Tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Full Scan's checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
+The scan runs on tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the Full Scan's checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
 
 == External services ==
 
-This plugin uses the Tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to Tvarkom until an administrator clicks **Partial Scan** or **Full Scan**.
+This plugin uses the tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to tvarkom until an administrator clicks **Partial Scan** or **Full Scan**.
 
-**Registration** (first scan only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. Tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
+**Registration** (first scan only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
 
-**Each scan**: your store's home URL, cart and checkout URLs and the report email are sent to `https://api.tvarkom.com/v1/audits`. Tvarkom's scanner then loads your homepage, cart and checkout pages. A Partial Scan sends nothing else.
+**Each scan**: your store's home URL, cart and checkout URLs and the report email are sent to `https://api.tvarkom.com/v1/audits`. tvarkom's scanner then loads your homepage, cart and checkout pages. A Partial Scan sends nothing else.
 
 **Full Scan only**: these values are sent as well. The plugin lists them next to the Full Scan button.
 
@@ -53,7 +53,7 @@ This plugin uses the Tvarkom audit service (https://tvarkom.com) to register you
 * Failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed), and the hook names and times of tasks more than 15 minutes late (never their arguments)
 * The checkout profile: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time
 
-The report is emailed to the report email, with a copy to Tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, deleted after 12 months. Tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
+The report is emailed to the report email, with a copy to tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, deleted after 12 months. tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
 
 **Next scan date**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan.
 
@@ -69,17 +69,17 @@ Both ship with the plugin in its `legal` folder. The plugin page links to them b
 
 1. Install from **Plugins → Add New**: search for "Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
 2. Activate the plugin.
-3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Partial Scan** or **Full Scan**. The first scan registers your store with Tvarkom; the report arrives by email within a few minutes.
+3. Go to **WooCommerce → Speed Audit**, check the **Report email**, and click **Partial Scan** or **Full Scan**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
 
 == Frequently Asked Questions ==
 
 = Does it work on a staging or local site? =
 
-No: Tvarkom must reach your store over the public internet with https, so localhost, IP addresses and password-protected sites can't be scanned.
+No: tvarkom must reach your store over the public internet with https, so localhost, IP addresses and password-protected sites can't be scanned.
 
 = Registration fails with "We couldn't confirm this domain" =
 
-Tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a security plugin or firewall doesn't block the WordPress REST API for outside visitors.
+tvarkom needs to reach `/wp-json/tvarkom/v1/verify` on your store. Check that a security plugin or firewall doesn't block the WordPress REST API for outside visitors.
 
 = How often can I run a scan? =
 
@@ -111,10 +111,13 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 == Changelog ==
 
+= 0.9.2 =
+* The brand is written tvarkom; the legal name is MB TVARKOM SOFTWARE.
+
 = 0.9.1 =
 * The plugin is now called Checkout Speed Audit.
 
 = 0.9.0 =
 * First release on WordPress.org.
-* Free store health report from Tvarkom, scored from 0 to 100 and emailed as a PDF: Partial Scan (outside measurements) or Full Scan (with store data, a checkout profile and a fix plan). One report per week.
+* Free store health report from tvarkom, scored from 0 to 100 and emailed as a PDF: Partial Scan (outside measurements) or Full Scan (with store data, a checkout profile and a fix plan). One report per week.
 * Terms of use and privacy policy ship with the plugin.

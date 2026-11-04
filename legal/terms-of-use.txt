@@ -1,21 +1,21 @@
 TERMS OF USE
 Checkout Speed Audit
 
-The terms for using the audit service of the Checkout Speed Audit plugin for WooCommerce, by Tvarkom.
+The terms for using the audit service of the Checkout Speed Audit plugin for WooCommerce, by tvarkom.
 
 Last updated: 3 November 2026
 
 Who we are
 ----------
 
-The service is provided by MB Tvarkom Software ("Tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. Contact: contact@tvarkom.com; for help with the plugin or a report, support@tvarkom.com.
+The service is provided by MB TVARKOM SOFTWARE ("tvarkom", "we", "us"), a small partnership (mažoji bendrija) registered in Lithuania under company code 308171668, registered office Gedimino g. 22A-14, 44319 Kaunas, Lithuania. Contact: contact@tvarkom.com; for help with the plugin or a report, support@tvarkom.com.
 
 By running an audit with the Checkout Speed Audit plugin ("the plugin"), you agree to these terms. If you use the service for a company, you confirm you may accept them on its behalf.
 
 What the service does
 ---------------------
 
-When you click Partial Scan or Full Scan, Tvarkom audits your store and emails you a report as a PDF. Our scanner loads your store's public pages like a visitor would and measures response times, page weight and caching. A Partial Scan uses only these measurements. A Full Scan also uses data the plugin reads from your store, including a profile of one checkout page load on your store's server, as described in our Privacy Policy (privacy-policy.txt, shipped with the plugin). Neither the scanner nor the plugin changes anything on your store. Results are sent only by email; the plugin doesn't show them on its page.
+When you click Partial Scan or Full Scan, tvarkom audits your store and emails you a report as a PDF. Our scanner loads your store's public pages like a visitor would and measures response times, page weight and caching. A Partial Scan uses only these measurements. A Full Scan also uses data the plugin reads from your store, including a profile of one checkout page load on your store's server, as described in our Privacy Policy (privacy-policy.txt, shipped with the plugin). Neither the scanner nor the plugin changes anything on your store. Results are sent only by email; the plugin doesn't show them on its page.
 
 Reports describe your store at the moment of the audit. Results can vary between audits with traffic, hosting and caching.
 
