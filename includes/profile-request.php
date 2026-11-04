@@ -64,7 +64,7 @@ function tvarkom_csa_profile_checkout() {
 		array(
 			'timeout'     => 30,
 			'redirection' => 0,
-			'user-agent'  => 'Tvarkom checkout profiler (+https://tvarkom.com)',
+			'user-agent'  => 'tvarkom checkout profiler (+https://tvarkom.com)',
 			'headers'     => array(
 				TVARKOM_CSA_PROFILE_HEADER => $token,
 				'Cache-Control'            => 'no-cache',
