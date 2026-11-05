@@ -37,6 +37,7 @@ require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/api.php';
 require_once __DIR__ . '/includes/rest.php';
 require_once __DIR__ . '/includes/business.php';
+require_once __DIR__ . '/includes/funnel.php';
 require_once __DIR__ . '/includes/metrics.php';
 require_once __DIR__ . '/includes/detailed.php';
 require_once __DIR__ . '/includes/audit.php';
@@ -55,6 +56,15 @@ add_action( 'admin_menu', 'tvarkom_csa_admin_menu', 99 );
 add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
 add_action( 'admin_init', 'tvarkom_csa_privacy_policy_content' );
+
+// Funnel counters (includes/funnel.php): the table on activation, or on the first admin page
+// after an update; daily totals of add-to-cart, checkout loads and orders.
+register_activation_hook( __FILE__, 'tvarkom_csa_funnel_install' );
+add_action( 'admin_init', 'tvarkom_csa_funnel_install' );
+add_action( 'woocommerce_add_to_cart', 'tvarkom_csa_funnel_add_to_cart' );
+add_action( 'template_redirect', 'tvarkom_csa_funnel_checkout_view' );
+add_action( 'woocommerce_checkout_order_processed', 'tvarkom_csa_funnel_order' );
+add_action( 'woocommerce_store_api_checkout_order_processed', 'tvarkom_csa_funnel_order' );
 
 // Domain check for registration (includes/rest.php).
 add_action( 'rest_api_init', 'tvarkom_csa_register_routes' );

@@ -103,6 +103,13 @@ class Tvarkom_CSA_Privacy_Test extends Tvarkom_CSA_Test_Case {
 				'template_overrides_outdated',
 				'plugins_updates_pending',
 				'backup_plugin',
+				'email_from_domain',
+				'funnel_days',
+				'funnel_add_to_cart',
+				'funnel_checkout_views',
+				'funnel_orders',
+				'order_sources',
+				'utm_sources',
 			),
 			array_keys( tvarkom_csa_collect_metrics() )
 		);

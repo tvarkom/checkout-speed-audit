@@ -13,6 +13,10 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'tvarkom_csa' );
 delete_option( 'tvarkom_csa_local_profile' ); // Profile my checkout's last result, before 0.9.0.
 delete_option( 'tvarkom_csa_audit_lock' );
+delete_option( 'tvarkom_csa_funnel_since' );
+global $wpdb;
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the plugin's own counter table on uninstall.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'tvarkom_csa_funnel' ) );
 delete_option( 'tvarkom_csa_monitor_seen' ); // The weekly Pro report's last attempt, before 0.9.0.
 delete_transient( 'tvarkom_csa_verify_token' );
 delete_transient( 'tvarkom_csa_status' );

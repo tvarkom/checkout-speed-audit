@@ -97,7 +97,8 @@ function tvarkom_csa_collect_business( $eur_rates ) {
 		'template_overrides_outdated' => tvarkom_csa_outdated_template_overrides(),
 		'plugins_updates_pending'     => tvarkom_csa_plugins_updates_pending(),
 		'backup_plugin'               => tvarkom_csa_backup_plugin(),
-	);
+		'email_from_domain'           => tvarkom_csa_email_from_domain(),
+	) + tvarkom_csa_funnel_totals() + tvarkom_csa_order_sources();
 }
 
 /**

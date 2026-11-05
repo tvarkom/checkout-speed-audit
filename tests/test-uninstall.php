@@ -12,6 +12,8 @@ class Tvarkom_CSA_Uninstall_Test extends Tvarkom_CSA_Test_Case {
 
 	public function test_uninstall_removes_the_plugin_data() {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
+		delete_option( TVARKOM_CSA_FUNNEL_SINCE );
+		tvarkom_csa_funnel_install();
 		update_option( 'tvarkom_csa_local_profile', array( 'total_ms' => 1 ) );
 		update_option( 'tvarkom_csa_monitor_seen', 41 );
 		tvarkom_csa_audit_lock();
@@ -29,5 +31,11 @@ class Tvarkom_CSA_Uninstall_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertFalse( $this->lock_is_held() );
 		$this->assertFalse( get_transient( TVARKOM_CSA_TOKEN ) );
 		$this->assertFalse( get_transient( 'tvarkom_csa_status' ) );
+		$this->assertFalse( get_option( 'tvarkom_csa_funnel_since' ) );
+		global $wpdb;
+		$wpdb->suppress_errors( true );
+		$wpdb->get_var( 'SELECT COUNT(*) FROM ' . tvarkom_csa_funnel_table() );
+		$wpdb->suppress_errors( false );
+		$this->assertNotSame( '', $wpdb->last_error, 'the counter table is dropped' );
 	}
 }
