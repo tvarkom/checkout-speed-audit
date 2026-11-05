@@ -169,12 +169,12 @@ function tvarkom_csa_sales_30d( $currency ) {
 
 	if ( tvarkom_csa_hpos() ) {
 		$table = $wpdb->prefix . 'wc_orders';
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- one aggregate per audit; table name from $wpdb->prefix, statuses as placeholders.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- one aggregate per audit; the table as %i, statuses as placeholders.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT COUNT(*) AS orders, COALESCE(SUM(total_amount), 0) AS total FROM `$table`
+				"SELECT COUNT(*) AS orders, COALESCE(SUM(total_amount), 0) AS total FROM %i
 				WHERE type = 'shop_order' AND status IN ($in) AND date_created_gmt > %s AND currency = %s",
-				array_merge( $statuses, array( $since, $currency ) )
+				array_merge( array( $table ), $statuses, array( $since, $currency ) )
 			)
 		);
 		// phpcs:enable
@@ -261,12 +261,12 @@ function tvarkom_csa_new_vs_returning_30d() {
 		tvarkom_csa_paid_statuses()
 	);
 	$in       = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- one aggregate per audit; table name from $wpdb->prefix.
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- one aggregate per audit; the table as %i, statuses as placeholders.
 	$rows = $wpdb->get_results(
 		$wpdb->prepare(
-			"SELECT returning_customer AS returning_customer, COUNT(DISTINCT customer_id) AS customers FROM `$table`
+			"SELECT returning_customer AS returning_customer, COUNT(DISTINCT customer_id) AS customers FROM %i
 			WHERE parent_id = 0 AND status IN ($in) AND date_created_gmt > %s GROUP BY returning_customer",
-			array_merge( $statuses, array( gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS ) ) )
+			array_merge( array( $table ), $statuses, array( gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS ) ) )
 		)
 	);
 	// phpcs:enable
