@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.10.1
+Stable tag: 0.11.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,7 +30,7 @@ It adds what the plugin reads from your store:
 
 You can request one report per week. Until 7 days have passed, the **Send me the Report** button is disabled and the page shows the date of your next scan. A scan that failed doesn't count. Reports go to the site's admin email by default; you can change the address.
 
-The scan runs on tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store. For the checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
+The scan runs on tvarkom's servers and loads your public pages like a visitor would. The plugin changes nothing on your store, apart from one small table of daily totals (below). For the checkout profile it loads your checkout page once from your own server, with one product in a temporary cart that is never saved; nothing is ordered. Analytics or marketing plugins that record checkout visits on the server may count that page load as one visit.
 
 == External services ==
 
@@ -56,6 +56,9 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
   * the IDs of the enabled payment gateways and shipping methods (for example `stripe`, `flat_rate`), never their settings or keys
   * whether checkout uses the Checkout block or the classic shortcode, and whether High-Performance Order Storage is on
   * the database and web server product (for example "MariaDB 10.11", "nginx"), how many of your theme's WooCommerce template overrides are outdated, how many plugins have an update waiting, and the name of an active backup plugin, if any
+  * the domain your store's emails come from (WooCommerce → Settings → Emails), never the address, so tvarkom can check its SPF and DMARC records
+  * how many products were added to the cart, checkout pages opened and orders placed over the last 30 days, and how many days that covers. The plugin counts these on your server in a small table of daily totals (its name ends in `tvarkom_csa_funnel`): no cookies, no browser script and nothing about the shopper. Logged-in administrators and shop managers aren't counted. Days older than 35 are deleted, and uninstalling the plugin removes the table
+  * how many orders in the last 30 days came from each source type (for example organic search, referral, campaign, direct) and from the 10 most common campaign sources (`utm_source`, for example "google"), from WooCommerce Order Attribution
 * The names and sizes of the 20 largest autoloaded options (never their contents)
 * Names, sizes and estimated row counts of database tables no active plugin or theme matches, each with the name of the switched-off or not-installed plugin or theme it likely belongs to
 * `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on
@@ -117,6 +120,10 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.11.0 =
+* Your shop's funnel in the report: the plugin counts products added to the cart, checkouts opened and orders placed as daily totals on your server (no cookies, nothing about shoppers), and reads where orders came from with WooCommerce Order Attribution. The report shows the funnel once 7 days have been counted.
+* Your email domain is sent (not the address), so the SPF and DMARC checks look at the domain your order emails come from.
 
 = 0.10.1 =
 * The plugin's description on the Plugins screen names tvarkom correctly and lists what 0.10.0 added.

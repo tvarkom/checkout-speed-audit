@@ -34,7 +34,7 @@ class Tvarkom_CSA_Uninstall_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertFalse( get_option( 'tvarkom_csa_funnel_since' ) );
 		global $wpdb;
 		$wpdb->suppress_errors( true );
-		$wpdb->get_var( 'SELECT COUNT(*) FROM ' . tvarkom_csa_funnel_table() );
+		$wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', tvarkom_csa_funnel_table() ) );
 		$wpdb->suppress_errors( false );
 		$this->assertNotSame( '', $wpdb->last_error, 'the counter table is dropped' );
 	}

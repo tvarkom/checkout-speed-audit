@@ -51,8 +51,20 @@ class Tvarkom_CSA_Funnel_Test extends Tvarkom_CSA_Test_Case {
 	public function test_a_new_day_removes_days_past_35() {
 		global $wpdb;
 		$table = tvarkom_csa_funnel_table();
-		$wpdb->insert( $table, array( 'day' => gmdate( 'Y-m-d', time() - 40 * DAY_IN_SECONDS ), 'orders' => 5 ) );
-		$wpdb->insert( $table, array( 'day' => gmdate( 'Y-m-d', time() - 20 * DAY_IN_SECONDS ), 'orders' => 3 ) );
+		$wpdb->insert(
+			$table,
+			array(
+				'day'    => gmdate( 'Y-m-d', time() - 40 * DAY_IN_SECONDS ),
+				'orders' => 5,
+			)
+		);
+		$wpdb->insert(
+			$table,
+			array(
+				'day'    => gmdate( 'Y-m-d', time() - 20 * DAY_IN_SECONDS ),
+				'orders' => 3,
+			)
+		);
 		tvarkom_csa_funnel_add_to_cart(); // Today's first event.
 		$this->assertSame( '2', $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ) );
 	}
@@ -87,7 +99,11 @@ class Tvarkom_CSA_Funnel_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_order_sources_from_order_attribution() {
-		foreach ( array( 'utm' => 'Google', 'organic' => '', 'referral' => '' ) as $type => $utm ) {
+		foreach ( array(
+			'utm'      => 'Google',
+			'organic'  => '',
+			'referral' => '',
+		) as $type => $utm ) {
 			$order = wc_create_order( array( 'status' => 'completed' ) );
 			$order->update_meta_data( '_wc_order_attribution_source_type', $type );
 			if ( $utm ) {

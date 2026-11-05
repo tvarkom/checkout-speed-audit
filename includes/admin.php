@@ -155,7 +155,7 @@ function tvarkom_csa_render_scan_note() {
 			</div>
 			<div>
 				<dt><?php esc_html_e( 'Business context', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
-				<dd><?php esc_html_e( 'So the report can speak in business terms: country and currency; paid, failed, pending and cancelled orders in the last 30 days; gross sales and average order value as euro ranges only (converted on your store, the amounts are never sent); how many customers were new or returning, as two counts; product and variation counts and whether stock management is on; the IDs of your payment gateways and shipping methods (never their settings); checkout type, order storage, database and web server, outdated template overrides, pending plugin updates and any backup plugin. tvarkom keeps the latest of these to count stores by country, size and so on, never the report.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
+				<dd><?php esc_html_e( 'So the report can speak in business terms: country and currency; paid, failed, pending and cancelled orders in the last 30 days; gross sales and average order value as euro ranges only (converted on your store, the amounts are never sent); how many customers were new or returning, as two counts; product and variation counts and whether stock management is on; the IDs of your payment gateways and shipping methods (never their settings); checkout type, order storage, database and web server, outdated template overrides, pending plugin updates and any backup plugin; the domain your store's emails come from (not the address); how many products were added to the cart, checkouts opened and orders placed over the last 30 days, as totals the plugin counts on your store without cookies or anything about the shopper; and how many orders came from each source (search, ads, referrals, direct), from WooCommerce Order Attribution. tvarkom keeps the latest of these to count stores by country, size and so on, never the report.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
 			</div>
 			<div>
 				<dt><?php esc_html_e( 'A checkout profile', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
@@ -179,7 +179,7 @@ function tvarkom_csa_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
-	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts, order counts, sales and average order value as euro ranges, and new and returning customer counts, and a profile of one checkout page load. No customer is identified: no names, emails or addresses are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts, order counts, sales and average order value as euro ranges, new and returning customer counts, daily shop activity totals and order source counts, and a profile of one checkout page load. No customer is identified: no names, emails or addresses are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
 	$content .= '<ul>';
 	foreach ( tvarkom_csa_privacy_points() as $point ) {
 		$content .= '<li>' . esc_html( $point ) . '</li>';
@@ -247,7 +247,7 @@ function tvarkom_csa_render_page() {
 					<li><?php echo esc_html( $cover ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<p class="tcsa__meta"><?php esc_html_e( 'The scan runs on our servers and loads your public pages like a visitor would. Nothing on your store changes. One report per week.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+			<p class="tcsa__meta"><?php esc_html_e( 'The scan runs on our servers and loads your public pages like a visitor would. Nothing on your store changes, apart from a small table of daily shop totals. One report per week.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 
 			<form id="tvarkom-csa-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="tvarkom_csa_form">
