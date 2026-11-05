@@ -96,7 +96,8 @@ function tvarkom_csa_privacy_points() {
 		__( 'Each scan request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Reports are emailed to the report email, with that copy to tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'Customer data, order contents and revenue are never sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'The latest business context of your store is kept, replaced by each scan, only to count stores by country, size and so on. It is deleted with the store\'s registration, at the latest 24 months after its last scan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'No customer is identified, and no order contents or exact sales amounts are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 	);
 }
 
@@ -153,12 +154,16 @@ function tvarkom_csa_render_scan_note() {
 				<dd><?php esc_html_e( 'PHP, WordPress and WooCommerce versions; database, options table and autoloaded options sizes, with the names and sizes of the largest autoloaded options and of tables left by removed plugins; the number of active plugins and the object cache type; background task and WP-Cron counts, with the names of failed and late tasks (error messages stripped of emails, links, IP addresses and long numbers); PHP settings such as the memory limit; and your monthly order volume as a range, for example 50–200.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
 			</div>
 			<div>
+				<dt><?php esc_html_e( 'Business context', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
+				<dd><?php esc_html_e( 'So the report can speak in business terms: country and currency; paid, failed, pending and cancelled orders in the last 30 days; gross sales and average order value as euro ranges only (converted on your store, the amounts are never sent); how many customers were new or returning, as two counts; product and variation counts and whether stock management is on; the IDs of your payment gateways and shipping methods (never their settings); checkout type, order storage, database and web server, outdated template overrides, pending plugin updates and any backup plugin. tvarkom keeps the latest of these to count stores by country, size and so on, never the report.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
+			</div>
+			<div>
 				<dt><?php esc_html_e( 'A checkout profile', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
 				<dd><?php esc_html_e( 'One checkout page load on your server: plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
 			</div>
 			<div class="tcsa__never">
 				<dt><?php esc_html_e( 'Never sent', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
-				<dd><?php esc_html_e( 'Customer data, order details, revenue, option contents or task arguments.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
+				<dd><?php esc_html_e( 'Customer names, emails or addresses, order details, exact sales amounts, option contents or task arguments.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
 			</div>
 		</dl>
 	</section>
@@ -174,7 +179,7 @@ function tvarkom_csa_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
-	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts and an order-count range, and a profile of one checkout page load. No data about the store\'s customers is sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts, order counts, sales and average order value as euro ranges, and new and returning customer counts, and a profile of one checkout page load. No customer is identified: no names, emails or addresses are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
 	$content .= '<ul>';
 	foreach ( tvarkom_csa_privacy_points() as $point ) {
 		$content .= '<li>' . esc_html( $point ) . '</li>';

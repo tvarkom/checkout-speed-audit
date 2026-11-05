@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.9.4
+Stable tag: 0.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,15 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
 * Number of active plugins, object cache type
 * Action Scheduler task counts (pending, overdue, failed) and how late WP-Cron is
 * Orders in the last 30 days as a range (for example 50–200)
+* Your store's business context, so the report can explain findings in business terms:
+  * country and currency from your WooCommerce settings
+  * the number of paid and on-hold orders in the last 30 days, and of failed, pending and cancelled orders
+  * gross sales in the last 30 days and the average order value, as euro ranges only (for example €5,000–25,000). The plugin converts them on your store with the European Central Bank's daily rates, which it gets from tvarkom; the amounts themselves are never sent
+  * how many customers in the last 30 days were new and how many returning, as two counts from WooCommerce Analytics (no customer is identified)
+  * the number of published products and variations, and whether stock management is on
+  * the IDs of the enabled payment gateways and shipping methods (for example `stripe`, `flat_rate`), never their settings or keys
+  * whether checkout uses the Checkout block or the classic shortcode, and whether High-Performance Order Storage is on
+  * the database and web server product (for example "MariaDB 10.11", "nginx"), how many of your theme's WooCommerce template overrides are outdated, how many plugins have an update waiting, and the name of an active backup plugin, if any
 * The names and sizes of the 20 largest autoloaded options (never their contents)
 * Names, sizes and estimated row counts of database tables no active plugin or theme matches, each with the name of the switched-off or not-installed plugin or theme it likely belongs to
 * `memory_limit`, `WP_MEMORY_LIMIT`, `max_execution_time` and whether OPcache is on
@@ -55,9 +64,11 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
 
 The report is emailed to the report email, with a copy to tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, deleted after 12 months. tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
 
-**Next scan date**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan.
+**Store profile**: tvarkom keeps the latest business context above (not the report) for your store, replaced by each scan, to understand which stores use the plugin. It's only ever used as totals across stores (for example how many stores per country or size), and it's deleted with your store's registration, at the latest 24 months after its last scan.
 
-No customer data, order contents or revenue figures are ever sent. The report is emailed only to the report email.
+**Next scan date and exchange rates**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), used for the euro ranges above.
+
+No customer names, emails or addresses, order contents or exact sales amounts are ever sent. The report is emailed only to the report email.
 
 Terms of use: https://plugins.svn.wordpress.org/tvarkom-checkout-speed-audit-for-woocommerce/trunk/legal/terms-of-use.txt
 
@@ -106,6 +117,10 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.10.0 =
+* The report now explains its findings with your store's business context: country and currency, orders, sales and average order value as euro ranges (converted on your store; the amounts are never sent), new and returning customer counts, catalog size, stock management, payment and shipping methods, checkout type and more. Everything sent is listed above the button and in the privacy policy.
+* tvarkom keeps the latest business context of your store, only to count stores by country, size and so on.
 
 = 0.9.4 =
 * A redesigned page: one button, Send me the Report, with what it sends and your agreement right above it. The Partial Scan button is gone.
