@@ -3,7 +3,7 @@ Checkout Speed Audit
 
 What personal data the Checkout Speed Audit plugin's audit service and tvarkom's website handle, why, who processes it for us and how long we keep it.
 
-Last updated: 4 November 2026
+Last updated: 5 November 2026
 
 Who we are
 ----------
@@ -13,25 +13,25 @@ The data controller is MB TVARKOM SOFTWARE ("tvarkom", "we", "us"), a small part
 The plugin's audit service
 --------------------------
 
-The Checkout Speed Audit plugin sends nothing until an administrator clicks Full Scan. Then:
+The Checkout Speed Audit plugin sends nothing until an administrator clicks "Send me the Report". Then:
 
 * Registration (first audit only): your store's address, the report email and the address of the plugin's verification endpoint. We fetch a one-time token from that endpoint to confirm the request comes from your store, then issue a key for your domain. Unfinished registrations are deleted after 7 days.
 
 * Each audit: your store's address, its cart and checkout page addresses and the report email. The request also reaches us from your store's server IP address, which we use for our limits.
 
-* Store data, with each Full Scan: PHP, WordPress and WooCommerce versions; database, options table and autoloaded options sizes; the number of active plugins and the object cache type; background task (Action Scheduler) counts and how late WP-Cron runs; the number of orders in the last 30 days as a range (for example 50–200); the names and sizes of the largest autoloaded options and of database tables left by removed plugins; PHP settings such as the memory limit; failed and late background task names, with error messages stripped of email addresses, links, IP addresses and long numbers; and a profile of one checkout page load on your store's server, with a temporary cart: plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts. The plugin lists this data next to the Full Scan button. It never includes customer data, order contents, revenue, option contents or task arguments.
+* Store data, with each report request: PHP, WordPress and WooCommerce versions; database, options table and autoloaded options sizes; the number of active plugins and the object cache type; background task (Action Scheduler) counts and how late WP-Cron runs; the number of orders in the last 30 days as a range (for example 50–200); the names and sizes of the largest autoloaded options and of database tables left by removed plugins; PHP settings such as the memory limit; failed and late background task names, with error messages stripped of email addresses, links, IP addresses and long numbers; and a profile of one checkout page load on your store's server, with a temporary cart: plugin, theme and hook names with their timings, database query shapes with every value replaced by "?", the host names of outside services called, and object cache hit and miss counts. The plugin lists this data next to the Full Scan button. It never includes customer data, order contents, revenue, option contents or task arguments.
 
 * Plan status: when you open the plugin's page and before each audit, the plugin asks us for your store's plan.
 
 What the scan reads. Our scanner then loads your store's public homepage, cart and checkout pages the way a visitor would, without running their JavaScript: it measures response times, page size and caching, and reads response headers and public platform markers. It doesn't log in, submit forms, place orders or read anything that isn't public.
 
-What a report contains. Your store's address, the health score and risk level, the findings and recommendations, and the measurements: response times, page weight, files, caching and marketing trackers. After a Full Scan, the report also contains the store data and what we found in it. A report never contains your email address.
+What a report contains. Your store's address, the health score and risk level, the findings and recommendations, and the measurements: response times, page weight, files, caching and marketing trackers. The report also contains the store data and what we found in it. A report never contains your email address.
 
 One report a week. Each store can request one free report per week. We use the store's audit requests to apply this.
 
 Where your report goes. We email it to the report email, with a copy to our report mailbox (checkoutspeedaudit@tvarkom.com), so we can answer questions about it and keep a record of what we sent. We delete those copies 12 months after they're sent. Our database keeps no copy of the report or of the store data in it once it's sent (see the working copy below).
 
-Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking Full Scan (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by not running further scans, or by uninstalling the plugin: nothing more is sent. To have your data deleted sooner, email privacy@tvarkom.com.
+Legal basis: taking the steps you asked for (Art. 6(1)(b) GDPR); for store data, your consent, given by clicking "Send me the Report" (Art. 6(1)(a)); for the IP address and our limits, our legitimate interest in preventing abuse of a free service (Art. 6(1)(f)). You can withdraw consent at any time by not running further scans, or by uninstalling the plugin: nothing more is sent. To have your data deleted sooner, email privacy@tvarkom.com.
 
 Emails we send
 --------------

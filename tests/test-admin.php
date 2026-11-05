@@ -187,8 +187,8 @@ class Tvarkom_CSA_Admin_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertStringNotContainsString( 'value="partial"', $page );
 		$this->assertStringContainsString( 'value="full"', $page );
 		// What is sent, then the agreement, then the button: the admin reads both before clicking.
-		$data    = strpos( $page, 'What Full Scan sends to tvarkom' );
-		$consent = strpos( $page, 'By clicking Full Scan, you agree to send this data to tvarkom' );
+		$data    = strpos( $page, 'What is sent to tvarkom' );
+		$consent = strpos( $page, 'you agree to send this data to tvarkom' );
 		$button  = strpos( $page, 'value="full"' );
 		$this->assertTrue( false !== $data && false !== $consent && $data < $consent && $consent < $button, 'data, consent, button in that order' );
 		$this->assertStringContainsString( 'legal/terms-of-use.txt', $page );
