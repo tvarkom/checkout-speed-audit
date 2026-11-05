@@ -36,7 +36,7 @@ function tvarkom_csa_run_audit() {
 		return 'invalid_key';
 	}
 
-	$body = array(
+	$body   = array(
 		'website' => home_url( '/' ),
 		'email'   => $settings['email'],
 		'pages'   => array(
@@ -44,7 +44,8 @@ function tvarkom_csa_run_audit() {
 			'checkout' => wc_get_checkout_url(),
 		),
 	);
-	$next = tvarkom_csa_next_scan_at( tvarkom_csa_status() );
+	$status = tvarkom_csa_status();
+	$next   = tvarkom_csa_next_scan_at( $status );
 	if ( $next > 0 ) {
 		tvarkom_csa_update_settings(
 			array(
@@ -57,7 +58,7 @@ function tvarkom_csa_run_audit() {
 		);
 		return 'too_soon';
 	}
-	$body['metrics']  = tvarkom_csa_collect_metrics();
+	$body['metrics']  = tvarkom_csa_collect_metrics( is_array( $status ) && isset( $status['eur_rates'] ) && is_array( $status['eur_rates'] ) ? $status['eur_rates'] : null );
 	$body['detailed'] = tvarkom_csa_collect_detailed();
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );

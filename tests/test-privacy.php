@@ -60,7 +60,8 @@ class Tvarkom_CSA_Privacy_Test extends Tvarkom_CSA_Test_Case {
 	}
 
 	public function test_metrics_sent_with_a_full_scan() {
-		// The fields the gateway's metrics schema 1 expects; a change here is a contract change.
+		// The fields of the gateway's metrics schema 2 (its README): schema 1's, which the audit
+		// tool reads, then the business context. A change here is a contract change.
 		$this->assertSame(
 			array(
 				'schema',
@@ -80,8 +81,31 @@ class Tvarkom_CSA_Privacy_Test extends Tvarkom_CSA_Test_Case {
 				'cron_disabled',
 				'cron_oldest_overdue_seconds',
 				'order_tier',
+				'country',
+				'currency',
+				'orders_30d',
+				'orders_failed_30d',
+				'orders_pending_30d',
+				'orders_cancelled_30d',
+				'sales_30d_range',
+				'aov_range',
+				'customers_new_30d',
+				'customers_returning_30d',
+				'products',
+				'variations',
+				'stock_management',
+				'payment_gateways',
+				'shipping_methods',
+				'checkout_type',
+				'hpos',
+				'database_server',
+				'web_server',
+				'template_overrides_outdated',
+				'plugins_updates_pending',
+				'backup_plugin',
 			),
 			array_keys( tvarkom_csa_collect_metrics() )
 		);
+		$this->assertSame( 2, tvarkom_csa_collect_metrics()['schema'] );
 	}
 }
