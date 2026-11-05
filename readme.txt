@@ -110,6 +110,7 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 = 0.9.4 =
 * A redesigned page: one button, Send me the Report, with what it sends and your agreement right above it. The Partial Scan button is gone.
 * The menu item is now WooCommerce → Checkout Speed Audit.
+* Every report is a Full Scan. An audit still queued by version 0.6.0 or earlier is dropped, unsent.
 
 = 0.9.3 =
 * The checkout profile's request is named "tvarkom checkout profiler" in your server logs.

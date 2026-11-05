@@ -58,7 +58,7 @@ add_action( 'admin_init', 'tvarkom_csa_privacy_policy_content' );
 // Domain check for registration (includes/rest.php).
 add_action( 'rest_api_init', 'tvarkom_csa_register_routes' );
 
-// Audits run when the admin clicks Partial Scan or Full Scan (admin.php). Version 0.6.0 and earlier queued
-// them with Action Scheduler; this keeps a job such a version queued before an upgrade working,
-// under the same one-audit-at-a-time lock (includes/audit.php).
-add_action( TVARKOM_CSA_ACTION, 'tvarkom_csa_run_queued_audit' );
+// Audits run when the admin clicks Send me the Report (admin.php). Version 0.6.0 and earlier queued
+// them with Action Scheduler; a job such a version queued before an upgrade is dropped
+// (includes/audit.php).
+add_action( TVARKOM_CSA_ACTION, 'tvarkom_csa_drop_queued_audits' );

@@ -1,7 +1,6 @@
 <?php
 /**
- * One audit: what a Full Scan sends (and the Partial Scan an older version's queued audit runs), and
- * the stored outcome (includes/audit.php).
+ * One audit: what a Full Scan sends, and the stored outcome (includes/audit.php).
  *
  * @package CheckoutSpeedAudit
  */
@@ -45,32 +44,31 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( 'invalid_key', tvarkom_csa_settings()['last']['code'] );
 	}
 
-	public function test_partial_scan_sends_only_the_store_addresses() {
+	public function test_full_scan_sends_the_addresses_with_the_store_data() {
 		$this->store();
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit( false );
+		tvarkom_csa_run_audit();
 
+		$body = $this->audit_body();
+		$this->assertSame( home_url( '/' ), $body['website'] );
+		$this->assertSame( 'owner@example.org', $body['email'] );
 		$this->assertSame(
 			array(
-				'website' => home_url( '/' ),
-				'email'   => 'owner@example.org',
-				'pages'   => array(
-					'cart'     => wc_get_cart_url(),
-					'checkout' => wc_get_checkout_url(),
-				),
+				'cart'     => wc_get_cart_url(),
+				'checkout' => wc_get_checkout_url(),
 			),
-			$this->audit_body()
+			$body['pages']
 		);
+		$this->assertSame( array( 'website', 'email', 'pages', 'metrics', 'detailed' ), array_keys( $body ) );
 		$this->assertSame( 'Bearer tvk_test', $this->requests[1]['headers']['Authorization'] );
-		$this->assertSame( 'queued', tvarkom_csa_settings()['last']['code'] );
 	}
 
 	public function test_free_full_scan_sends_the_metrics_and_the_diagnostics() {
 		$this->store();
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit( true );
+		tvarkom_csa_run_audit();
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
@@ -83,7 +81,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$this->store();
 		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
 
-		tvarkom_csa_run_audit( true );
+		tvarkom_csa_run_audit();
 
 		$body = $this->audit_body();
 		$this->assertArrayHasKey( 'metrics', $body );
@@ -111,7 +109,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			'network error'        => array( new WP_Error( 'http_request_failed', 'down' ), null, 'network', true ),
 			'invalid key'          => array( 401, array( 'error' => 'invalid_key' ), 'invalid_key', false ),
 			'store address moved'  => array( 403, array( 'error' => 'website_not_allowed' ), 'website_not_allowed', false ),
-			'free limit reached'   => array( 429, array( 'error' => 'limit_reached' ), 'limit_reached', true ),
+			'scans per day'        => array( 429, array( 'error' => 'rate_limited' ), 'rate_limited', true ),
 			'not WooCommerce'      => array( 422, array( 'error' => 'not_woocommerce' ), 'not_woocommerce', true ),
 			'error without a code' => array( 500, 'oops', 'server', true ),
 		);
@@ -148,7 +146,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 		$next = time() + 3 * DAY_IN_SECONDS;
 		$this->respond( 'GET', '/v1/client', 200, array_merge( $this->client_status(), array( 'next_scan_at' => gmdate( 'c', $next ) ) ) );
 
-		$this->assertSame( 'too_soon', tvarkom_csa_run_audit( true ) );
+		$this->assertSame( 'too_soon', tvarkom_csa_run_audit() );
 
 		$this->assertSame( array( 'GET /v1/client' ), $this->request_lines(), 'no scan sent' );
 		$this->assertSame( $next, tvarkom_csa_settings()['last']['next_eligible_at'] );
@@ -166,7 +164,7 @@ class Tvarkom_CSA_Run_Audit_Test extends Tvarkom_CSA_Test_Case {
 			)
 		);
 
-		$this->assertSame( 'too_soon', tvarkom_csa_run_audit( false ) );
+		$this->assertSame( 'too_soon', tvarkom_csa_run_audit() );
 
 		$last     = tvarkom_csa_settings()['last'];
 		$messages = tvarkom_csa_messages();

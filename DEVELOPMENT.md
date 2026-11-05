@@ -16,7 +16,7 @@ needs WooCommerce.
 | `includes/settings.php` | The stored settings (option `tvarkom_csa`): API key, plan, email, last result (versions before 0.9.0 also stored `consent`, now ignored) |
 | `includes/api.php` | The tvarkom API gateway client: requests, plan status, license keys, registration, error codes |
 | `includes/rest.php` | `GET /wp-json/tvarkom/v1/verify`, which the gateway fetches to check the domain at registration |
-| `includes/audit.php` | One audit: Partial Scan (addresses only) or Full Scan (with store data), what is sent, and the stored outcome; the lock that allows one audit at a time |
+| `includes/audit.php` | One audit (always a Full Scan, with store data): what is sent, and the stored outcome; the lock that allows one audit at a time |
 | `includes/metrics.php` | Store metrics sent with every Full Scan |
 | `includes/detailed.php` | Detailed diagnostics (Full Scan): autoloaded options, orphaned tables, PHP setup, failed background tasks |
 | `includes/class-tvarkom-csa-profiler.php` | The checkout profiler's state |
@@ -35,10 +35,10 @@ All in `checkout-speed-audit.php`:
 | Hook | Callback |
 |---|---|
 | `admin_menu` (priority 99) | `tvarkom_csa_admin_menu` |
-| `admin_post_tvarkom_csa_form` | `tvarkom_csa_handle_form` (save settings, license, run an audit) |
+| `admin_post_tvarkom_csa_form` | `tvarkom_csa_handle_form` (save the report email, run an audit) |
 | `admin_enqueue_scripts` | `tvarkom_csa_admin_scripts` |
 | `rest_api_init` | `tvarkom_csa_register_routes` (`/verify`; `/monitor`, the weekly Pro report, was removed in 0.9.0) |
-| `tvarkom_csa_run_audit` | `tvarkom_csa_run_queued_audit`; only for audits queued by versions up to 0.6.0 |
+| `tvarkom_csa_run_audit` | `tvarkom_csa_drop_queued_audits`: drops audits queued by versions up to 0.6.0, unsent |
 
 `tvarkom_csa_profile_maybe_start()` runs at load. On the profiled checkout request only, it
 registers the profiler's own hooks (`includes/profile.php`); every other request returns after

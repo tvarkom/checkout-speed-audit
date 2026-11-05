@@ -1,8 +1,8 @@
 <?php
 /**
  * One audit: what is collected and sent to the gateway, and the outcome stored for the admin
- * page. Runs when the admin clicks Full Scan (admin.php), the only scan the page offers since
- * 0.9.4; a Partial Scan (no store data) is left for an audit queued by an older version.
+ * page. Runs when the admin clicks Send me the Report (admin.php): always a Full Scan, the only
+ * audit the gateway runs since 5 Nov 2026.
  *
  * @package CheckoutSpeedAudit
  */
@@ -14,17 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TVARKOM_CSA_AUDIT_LOCK', 'tvarkom_csa_audit_lock' );
 
 /**
- * Requests the audit: a Partial Scan sends the store's addresses and the report email only; a
- * Full Scan also collects and sends the store metrics and the detailed diagnostics, with a
- * checkout profile. The gateway treats an audit with the detailed data as a Full Scan.
+ * Requests the audit, a Full Scan: the store's addresses, the report email, the store metrics and
+ * the detailed diagnostics, with a checkout profile.
  *
- * A free store scans once a week (founder decision of 3 Nov 2026): inside the week nothing is
+ * A store scans once a week (founder decision of 3 Nov 2026): inside the week nothing is
  * sent, and the result says when the next scan is possible. The gateway enforces it too.
  *
- * @param bool $full_scan The admin clicked Full Scan.
  * @return string The result code (the admin page's codes).
  */
-function tvarkom_csa_run_audit( $full_scan = false ) {
+function tvarkom_csa_run_audit() {
 	$settings = tvarkom_csa_settings();
 	if ( '' === $settings['api_key'] ) {
 		tvarkom_csa_update_settings(
@@ -59,17 +57,15 @@ function tvarkom_csa_run_audit( $full_scan = false ) {
 		);
 		return 'too_soon';
 	}
-	if ( $full_scan ) {
-		$body['metrics']  = tvarkom_csa_collect_metrics();
-		$body['detailed'] = tvarkom_csa_collect_detailed();
-	}
+	$body['metrics']  = tvarkom_csa_collect_metrics();
+	$body['detailed'] = tvarkom_csa_collect_detailed();
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );
 	$last     = array();
 	if ( is_wp_error( $response ) ) {
 		$code = 'network';
 	} elseif ( 202 === $response['status'] ) {
-		$code = $full_scan ? 'queued_full' : 'queued';
+		$code = 'queued_full';
 	} else {
 		$code = tvarkom_csa_error_code( $response );
 		if ( 'too_soon' === $code && isset( $response['body']['next_eligible_at'] ) ) {
@@ -148,16 +144,14 @@ function tvarkom_csa_audit_unlock() {
 }
 
 /**
- * An audit queued by version 0.6.0 (Action Scheduler), run under the same lock as a click, as a
- * Partial Scan: 0.9.0 sends store data only when the admin clicks Full Scan. If an audit is
- * running already, the queued one is dropped: it would only repeat that audit.
+ * An audit queued by version 0.6.0 (Action Scheduler) is dropped, with any others still queued:
+ * every audit is now a Full Scan, which sends store data only when the admin clicks Send me the
+ * Report, and the gateway no longer runs one without that data.
  *
  * @return void
  */
-function tvarkom_csa_run_queued_audit() {
-	if ( ! tvarkom_csa_audit_lock() ) {
-		return;
+function tvarkom_csa_drop_queued_audits() {
+	if ( function_exists( 'as_unschedule_all_actions' ) ) {
+		as_unschedule_all_actions( TVARKOM_CSA_ACTION );
 	}
-	tvarkom_csa_run_audit( false );
-	tvarkom_csa_audit_unlock();
 }

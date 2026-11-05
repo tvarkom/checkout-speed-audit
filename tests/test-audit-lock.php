@@ -52,25 +52,13 @@ class Tvarkom_CSA_Audit_Lock_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertFalse( tvarkom_csa_audit_lock(), 'and held again' );
 	}
 
-	public function test_a_queued_audit_is_dropped_while_an_audit_runs() {
+	public function test_a_queued_audit_from_0_6_0_sends_nothing() {
 		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		tvarkom_csa_audit_lock();
 
 		do_action( TVARKOM_CSA_ACTION );
 
 		$this->assertSame( array(), $this->request_lines() );
-		$this->assertTrue( $this->lock_is_held(), 'the running audit keeps its lock' );
-	}
-
-	public function test_a_queued_audit_runs_and_releases_the_lock() {
-		tvarkom_csa_update_settings( array( 'api_key' => 'tvk_test' ) );
-		$this->respond( 'GET', '/v1/client', 200, $this->client_status() );
-		$this->respond( 'POST', '/v1/audits', 202, array( 'status' => 'queued' ) );
-
-		do_action( TVARKOM_CSA_ACTION );
-
-		$this->assertSame( array( 'GET /v1/client', 'POST /v1/audits' ), $this->request_lines() );
-		$this->assertSame( 'queued', tvarkom_csa_settings()['last']['code'] );
 		$this->assertFalse( $this->lock_is_held() );
+		$this->assertArrayNotHasKey( 'code', tvarkom_csa_settings()['last'] );
 	}
 }

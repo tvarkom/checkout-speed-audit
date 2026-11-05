@@ -46,12 +46,9 @@ function tvarkom_csa_messages() {
 		'invalid_verify_url'     => array( 'error', __( 'This store can\'t be registered: its REST API is on a different domain than the store.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'verification_failed'    => array( 'error', __( 'We couldn\'t confirm this domain. tvarkom needs to reach /wp-json/tvarkom/v1/verify on your store: check that a security plugin or firewall isn\'t blocking the WordPress REST API.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'registration_not_found' => array( 'error', __( 'The registration expired. Click Send me the Report again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'origin_taken'           => array( 'error', __( 'This domain is already set up with tvarkom another way. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'invalid_key'            => array( 'error', __( 'This store\'s key was replaced or revoked. Click Send me the Report to register the store again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'key_expired'            => array( 'error', __( 'This store\'s key has expired. Email support@tvarkom.com to renew it.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'client_disabled'        => array( 'error', __( 'Scans are paused for this store. Email support@tvarkom.com.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'website_not_allowed'    => array( 'error', __( 'This store\'s address changed since it was registered. Click Send me the Report to register it again.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
-		'limit_reached'          => array( 'error', __( 'This store has reached its scan limit for now.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . ' ' . $try_later ),
 		'rate_limited'           => array( 'error', __( 'Too many scans or registrations for this store today.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . ' ' . $try_later ),
 		'not_woocommerce'        => array( 'error', __( 'Our scanner couldn\'t find WooCommerce on your public homepage.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
 		'busy'                   => array( 'error', __( 'The scanner is busy right now. Try again in a few minutes.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) ),
@@ -328,7 +325,7 @@ function tvarkom_csa_handle_form() {
 	// (Action Scheduler, WP-Cron) is often what's broken or backed up on the stores we
 	// audit, and the admin gets the real result at once.
 	wc_set_time_limit( 120 );
-	tvarkom_csa_run_audit( true ); // Full Scan ("Send me the Report"): the only scan the page offers.
+	tvarkom_csa_run_audit(); // Full Scan ("Send me the Report"): the only scan the page offers.
 	tvarkom_csa_audit_unlock();
 	$last = tvarkom_csa_settings()['last'];
 	tvarkom_csa_redirect( isset( $last['code'] ) ? (string) $last['code'] : 'server' );
