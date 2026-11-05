@@ -1,6 +1,6 @@
 {
     "name": "tvarkom/checkout-speed-audit",
-    "description": "Development tools for the Tvarkom Checkout Speed Audit plugin (not shipped in the plugin zip).",
+    "description": "Development tools for the Checkout Speed Audit plugin by tvarkom (not shipped in the plugin zip).",
     "license": "GPL-2.0-or-later",
     "type": "wordpress-plugin",
     "require-dev": {

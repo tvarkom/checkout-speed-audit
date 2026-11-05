@@ -4,11 +4,11 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.10.0
+Stable tag: 0.10.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A free WooCommerce health report from tvarkom, scored 0 to 100 and emailed as a PDF: speed, caching, database, background tasks and checkout.
+A free WooCommerce health report from tvarkom, emailed as a PDF: speed, caching, database, checkout, and what each finding means for your sales.
 
 == Description ==
 
@@ -117,6 +117,10 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.10.1 =
+* The plugin's description on the Plugins screen names tvarkom correctly and lists what 0.10.0 added.
+* Reports now also check your HTTPS certificate's expiry and your email domain's SPF and DMARC records, from outside (no change on your store).
 
 = 0.10.0 =
 * The report now explains its findings with your store's business context: country and currency, orders, sales and average order value as euro ranges (converted on your store; the amounts are never sent), new and returning customer counts, catalog size, stock management, payment and shipping methods, checkout type and more. Everything sent is listed above the button and in the privacy policy.

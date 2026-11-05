@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Tvarkom Checkout Speed Audit">
+<ruleset name="Checkout Speed Audit by tvarkom">
 	<description>WordPress Coding Standards and PHP 7.4 compatibility for the plugin.</description>
 
 	<file>.</file>

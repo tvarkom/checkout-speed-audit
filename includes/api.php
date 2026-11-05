@@ -1,6 +1,6 @@
 <?php
 /**
- * Tvarkom API gateway client: requests, store status (the next scan date), registration (free API key
+ * tvarkom API gateway client: requests, store status (the next scan date), registration (free API key
  * for this domain) and the gateway's error codes. The audit itself is in audit.php.
  *
  * @package CheckoutSpeedAudit

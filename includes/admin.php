@@ -186,7 +186,7 @@ function tvarkom_csa_privacy_policy_content() {
 	}
 	$content .= '</ul>';
 	$content .= '<p>' . sprintf(
-		/* translators: %s: link to Tvarkom's Privacy Policy. */
+		/* translators: %s: link to tvarkom's Privacy Policy. */
 		esc_html__( 'Details: %s.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		'<a href="' . esc_url( tvarkom_csa_legal_url( 'privacy-policy.txt' ) ) . '">' . esc_html__( 'tvarkom Privacy Policy', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</a>'
 	) . '</p>';

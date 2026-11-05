@@ -1,6 +1,6 @@
 <?php
 /**
- * Removes the plugin's data. The free API key stays valid on Tvarkom's side; a
+ * Removes the plugin's data. The free API key stays valid on tvarkom's side; a
  * reinstall registers the store again and replaces it.
  *
  * @package CheckoutSpeedAudit
