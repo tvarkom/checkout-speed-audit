@@ -354,7 +354,7 @@ function tvarkom_csa_profile_http_end( $response, $context, $transport, $args, $
 		$own  = array( 'localhost', '127.0.0.1', '::1', '[::1]', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ), strtolower( (string) wp_parse_url( site_url(), PHP_URL_HOST ) ) );
 		if ( count( Tvarkom_CSA_Profiler::$http ) < 25 ) {
 			Tvarkom_CSA_Profiler::$http[] = array(
-				'host'      => $host,
+				'host'      => tvarkom_csa_identifier( $host ),
 				'own_site'  => in_array( $host, $own, true ), // E.g. WordPress starting WP-Cron.
 				'component' => $component,
 				'ms'        => round( ( hrtime( true ) - $start ) / 1e6, 1 ),

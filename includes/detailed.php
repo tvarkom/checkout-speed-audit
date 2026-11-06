@@ -139,7 +139,7 @@ function tvarkom_csa_top_autoloaded_keys() {
 	foreach ( (array) $rows as $row ) {
 		$name  = (string) $row->option_name;
 		$out[] = array(
-			'option_name'       => $name,
+			'option_name'       => tvarkom_csa_identifier( $name ),
 			'size_bytes'        => (int) $row->size,
 			'associated_plugin' => $wpdb->prefix . 'user_roles' === $name ? 'WordPress core' : tvarkom_csa_owner( $name, $plugins ),
 		);
@@ -307,7 +307,7 @@ function tvarkom_csa_orphaned_tables() {
 			continue;
 		}
 		$out[] = array(
-			'table_name'          => $table,
+			'table_name'          => tvarkom_csa_identifier( $table ),
 			'size_mb'             => round( (int) $row->bytes / 1048576, 1 ),
 			'estimated_row_count' => (int) $row->row_count,
 			'classification'      => $classification,
@@ -359,6 +359,29 @@ function tvarkom_csa_scrub( $message ) {
 }
 
 /**
+ * A name chosen by a plugin (option, table, task hook, host) with anything that could identify a
+ * person or a record masked: email addresses become "email", runs of 6 or more digits "N", and
+ * long hexadecimal or UUID identifiers "id". Plugin and WordPress names are kept, so the report
+ * can still say which plugin a name belongs to. The tokens fit the scanner's name rules.
+ *
+ * @param string $name A name read on the store.
+ * @return string
+ */
+function tvarkom_csa_identifier( $name ) {
+	$name = preg_replace( '/[A-Za-z0-9.+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+/', 'email', (string) $name ); // Not across "_", so a plugin's prefix stays.
+	$name = preg_replace( '/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i', 'id', $name );
+	$name = preg_replace_callback(
+		'/[0-9a-f]{16,}/i',
+		function ( $m ) {
+			return preg_match( '/[0-9]/', $m[0] ) ? 'id' : $m[0]; // Hex with digits: a hash or key, not a word.
+		},
+		$name
+	);
+	$name = preg_replace( '/\d{6,}/', 'N', $name );
+	return substr( $name, 0, 191 );
+}
+
+/**
  * Action Scheduler table names, or null when its tables aren't in use.
  *
  * @return array{actions: string, logs: string}|null
@@ -403,7 +426,7 @@ function tvarkom_csa_failed_tasks() {
 			$wpdb->prepare( 'SELECT message FROM %i WHERE action_id = %d ORDER BY log_id DESC LIMIT 1', $tables['logs'], (int) $group->last_id )
 		);
 		$out[]   = array(
-			'hook_signature'     => (string) $group->hook,
+			'hook_signature'     => tvarkom_csa_identifier( (string) $group->hook ),
 			'failure_count'      => (int) $group->failures,
 			'last_error_message' => is_string( $message ) && '' !== $message ? tvarkom_csa_scrub( $message ) : null,
 		);
@@ -437,7 +460,7 @@ function tvarkom_csa_stalled_actions() {
 		foreach ( (array) $rows as $row ) {
 			$at    = strtotime( $row->scheduled_date_gmt . ' UTC' );
 			$out[] = array(
-				'hook'          => (string) $row->hook,
+				'hook'          => tvarkom_csa_identifier( (string) $row->hook ),
 				'source'        => 'action_scheduler',
 				'scheduled_at'  => gmdate( 'c', $at ),
 				'delay_minutes' => (int) floor( ( time() - $at ) / MINUTE_IN_SECONDS ),
@@ -452,7 +475,7 @@ function tvarkom_csa_stalled_actions() {
 		}
 		foreach ( array_keys( (array) $hooks ) as $hook ) {
 			$out[] = array(
-				'hook'          => (string) $hook,
+				'hook'          => tvarkom_csa_identifier( (string) $hook ),
 				'source'        => 'wp_cron',
 				'scheduled_at'  => gmdate( 'c', (int) $timestamp ),
 				'delay_minutes' => (int) floor( ( time() - $timestamp ) / MINUTE_IN_SECONDS ),

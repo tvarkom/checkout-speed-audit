@@ -222,8 +222,11 @@ function tvarkom_csa_order_sources() {
 	$top   = array();
 	$other = 0;
 	foreach ( $utm as $source => $orders ) {
-		$name = strtolower( substr( preg_replace( '/[^A-Za-z0-9 ._\-]/', '', $source ), 0, 40 ) );
-		if ( '' === $name || count( $top ) >= 10 ) {
+		// Campaign names are free text: one that could identify a person or a record (an email
+		// address, a long number, a hash) is counted as "other", never sent.
+		$looks_personal = preg_match( '/@|\d{6,}|[0-9a-f]{16,}/i', (string) $source );
+		$name           = strtolower( substr( preg_replace( '/[^A-Za-z0-9 ._\-]/', '', $source ), 0, 40 ) );
+		if ( $looks_personal || '' === $name || count( $top ) >= 10 ) {
 			$other += $orders;
 			continue;
 		}

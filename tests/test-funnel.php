@@ -128,6 +128,24 @@ class Tvarkom_CSA_Funnel_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertSame( array( 'google' => 1 ), $sources['utm_sources'] );
 	}
 
+	public function test_campaign_names_that_look_personal_are_other() {
+		foreach ( array( 'newsletter', 'jane@example.com', 'crm_1234567', 'ref_5f4dcc3b5aa765d61d8327deb882cf99' ) as $utm ) {
+			$order = wc_create_order( array( 'status' => 'completed' ) );
+			$order->update_meta_data( '_wc_order_attribution_source_type', 'utm' );
+			$order->update_meta_data( '_wc_order_attribution_utm_source', $utm );
+			$order->save();
+		}
+		$utm = tvarkom_csa_order_sources()['utm_sources'];
+		ksort( $utm );
+		$this->assertSame(
+			array(
+				'newsletter' => 1,
+				'other'      => 3,
+			),
+			$utm
+		);
+	}
+
 	public function test_no_attribution_is_null() {
 		$this->assertSame(
 			array(

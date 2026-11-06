@@ -50,6 +50,35 @@ class Tvarkom_CSA_Privacy_Test extends Tvarkom_CSA_Test_Case {
 		);
 	}
 
+	/**
+	 * Plugin-chosen names and what is sent.
+	 *
+	 * @return array<string, array{0: string, 1: string}>
+	 */
+	public function data_identifiers() {
+		return array(
+			'session id in an option' => array( '_transient_wc_session_1234567', '_transient_wc_session_N' ),
+			'email in a task hook'    => array( 'wc_deliver_webhook_jane.doe@example.com', 'wc_deliver_webhook_email' ),
+			'md5 in an option'        => array( 'cache_5f4dcc3b5aa765d61d8327deb882cf99', 'cache_id' ),
+			'uuid in a hook'          => array( 'job_3f2b8c1e-9a7d-4c2b-8e1f-0a9b8c7d6e5f', 'job_id' ),
+			'plugin names stay'       => array( 'woocommerce_scheduled_sales', 'woocommerce_scheduled_sales' ),
+			'short numbers stay'      => array( 'wp_2_options', 'wp_2_options' ),
+			'hosts stay'              => array( 'api.stripe.com', 'api.stripe.com' ),
+		);
+	}
+
+	/**
+	 * Option, table, hook and host names lose what could identify a person or a record.
+	 *
+	 * @dataProvider data_identifiers
+	 *
+	 * @param string $name Name on the store.
+	 * @param string $sent What leaves the store.
+	 */
+	public function test_identifiers_are_masked( $name, $sent ) {
+		$this->assertSame( $sent, tvarkom_csa_identifier( $name ) );
+	}
+
 	public function test_order_volume_is_sent_as_a_range() {
 		$this->assertSame( '0-10', tvarkom_csa_order_tier() );
 		for ( $i = 0; $i < 10; $i++ ) {

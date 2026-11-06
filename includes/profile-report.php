@@ -171,7 +171,7 @@ function tvarkom_csa_profile_finish() {
 	foreach ( array_slice( $hooks, 0, 10, true ) as $key => $stats ) {
 		list( $component, $hook ) = explode( "\0", (string) $key, 2 );
 		$hook_rows[]              = array(
-			'hook'      => $hook,
+			'hook'      => tvarkom_csa_identifier( $hook ),
 			'component' => tvarkom_csa_profile_component_name( $component ),
 			'ms'        => round( $stats[0] / 1e6, 1 ),
 			'calls'     => (int) $stats[1],
