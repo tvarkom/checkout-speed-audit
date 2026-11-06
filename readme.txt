@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.11.1
+Stable tag: 0.11.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.11.2 =
+* Privacy policy: covers the free report you can now request on tvarkom.com without the plugin (confirmation by email, limits, and contact only if you agree). Nothing changes in the plugin.
 
 = 0.11.1 =
 * Privacy: tvarkom no longer keeps a copy of your report (its mailbox gets only a sent notice); option, task, table and host names have email addresses, long numbers and identifiers masked before they're sent; campaign names that look personal count as "other". The privacy policy, this readme and the plugin page say exactly when the plugin contacts tvarkom.

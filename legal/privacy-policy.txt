@@ -55,15 +55,32 @@ We email reports to the report email, from checkoutspeedaudit@tvarkom.com. Once 
 
 If something goes wrong, for example our scanner can't reach your store or a report can't be delivered, our team gets an alert in our mailbox naming your store and, in its text, the report email, so we can fix it or run the audit by hand. Alerts never contain your report.
 
+Free report from our website
+----------------------------
+
+On tvarkom.com you can ask for a free Checkout Speed Audit of a WooCommerce store without installing the plugin: you give the store's address and your email, and you can tick a box, unticked by default, to let us contact you about your report.
+
+* What we receive: the store's address, your email, whether you ticked the box, and the IP address your request comes from, which we use for our limits (3 requests per email a day, 3 per IP address an hour).
+
+* Confirmation first: we email you a link, and nothing runs until you click it within 24 hours. If you don't, nothing more is sent. The request itself is deleted 7 days after it was made either way.
+
+* The report: our scanner then loads the store's public pages from outside, as described in "What the scan reads", and we email the report to you, with a link to the plugin. It contains none of the store data the plugin sends. Each store can have one such report a week.
+
+* Contacting you: only if you ticked the box, we may contact you about your report. We keep that agreement until you withdraw it: reply to any of our emails or write to privacy@tvarkom.com. If you didn't tick it, we use your email only for the confirmation and the report.
+
+* Our records: when you confirm, an alert in our mailbox tells our team the store, your email and whether you ticked the box. The request is then kept like a plugin audit request (24 months; your email and IP address erased after 90 days), and its results in the audit history (12 months).
+
+Legal basis: providing the report you ask for (Art. 6(1)(b)); the limits, the IP address and the alert: our legitimate interest in preventing abuse and knowing what we sent (Art. 6(1)(f)); contacting you about your report: your consent (Art. 6(1)(a)), which you can withdraw at any time.
+
 Forms on our former website
 ---------------------------
 
-Until November 2026, tvarkom.com had a free store audit form, an early-access waitlist for tvarkom Lead Time Management and an engineering enquiry form. These forms have been removed and we no longer collect data through tvarkom.com. On 5 November 2026 we deleted what they had stored in our database: the audits requested on tvarkom.com and their reports, the waitlist sign-ups and the enquiries. Copies of sign-ups and enquiries remain in our mailboxes (see below), and deleted data can remain in database snapshots for 5 days.
+Until November 2026, tvarkom.com had a free store audit form, an early-access waitlist for tvarkom Lead Time Management and an engineering enquiry form. Those forms were removed; the free report form above is new and separate. On 5 November 2026 we deleted what they had stored in our database: the audits requested on tvarkom.com and their reports, the waitlist sign-ups and the enquiries. Copies of sign-ups and enquiries remain in our mailboxes (see below), and deleted data can remain in database snapshots for 5 days.
 
 tvarkom's website
 -----------------
 
-tvarkom.com has no analytics, no forms and no browser storage of its own. When you visit it, our hosting provider and Cloudflare process your IP address and the pages you request to deliver the site and protect it from abuse. Cloudflare's bot protection runs a short check in your browser and sets one security cookie, cf_clearance (HttpOnly, up to one year), which tells Cloudflare your browser passed it; it isn't used for tracking or advertising. Legal basis: our legitimate interest in running a secure website (Art. 6(1)(f)); the cookie is strictly necessary for that security.
+tvarkom.com has no analytics and no browser storage of its own, and its only form is the free report form described above. When you visit it, our hosting provider and Cloudflare process your IP address and the pages you request to deliver the site and protect it from abuse. Cloudflare's bot protection runs a short check in your browser and sets one security cookie, cf_clearance (HttpOnly, up to one year), which tells Cloudflare your browser passed it; it isn't used for tracking or advertising. Legal basis: our legitimate interest in running a secure website (Art. 6(1)(f)); the cookie is strictly necessary for that security.
 
 When you email us
 -----------------
@@ -102,9 +119,13 @@ These periods are applied automatically by our software:
 
 * Exchange rates: only the latest day's.
 
+* Free report requests from tvarkom.com (store, email, IP address, your choice about being contacted): 7 days after the request, confirmed or not. A confirmed one is then kept as an audit request and audit results, as above.
+
+* Your agreement to be contacted about your report: until you withdraw it.
+
 Mailboxes and other copies:
 
-* Our report mailbox (checkoutspeedaudit@tvarkom.com) holds the notices of reports sent (store domain, time, status) and the alerts about failed scans and deliveries, which name the store and the report email. We delete them 12 months after they arrive. It also holds the copies of reports sent before 6 November 2026, which we delete 12 months after they were sent.
+* Our report mailbox (checkoutspeedaudit@tvarkom.com) holds the notices of reports sent (store domain, time, status) and the alerts about failed scans and deliveries and about free reports confirmed on tvarkom.com, which name the store and the report email. We delete them 12 months after they arrive. It also holds the copies of reports sent before 6 November 2026, which we delete 12 months after they were sent.
 
 * Our other mailboxes hold copies of past waitlist sign-ups and enquiries, and the emails you send us. They have no automatic deletion: we keep these messages for as long as we need them to deal with your request and any follow-up, and longer only where the law requires it, for example for records of work we do for you.
 
