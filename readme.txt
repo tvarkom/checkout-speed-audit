@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.11.0
+Stable tag: 0.11.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,7 +34,7 @@ The scan runs on tvarkom's servers and loads your public pages like a visitor wo
 
 == External services ==
 
-This plugin uses the tvarkom audit service (https://tvarkom.com) to register your store and run scans. Nothing is sent to tvarkom until an administrator clicks **Send me the Report**, right under a list of what it sends and the line "By clicking “Send me the Report”, you agree to send this data to tvarkom and accept tvarkom's Terms of Use and Privacy Policy".
+This plugin uses the tvarkom audit service (https://tvarkom.com) to register your store and run scans. The plugin contacts tvarkom for the first time when an administrator clicks **Send me the Report**, right under a list of what it sends and the line "By clicking “Send me the Report”, you agree to send this data to tvarkom and accept tvarkom's Terms of Use and Privacy Policy". Before that click, nothing is sent and the plugin's page contacts nobody.
 
 **Registration** (first scan only): your store's home URL, the report email and the URL of the plugin's verification endpoint are sent to `https://api.tvarkom.com/v1/register`. tvarkom then calls `https://<your store>/wp-json/tvarkom/v1/verify` to confirm the request came from your store, and issues a free API key for your domain (`https://api.tvarkom.com/v1/register/verify`).
 
@@ -65,13 +65,15 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
 * Failed Action Scheduler tasks grouped by hook with their count and last error message (with emails, links, IP addresses and long numbers removed), and the hook names and times of tasks more than 15 minutes late (never their arguments)
 * The checkout profile: plugin, theme and hook names with their timings and call counts, database query shapes with every value replaced by `?`, the host names (not the full addresses) of outside services called while the checkout page loads, object cache hit and miss counts, peak memory and the page's server time
 
-The report is emailed to the report email, with a copy to tvarkom's report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, deleted after 12 months. tvarkom's database keeps no copy of it once it's sent (see the privacy policy for the mailbox, the short-lived working copy and backups).
+The report is emailed only to the report email. tvarkom keeps no copy: its report mailbox (checkoutspeedaudit@tvarkom.com) gets a short notice for each report sent, with the store's domain, the time and the status, never the report. Notices and alerts are deleted after 12 months (see the privacy policy for the mailbox, the short-lived working copy and backups).
 
 **Store profile**: tvarkom keeps the latest business context above (not the report) for your store, replaced by each scan, to understand which stores use the plugin. It's only ever used as totals across stores (for example how many stores per country or size), and it's deleted with your store's registration, at the latest 24 months after its last scan.
 
-**Next scan date and exchange rates**: the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), used for the euro ranges above.
+**Next scan date and exchange rates**: once your store is registered (after the first click), the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan, sending only your store's key. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), used for the euro ranges above.
 
-No customer names, emails or addresses, order contents or exact sales amounts are ever sent. The report is emailed only to the report email.
+The plugin doesn't read customers' names, emails or addresses or order contents for this, and sends sales only as ranges. Option, table, task and host names have email addresses, long numbers and identifiers replaced before they're sent, and campaign names that look like one count as "other".
+
+Uninstalling the plugin deletes its settings, key and table of daily totals from your store; records on tvarkom's side follow the retention periods in the privacy policy.
 
 Terms of use: https://plugins.svn.wordpress.org/tvarkom-checkout-speed-audit-for-woocommerce/trunk/legal/terms-of-use.txt
 
@@ -120,6 +122,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.11.1 =
+* Privacy: tvarkom no longer keeps a copy of your report (its mailbox gets only a sent notice); option, task, table and host names have email addresses, long numbers and identifiers masked before they're sent; campaign names that look personal count as "other". The privacy policy, this readme and the plugin page say exactly when the plugin contacts tvarkom.
 
 = 0.11.0 =
 * Your shop's funnel in the report: the plugin counts products added to the cart, checkouts opened and orders placed as daily totals on your server (no cookies, nothing about shoppers), and reads where orders came from with WooCommerce Order Attribution. The report shows the funnel once 7 days have been counted.

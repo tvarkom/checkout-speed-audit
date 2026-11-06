@@ -92,12 +92,13 @@ function tvarkom_csa_date( $time ) {
  */
 function tvarkom_csa_privacy_points() {
 	return array(
-		__( 'A copy of each report email goes to tvarkom\'s report mailbox (checkoutspeedaudit@tvarkom.com) for support and records, and is deleted after 12 months. Failed scans are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'tvarkom keeps no copy of your report: its report mailbox (checkoutspeedaudit@tvarkom.com) gets only a notice with the store, the time and the status, deleted after 12 months. Failed scans are deleted 15 days after they fail.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Each scan request (store, page addresses and time) is kept for 24 months. The email and IP address in it are erased after 90 days.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The report email is used only to send reports and answer support questions, never for marketing. It is deleted after 12 months without activity.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'Reports are emailed to the report email, with that copy to tvarkom. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Reports are emailed only to the report email. Nobody else receives them.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'The latest business context of your store is kept, replaced by each scan, only to count stores by country, size and so on. It is deleted with the store\'s registration, at the latest 24 months after its last scan.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'No customer is identified, and no order contents or exact sales amounts are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Customers\' names, emails and addresses and order contents aren\'t read for the audit, sales are sent only as ranges, and names of options, tasks and tables have emails, long numbers and identifiers masked.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'Before the first Send me the Report, the plugin contacts nobody. Uninstalling it deletes its settings and daily totals from this store; records on tvarkom\'s side follow the periods in its Privacy Policy.', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 	);
 }
 
@@ -163,7 +164,7 @@ function tvarkom_csa_render_scan_note() {
 			</div>
 			<div class="tcsa__never">
 				<dt><?php esc_html_e( 'Never sent', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dt>
-				<dd><?php esc_html_e( 'Customer names, emails or addresses, order details, exact sales amounts, option contents or task arguments.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
+				<dd><?php esc_html_e( 'Order details, exact sales amounts, option contents and task arguments. Customer records aren\'t read; error messages from failed tasks are stripped of emails, links, IP addresses and long numbers before they\'re sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></dd>
 			</div>
 		</dl>
 	</section>
@@ -179,7 +180,7 @@ function tvarkom_csa_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
-	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts, order counts, sales and average order value as euro ranges, new and returning customer counts, daily shop activity totals and order source counts, and a profile of one checkout page load. No customer is identified: no names, emails or addresses are sent.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
+	$content  = '<p>' . esc_html__( 'This site uses the Checkout Speed Audit plugin, by tvarkom. When an administrator clicks Send me the Report, the store\'s address, its cart and checkout page addresses and the report email are sent to tvarkom (MB TVARKOM SOFTWARE, Lithuania), with aggregate store data, such as software versions, database sizes, background task counts, order counts, sales and average order value as euro ranges, new and returning customer counts, daily shop activity totals and order source counts, and a profile of one checkout page load. Customers\' names, emails and addresses are not sent. The report is emailed only to the report email; tvarkom keeps a notice that it was sent, not the report.', 'tvarkom-checkout-speed-audit-for-woocommerce' ) . '</p>';
 	$content .= '<ul>';
 	foreach ( tvarkom_csa_privacy_points() as $point ) {
 		$content .= '<li>' . esc_html( $point ) . '</li>';
