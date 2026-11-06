@@ -67,7 +67,9 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
 
 The report is emailed only to the report email. tvarkom keeps no copy: its report mailbox (checkoutspeedaudit@tvarkom.com) gets a short notice for each report sent, with the store's domain, the time and the status, never the report. Notices and alerts are deleted after 12 months (see the privacy policy for the mailbox, the short-lived working copy and backups).
 
-**Store profile**: tvarkom keeps the latest business context above (not the report) for your store, replaced by each scan, to understand which stores use the plugin. It's only ever used as totals across stores (for example how many stores per country or size), and it's deleted with your store's registration, at the latest 24 months after its last scan.
+**Audit history**: we retain audit results linked to your store for support and comparison over time. For each report sent, tvarkom keeps the score and risk level, which scoring rules and fix plan items applied (as short identifiers), the response times, page weight and number of files, the autoloaded options size, the PHP version and object cache type, the days left on the HTTPS certificate, and whether SPF and DMARC records were found; never the report, its text, the report email, or option, table, task or hook names. The results aren't anonymous: they're linked to your store through its audit request. They're used to answer you about your reports and, across stores, to improve the scanner, and are deleted 12 months after each scan, or sooner on request.
+
+**Store profile**: tvarkom keeps the latest business context above (not the report) for your store, replaced by each scan. It's used as totals across stores (for example how many stores per country or size) and to support your store when you contact tvarkom, and it's deleted with your store's registration, at the latest 24 months after its last scan.
 
 **Next scan date and exchange rates**: once your store is registered (after the first click), the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan, sending only your store's key. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), used for the euro ranges above.
 
@@ -77,7 +79,7 @@ Uninstalling the plugin deletes its settings, key and table of daily totals from
 
 Terms of use: https://plugins.svn.wordpress.org/tvarkom-checkout-speed-audit-for-woocommerce/trunk/legal/terms-of-use.txt
 
-Privacy policy: https://plugins.svn.wordpress.org/tvarkom-checkout-speed-audit-for-woocommerce/trunk/legal/privacy-policy.txt
+Privacy policy: https://tvarkom.com/privacy/
 
 Both ship with the plugin in its `legal` folder. The plugin page links to them before you run a scan, with a short privacy summary, and the plugin suggests text for your own privacy policy under **Settings → Privacy**.
 
@@ -125,6 +127,7 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 
 = 0.11.1 =
 * Privacy: tvarkom no longer keeps a copy of your report (its mailbox gets only a sent notice); option, task, table and host names have email addresses, long numbers and identifiers masked before they're sent; campaign names that look personal count as "other". The privacy policy, this readme and the plugin page say exactly when the plugin contacts tvarkom.
+* Privacy: tvarkom now keeps each scan's results (score, findings and measurements, never the report text or email) linked to your store for 12 months, for support and comparing results over time. The privacy policy is also published at https://tvarkom.com/privacy/.
 
 = 0.11.0 =
 * Your shop's funnel in the report: the plugin counts products added to the cart, checkouts opened and orders placed as daily totals on your server (no cookies, nothing about shoppers), and reads where orders came from with WooCommerce Order Attribution. The report shows the funnel once 7 days have been counted.

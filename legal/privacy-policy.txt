@@ -33,15 +33,18 @@ What a report contains. Your store's address, the health score and risk level, t
 
 One report a week. Each store can request one free report per week. We use the store's audit requests to apply this.
 
-Where your report goes. We email it to the report email only. We keep no copy of it: our report mailbox (checkoutspeedaudit@tvarkom.com) gets a short notice for each report sent, with your store's domain, the time and whether it was sent, so we have a record of our deliveries; the notice never contains the report, its findings or the report email. Our database keeps no copy of the report or of the store data once it's sent. Until 6 November 2026 the report mailbox received a copy of each report; those copies are deleted 12 months after they were sent.
+Where your report goes. We email it to the report email only. We keep no copy of it: our report mailbox (checkoutspeedaudit@tvarkom.com) gets a short notice for each report sent, with your store's domain, the time and whether it was sent, so we have a record of our deliveries; the notice never contains the report, its findings or the report email. Our database keeps no copy of the report or of the store data once it's sent; it keeps the audit results described below. Until 6 November 2026 the report mailbox received a copy of each report; those copies are deleted 12 months after they were sent.
 
-Your store's profile. We keep the latest business context of each store (not the report, the store data or the checkout profile), replaced by each new report request, to understand which stores use the plugin: we only ever look at it as totals across stores, for example how many stores per country, size or checkout type, never store by store.
+Your audit history. We retain audit results linked to your store for support and comparison over time. For each report sent we keep: the health score and risk level; which scoring rules and fix plan items applied, as short identifiers; the server, cart and checkout response times; page weight and number of files; the autoloaded options size; the PHP version and object cache type; the days left on your HTTPS certificate; and whether SPF and DMARC records were found. We don't keep the report, its text, the report email, option, table, task or hook names, or error messages. These results are not anonymous: they are linked to your store through its audit request, which holds the report email and IP address until those are erased after 90 days. We use them to answer you about your reports and how your store's results change over time, and, across stores, to improve our scanner and its recommendations. We keep them for 12 months after each audit, a period we'll review against how useful they turn out to be, and delete them sooner on request.
+
+Your store's profile. We keep the latest business context of each store (not the report, the store data or the checkout profile), replaced by each new report request. We use it as totals across stores, for example how many stores per country, size or checkout type, to understand which stores use the plugin, and to support your store when you contact us.
 
 Legal basis (Art. 6 GDPR), by purpose:
 * Registering your store, scanning it and emailing the report you ask for: providing the service you request (Art. 6(1)(b)).
 * The report email address when it belongs to someone other than the store's owner, such as an employee or an agency: our legitimate interest in delivering the report the store asked for to the person it chose (Art. 6(1)(f)).
-* The store profile and its statistics; the IP address, audit requests and limits; the notices and alerts in our mailboxes: our legitimate interests in understanding who uses our free plugin, preventing abuse of it, and keeping a record of what we sent and what went wrong (Art. 6(1)(f)).
-You can object at any time: email privacy@tvarkom.com and we'll delete your store's profile, or stop running scans or uninstall the plugin, and nothing more is sent.
+* The audit history: our legitimate interests in supporting your store, comparing its results over time, and improving our scanner and recommendations (Art. 6(1)(f)).
+* The store profile and its statistics; the IP address, audit requests and limits; the notices and alerts in our mailboxes: our legitimate interests in understanding who uses our free plugin, supporting stores that contact us, preventing abuse of the plugin, and keeping a record of what we sent and what went wrong (Art. 6(1)(f)).
+You can object at any time: email privacy@tvarkom.com and we'll delete your store's audit history and profile, or stop running scans or uninstall the plugin, and nothing more is sent.
 
 Uninstalling the plugin deletes everything it keeps on your store: its settings, its key and the table of daily totals. Records already on our side follow the periods in "How long we keep it" below, or are deleted sooner on request.
 
@@ -93,13 +96,15 @@ These periods are applied automatically by our software:
 
 * Plugin registrations (store and the latest report email): the email is deleted after 12 months without activity, and the registration 24 months after the store's last audit. Activity means a successful audit, a registration or a reconnection.
 
+* Audit results (the audit history): 12 months after each audit, or sooner on request. They're also deleted with their audit request.
+
 * Store profiles: replaced by each report request, and deleted with the store's registration (at the latest 24 months after its last audit), or sooner on request.
 
 * Exchange rates: only the latest day's.
 
 Mailboxes and other copies:
 
-* Our report mailbox (checkoutspeedaudit@tvarkom.com) holds the notices of reports sent (store domain, time, status) and the alerts about failed scans and deliveries, which name the store and the report email. A rule in the mailbox deletes them 12 months after they arrive. It also holds the copies of reports sent before 6 November 2026, which the same rule deletes 12 months after they were sent.
+* Our report mailbox (checkoutspeedaudit@tvarkom.com) holds the notices of reports sent (store domain, time, status) and the alerts about failed scans and deliveries, which name the store and the report email. We delete them 12 months after they arrive. It also holds the copies of reports sent before 6 November 2026, which we delete 12 months after they were sent.
 
 * Our other mailboxes hold copies of past waitlist sign-ups and enquiries, and the emails you send us. They have no automatic deletion: we keep these messages for as long as we need them to deal with your request and any follow-up, and longer only where the law requires it, for example for records of work we do for you.
 
@@ -121,4 +126,4 @@ You can also complain to the Lithuanian supervisory authority, the State Data Pr
 Changes
 -------
 
-If we change how we handle your data, we'll update this file and the date at the top, and ship the new version with the plugin.
+This policy is published at https://tvarkom.com/privacy/ and shipped with the plugin. If we change how we handle your data, we'll update both and the date at the top.
