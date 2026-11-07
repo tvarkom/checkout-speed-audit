@@ -125,7 +125,8 @@ class Tvarkom_CSA_Business_Test extends Tvarkom_CSA_Test_Case {
 		$metrics = $this->requests[1]['body']['metrics'];
 		$this->assertSame( 3, $metrics['schema'] );
 		$this->assertSame( 'USD', $metrics['currency'] );
-		$this->assertSame( 2000.0, $metrics['sales_30d'] );
-		$this->assertSame( 2000.0, $metrics['aov_30d'] );
+		// The request body went through JSON: 2000.0 comes back as the number 2000.
+		$this->assertEquals( 2000, $metrics['sales_30d'] );
+		$this->assertEquals( 2000, $metrics['aov_30d'] );
 	}
 }
