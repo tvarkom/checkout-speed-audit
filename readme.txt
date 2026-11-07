@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.11.2
+Stable tag: 0.12.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,7 +50,7 @@ This plugin uses the tvarkom audit service (https://tvarkom.com) to register you
 * Your store's business context, so the report can explain findings in business terms:
   * country and currency from your WooCommerce settings
   * the number of paid and on-hold orders in the last 30 days, and of failed, pending and cancelled orders
-  * gross sales in the last 30 days and the average order value, as euro ranges only (for example €5,000–25,000). The plugin converts them on your store with the European Central Bank's daily rates, which it gets from tvarkom; the amounts themselves are never sent
+  * gross sales in the last 30 days and the average order value, in your store's currency, so the report can show them as they are. tvarkom uses them only to write your report and never stores them
   * how many customers in the last 30 days were new and how many returning, as two counts from WooCommerce Analytics (no customer is identified)
   * the number of published products and variations, and whether stock management is on
   * the IDs of the enabled payment gateways and shipping methods (for example `stripe`, `flat_rate`), never their settings or keys
@@ -69,11 +69,11 @@ The report is emailed only to the report email. tvarkom keeps no copy: its repor
 
 **Audit history**: we retain audit results linked to your store for support and comparison over time. For each report sent, tvarkom keeps the score and risk level, which scoring rules and fix plan items applied (as short identifiers), the response times, page weight and number of files, the autoloaded options size, the PHP version and object cache type, the days left on the HTTPS certificate, and whether SPF and DMARC records were found; never the report, its text, the report email, or option, table, task or hook names. The results aren't anonymous: they're linked to your store through its audit request. They're used to answer you about your reports and, across stores, to improve the scanner, and are deleted 12 months after each scan, or sooner on request.
 
-**Store profile**: tvarkom keeps the latest business context above (not the report) for your store, replaced by each scan. It's used as totals across stores (for example how many stores per country or size) and to support your store when you contact tvarkom, and it's deleted with your store's registration, at the latest 24 months after its last scan.
+**Store profile**: tvarkom keeps the latest business context above (not the report, and no sales amount) for your store, replaced by each scan. It's used as totals across stores (for example how many stores per country or size) and to support your store when you contact tvarkom, and it's deleted with your store's registration, at the latest 24 months after its last scan.
 
-**Next scan date and exchange rates**: once your store is registered (after the first click), the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan, sending only your store's key. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), used for the euro ranges above.
+**Next scan date and exchange rates**: once your store is registered (after the first click), the plugin asks `https://api.tvarkom.com/v1/client` when your store may scan again, each time you open its page and before each scan, sending only your store's key. The answer also carries the European Central Bank's daily euro rates (fetched by tvarkom, not by your store), which versions before 0.12.0 used.
 
-The plugin doesn't read customers' names, emails or addresses or order contents for this, and sends sales only as ranges. Option, table, task and host names have email addresses, long numbers and identifiers replaced before they're sent, and campaign names that look like one count as "other".
+The plugin doesn't read customers' names, emails or addresses or order contents for this, and sends sales only as the two 30-day totals above, which tvarkom doesn't store. Option, table, task and host names have email addresses, long numbers and identifiers replaced before they're sent, and campaign names that look like one count as "other".
 
 Uninstalling the plugin deletes its settings, key and table of daily totals from your store; records on tvarkom's side follow the retention periods in the privacy policy.
 
@@ -124,6 +124,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.12.0 =
+* Your report now shows gross sales and average order value as they are, in your store's currency and your country's number format (for example R$ 1.234,56), instead of converted euro ranges. tvarkom uses them only to write your report and never stores them; the privacy policy says so.
 
 = 0.11.2 =
 * Privacy policy: covers the free report you can now request on tvarkom.com without the plugin (confirmation by email, limits, and contact only if you agree). Nothing changes in the plugin.

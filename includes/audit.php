@@ -58,7 +58,7 @@ function tvarkom_csa_run_audit() {
 		);
 		return 'too_soon';
 	}
-	$body['metrics']  = tvarkom_csa_collect_metrics( is_array( $status ) && isset( $status['eur_rates'] ) && is_array( $status['eur_rates'] ) ? $status['eur_rates'] : null );
+	$body['metrics']  = tvarkom_csa_collect_metrics();
 	$body['detailed'] = tvarkom_csa_collect_detailed();
 
 	$response = tvarkom_csa_post( '/v1/audits', $body, $settings['api_key'] );

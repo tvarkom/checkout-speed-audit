@@ -1,10 +1,11 @@
 <?php
 /**
- * Business context for the audit (metrics schema 2): what kind of store this is, so the report
- * can put the technical findings in business terms. Aggregates only: counts, euro ranges, codes
- * and component names. No customer names, emails or addresses, no order contents and no exact
- * sales amounts leave the store: sales are converted to euros here, with the European Central
- * Bank's rates from the gateway, and only the range is sent.
+ * Business context for the audit (metrics schema 3): what kind of store this is, so the report
+ * can put the technical findings in business terms. Aggregates only: counts, codes, component
+ * names, and the last 30 days' gross sales and average order value in the store's own currency
+ * (founder decision of 7 Nov 2026, replacing the euro ranges of schema 2), which tvarkom uses only
+ * to write the report and doesn't keep. No customer names, emails or addresses and no order
+ * contents leave the store.
  *
  * Every value is read with WooCommerce or WordPress functions, or one aggregate query on an
  * indexed column; nothing runs in the background and nothing is written.
@@ -15,29 +16,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-/**
- * Gross sales ranges in euros, last 30 days: upper bound => range sent.
- */
-const TVARKOM_CSA_SALES_RANGES = array(
-	1000    => '0-1000',
-	5000    => '1000-5000',
-	25000   => '5000-25000',
-	100000  => '25000-100000',
-	500000  => '100000-500000',
-	1000000 => '500000-1000000',
-);
-
-/**
- * Average order value ranges in euros: upper bound => range sent.
- */
-const TVARKOM_CSA_AOV_RANGES = array(
-	25  => '0-25',
-	50  => '25-50',
-	100 => '50-100',
-	250 => '100-250',
-	500 => '250-500',
-);
 
 /**
  * Known backup plugins (main file => name), for "backup plugin active". Hosting companies' own
@@ -63,15 +41,13 @@ const TVARKOM_CSA_BACKUP_PLUGINS = array(
 );
 
 /**
- * The business fields of metrics schema 2 (the gateway's README, "Metrics schema 2").
+ * The business fields of metrics schema 3 (the gateway's README, "Metrics schema 3").
  *
- * @param array<string, mixed>|null $eur_rates The gateway's euro rates ({date, rates}), or null.
  * @return array<string, mixed>
  */
-function tvarkom_csa_collect_business( $eur_rates ) {
+function tvarkom_csa_collect_business() {
 	$currency = get_woocommerce_currency();
 	$sales    = tvarkom_csa_sales_30d( $currency );
-	$rate     = tvarkom_csa_eur_rate( $eur_rates, $currency );
 	$returns  = tvarkom_csa_new_vs_returning_30d();
 
 	return array(
@@ -81,8 +57,8 @@ function tvarkom_csa_collect_business( $eur_rates ) {
 		'orders_failed_30d'           => tvarkom_csa_orders_30d( array( 'failed' ) ),
 		'orders_pending_30d'          => tvarkom_csa_orders_30d( array( 'pending' ) ),
 		'orders_cancelled_30d'        => tvarkom_csa_orders_30d( array( 'cancelled' ) ),
-		'sales_30d_range'             => tvarkom_csa_euro_range( $sales['total'], $rate, TVARKOM_CSA_SALES_RANGES, '1000000+' ),
-		'aov_range'                   => $sales['orders'] > 0 ? tvarkom_csa_euro_range( $sales['total'] / $sales['orders'], $rate, TVARKOM_CSA_AOV_RANGES, '500+' ) : null,
+		'sales_30d'                   => round( $sales['total'], 2 ),
+		'aov_30d'                     => $sales['orders'] > 0 ? round( $sales['total'] / $sales['orders'], 2 ) : null,
 		'customers_new_30d'           => $returns['new'],
 		'customers_returning_30d'     => $returns['returning'],
 		'products'                    => tvarkom_csa_published_count( 'product' ),
@@ -197,44 +173,6 @@ function tvarkom_csa_sales_30d( $currency ) {
 		'total'  => $row ? (float) $row->total : 0.0,
 		'orders' => $row ? (int) $row->orders : 0,
 	);
-}
-
-/**
- * Units of the store's currency per euro, from the gateway's ECB rates; 0 when there is no rate.
- *
- * @param array<string, mixed>|null $eur_rates The gateway's euro rates, or null.
- * @param string                    $currency  The store's currency.
- * @return float
- */
-function tvarkom_csa_eur_rate( $eur_rates, $currency ) {
-	if ( ! is_array( $eur_rates ) || ! isset( $eur_rates['rates'] ) || ! is_array( $eur_rates['rates'] ) ) {
-		return 0.0;
-	}
-	$rate = $eur_rates['rates'][ strtoupper( $currency ) ] ?? null;
-	return is_numeric( $rate ) && (float) $rate > 0 ? (float) $rate : 0.0;
-}
-
-/**
- * The euro range of an amount in the store's currency: "unsupported_currency" when the ECB has no
- * rate for it.
- *
- * @param float              $amount In the store's currency.
- * @param float              $rate   Units of the store's currency per euro, or 0.
- * @param array<int, string> $ranges Upper bound in euros => range, ascending.
- * @param string             $top    The range above the last bound.
- * @return string
- */
-function tvarkom_csa_euro_range( $amount, $rate, array $ranges, $top ) {
-	if ( $rate <= 0 ) {
-		return 'unsupported_currency';
-	}
-	$euros = $amount / $rate;
-	foreach ( $ranges as $below => $range ) {
-		if ( $euros < $below ) {
-			return $range;
-		}
-	}
-	return $top;
 }
 
 /**

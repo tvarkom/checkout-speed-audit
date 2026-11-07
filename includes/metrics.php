@@ -1,8 +1,8 @@
 <?php
 /**
- * Store metrics for the audit (schema 2): the technical ones here, and the business context
- * from includes/business.php. Only aggregate counts, sizes, ranges and settings: no customer
- * data, no order contents, no exact revenue. Every query is a COUNT/SUM on an indexed column
+ * Store metrics for the audit (schema 3): the technical ones here, and the business context
+ * from includes/business.php. Only aggregate counts, sizes, settings and the 30-day sales totals
+ * (in the store's currency, for the report only): no customer data, no order contents. Every query is a COUNT/SUM on an indexed column
  * or a read of the table sizes MySQL already keeps, so it's light even on shared hosting.
  *
  * @package CheckoutSpeedAudit
@@ -13,19 +13,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Collects the metrics sent with an audit. Schema 2 keeps every schema 1 field (the audit tool
- * reads them) and adds the business fields.
+ * Collects the metrics sent with an audit. Schema 3 keeps every schema 1 field (the audit tool
+ * reads them) and adds the business fields, with sales in the store's currency (schema 2 sent
+ * euro ranges).
  *
- * @param array<string, mixed>|null $eur_rates The gateway's euro rates (GET /v1/client), or null.
  * @return array<string, mixed>
  */
-function tvarkom_csa_collect_metrics( $eur_rates = null ) {
+function tvarkom_csa_collect_metrics() {
 	$sizes     = tvarkom_csa_table_sizes();
 	$scheduler = tvarkom_csa_scheduler_counts();
 	$cron      = tvarkom_csa_cron_overdue_seconds();
 
 	$technical = array(
-		'schema'                      => 2,
+		'schema'                      => 3,
 		'php_version'                 => PHP_VERSION,
 		'wordpress_version'           => get_bloginfo( 'version' ),
 		'woocommerce_version'         => defined( 'WC_VERSION' ) ? WC_VERSION : null,
@@ -43,7 +43,7 @@ function tvarkom_csa_collect_metrics( $eur_rates = null ) {
 		'cron_oldest_overdue_seconds' => $cron,
 		'order_tier'                  => tvarkom_csa_order_tier(),
 	);
-	return array_merge( $technical, tvarkom_csa_collect_business( $eur_rates ) );
+	return array_merge( $technical, tvarkom_csa_collect_business() );
 }
 
 /**
