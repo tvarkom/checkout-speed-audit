@@ -219,6 +219,10 @@ function tvarkom_csa_render_page() {
 		$notice = 'server';
 	}
 	$status = '' !== $settings['api_key'] ? tvarkom_csa_status( '', 5 ) : null;
+	// First visit (no report requested yet): a welcome with a button to the form. Reaching this
+	// page also ends the activation notice (includes/onboarding.php).
+	$first_audit = tvarkom_csa_first_audit_pending() && '' === $notice;
+	delete_option( TVARKOM_CSA_ONBOARDING );
 	// One scan a week: until the next one is possible, say when (next to the last result) and
 	// disable the Full Scan button.
 	$next_scan = tvarkom_csa_next_scan_at( $status );
@@ -228,7 +232,7 @@ function tvarkom_csa_render_page() {
 		__( 'Database and PHP setup', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'Background tasks and WP-Cron', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 		__( 'A profile of your checkout', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
-		__( 'A fix plan with estimated hours', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
+		__( 'An action plan, most urgent first', 'tvarkom-checkout-speed-audit-for-woocommerce' ),
 	);
 	?>
 	<div class="wrap tcsa">
@@ -243,12 +247,19 @@ function tvarkom_csa_render_page() {
 
 			<h1 class="tcsa__title"><?php esc_html_e( 'Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h1>
 			<p class="tcsa__eyebrow"><?php esc_html_e( 'For WooCommerce', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+			<?php if ( $first_audit ) : ?>
+				<h2 class="tcsa__h2 tcsa__welcome"><?php esc_html_e( 'Check your WooCommerce checkout health', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h2>
+				<p class="tcsa__lead"><?php esc_html_e( 'Find potential checkout performance issues and understand what may be affecting your customers.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
+			<?php endif; ?>
 			<p class="tcsa__lead"><?php esc_html_e( 'Find out what slows your store down before it costs you sales. Checkout Speed Audit scores your store from 0 to 100 and emails you a PDF report with what to fix first.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 			<ul class="tcsa__covers">
 				<?php foreach ( $covers as $cover ) : ?>
 					<li><?php echo esc_html( $cover ); ?></li>
 				<?php endforeach; ?>
 			</ul>
+			<?php if ( $first_audit ) : ?>
+				<p class="tcsa__actions"><a class="tcsa__btn tcsa__btn--primary" href="#tcsa-settings-title"><?php esc_html_e( 'Run Your Free Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></a></p>
+			<?php endif; ?>
 			<p class="tcsa__meta"><?php esc_html_e( 'The scan runs on our servers and loads your public pages like a visitor would. Nothing on your store changes, apart from a small table of daily shop totals. One report per week.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 
 			<form id="tvarkom-csa-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Checkout Speed Audit
  * Description:       A free store health report from tvarkom, emailed as a PDF: server and checkout speed, caching, your database, PHP setup, background tasks and a checkout profile. New: findings explained with your store's business context (orders, sales ranges, catalog, payments and shipping), and checks of your HTTPS certificate and email setup (SPF, DMARC).
- * Version:           0.12.0
+ * Version:           0.12.1
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TVARKOM_CSA_VERSION', '0.12.0' );
+define( 'TVARKOM_CSA_VERSION', '0.12.1' );
 define( 'TVARKOM_CSA_OPTION', 'tvarkom_csa' );
 define( 'TVARKOM_CSA_TOKEN', 'tvarkom_csa_verify_token' );
 define( 'TVARKOM_CSA_ACTION', 'tvarkom_csa_run_audit' );
@@ -46,6 +46,7 @@ require_once __DIR__ . '/includes/profile.php';
 require_once __DIR__ . '/includes/profile-report.php';
 require_once __DIR__ . '/includes/profile-request.php';
 require_once __DIR__ . '/includes/admin.php';
+require_once __DIR__ . '/includes/onboarding.php';
 
 // Every hook the plugin registers when it loads. The profiler registers its own hooks, and
 // only on the audit job's own checkout request (includes/profile.php).
@@ -56,6 +57,14 @@ add_action( 'admin_menu', 'tvarkom_csa_admin_menu', 99 );
 add_action( 'admin_post_tvarkom_csa_form', 'tvarkom_csa_handle_form' );
 add_action( 'admin_enqueue_scripts', 'tvarkom_csa_admin_scripts' );
 add_action( 'admin_init', 'tvarkom_csa_privacy_policy_content' );
+
+// First-audit onboarding (includes/onboarding.php): a dismissible notice after activation and a
+// link on the Plugins screen, both leading to the admin page. Neither contacts tvarkom.
+register_activation_hook( __FILE__, 'tvarkom_csa_onboarding_activate' );
+add_action( 'admin_notices', 'tvarkom_csa_onboarding_notice' );
+add_action( 'admin_enqueue_scripts', 'tvarkom_csa_onboarding_script' );
+add_action( 'wp_ajax_tvarkom_csa_dismiss_onboarding', 'tvarkom_csa_dismiss_onboarding' );
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'tvarkom_csa_plugin_action_links' );
 
 // Funnel counters (includes/funnel.php): the table on activation, or on the first admin page
 // after an update; daily totals of add-to-cart, checkout loads and orders.

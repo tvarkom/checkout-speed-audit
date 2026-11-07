@@ -16,6 +16,7 @@ class Tvarkom_CSA_Uninstall_Test extends Tvarkom_CSA_Test_Case {
 		tvarkom_csa_funnel_install();
 		update_option( 'tvarkom_csa_local_profile', array( 'total_ms' => 1 ) );
 		update_option( 'tvarkom_csa_monitor_seen', 41 );
+		update_option( TVARKOM_CSA_ONBOARDING, 1 );
 		tvarkom_csa_audit_lock();
 		set_transient( TVARKOM_CSA_TOKEN, 'tok_1', MINUTE_IN_SECONDS );
 		set_transient( 'tvarkom_csa_status', array( 'plan' => 'free' ), MINUTE_IN_SECONDS );
@@ -28,6 +29,7 @@ class Tvarkom_CSA_Uninstall_Test extends Tvarkom_CSA_Test_Case {
 		$this->assertFalse( get_option( TVARKOM_CSA_OPTION ) );
 		$this->assertFalse( get_option( 'tvarkom_csa_local_profile' ) );
 		$this->assertFalse( get_option( 'tvarkom_csa_monitor_seen' ) );
+		$this->assertFalse( get_option( TVARKOM_CSA_ONBOARDING ) );
 		$this->assertFalse( $this->lock_is_held() );
 		$this->assertFalse( get_transient( TVARKOM_CSA_TOKEN ) );
 		$this->assertFalse( get_transient( 'tvarkom_csa_status' ) );

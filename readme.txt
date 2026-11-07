@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.12.0
+Stable tag: 0.12.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,7 +86,7 @@ Both ship with the plugin in its `legal` folder. The plugin page links to them b
 == Installation ==
 
 1. Install from **Plugins → Add New**: search for "Checkout Speed Audit", or upload the plugin zip. WooCommerce must be installed and active.
-2. Activate the plugin.
+2. Activate the plugin. A notice offers **Run Your Free Audit**; the Plugins screen has the same link.
 3. Go to **WooCommerce → Checkout Speed Audit**, check the report email, and click **Send me the Report**. The first scan registers your store with tvarkom; the report arrives by email within a few minutes.
 
 == Frequently Asked Questions ==
@@ -124,6 +124,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.12.1 =
+* Easier first audit: after activation a dismissible notice and a link on the Plugins screen lead to the audit page, which welcomes first-time users with a Run Your Free Audit button. Nothing is sent until you click Send me the Report, as before. The page no longer mentions estimated hours, which reports dropped.
 
 = 0.12.0 =
 * Your report now shows gross sales and average order value as they are, in your store's currency and your country's number format (for example R$ 1.234,56), instead of converted euro ranges. tvarkom uses them only to write your report and never stores them; the privacy policy says so.
