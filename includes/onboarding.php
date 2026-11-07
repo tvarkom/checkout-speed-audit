@@ -69,7 +69,7 @@ function tvarkom_csa_onboarding_notice() {
 	}
 	?>
 	<div class="notice notice-info is-dismissible tvarkom-csa-onboarding" data-nonce="<?php echo esc_attr( wp_create_nonce( 'tvarkom_csa_dismiss_onboarding' ) ); ?>">
-		<h2><?php esc_html_e( 'Check your WooCommerce checkout health', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h2>
+		<h2><?php esc_html_e( 'Run your Checkout Speed Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></h2>
 		<p><?php esc_html_e( 'Find potential checkout performance issues and understand what may be affecting your customers.', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></p>
 		<p><a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=tvarkom-csa' ) ); ?>"><?php esc_html_e( 'Run Your Free Audit', 'tvarkom-checkout-speed-audit-for-woocommerce' ); ?></a></p>
 	</div>

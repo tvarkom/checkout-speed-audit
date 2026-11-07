@@ -4,7 +4,7 @@ Tags: woocommerce, performance, speed, audit, database
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.12.1
+Stable tag: 0.12.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,9 @@ Use the plugin's support forum on WordPress.org, or email support@tvarkom.com.
 1. The Checkout Speed Audit page: the report email, what is sent, and the **Send me the Report** button.
 
 == Changelog ==
+
+= 0.12.2 =
+* The activation notice's title now reads Run your Checkout Speed Audit.
 
 = 0.12.1 =
 * Easier first audit: after activation a dismissible notice and a link on the Plugins screen lead to the audit page, which welcomes first-time users with a Run Your Free Audit button. Nothing is sent until you click Send me the Report, as before. The page no longer mentions estimated hours, which reports dropped.

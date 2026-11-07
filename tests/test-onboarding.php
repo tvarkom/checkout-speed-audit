@@ -78,7 +78,7 @@ class Tvarkom_CSA_Onboarding_Test extends Tvarkom_CSA_Test_Case {
 		$this->sign_in_shop_manager();
 
 		$html = $this->notice_on( 'dashboard' );
-		$this->assertStringContainsString( 'Check your WooCommerce checkout health', $html );
+		$this->assertStringContainsString( '<h2>Run your Checkout Speed Audit</h2>', $html );
 		$this->assertStringContainsString( 'Find potential checkout performance issues and understand what may be affecting your customers.', $html );
 		$this->assertStringContainsString( 'Run Your Free Audit', $html );
 		$this->assertStringContainsString( esc_url( admin_url( 'admin.php?page=tvarkom-csa' ) ), $html );
